@@ -161,7 +161,7 @@
                                 <th>Total</th>
                                 <td>${{ $order->total }}</td>
                                 <th>Payment Mode</th>
-                                <td>{{ $order->mode }}</td>
+                                <td>{{ $order->transaction->mode }}</td>
                                 <th>Status</th>
                                 <td>
                                     @if ($transaction->status == 'approved')

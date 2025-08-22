@@ -50,13 +50,23 @@
                         </div>
                     </div>
                     <div class="center">
+                       
                         <div class="center-item">
-                            <div class="center-heading">Main Home</div>
+                             <ul class="menu-list">
+                                <li class="menu-item">
+                                    <a href="{{ route('home.index') }}" class="">
+                                        <div class="icon"><i class="icon-arrow-left"></i></div>
+                                        <div class="text">Kembali</div>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="center-heading">Daftar Fitur Admin</div>
+                           
                             <ul class="menu-list">
                                 <li class="menu-item">
                                     <a href="{{ route('admin.index') }}" class="">
                                         <div class="icon"><i class="icon-grid"></i></div>
-                                        <div class="text">Dashboard</div>
+                                        <div class="text">Menu Utama</div>
                                     </a>
                                 </li>
                             </ul>
@@ -66,17 +76,17 @@
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
                                         <div class="icon"><i class="icon-shopping-cart"></i></div>
-                                        <div class="text">Products</div>
+                                        <div class="text">Produk</div>
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.product.add') }}" class="">
-                                                <div class="text">Add Product</div>
+                                                <div class="text">Tambah Produk</div>
                                             </a>
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.products') }}" class="">
-                                                <div class="text">Products</div>
+                                                <div class="text">Daftar Produk</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -84,17 +94,17 @@
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
                                         <div class="icon"><i class="icon-layers"></i></div>
-                                        <div class="text">Brand</div>
+                                        <div class="text">Merek</div>
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.brand.add') }}" class="">
-                                                <div class="text">New Brand</div>
+                                                <div class="text">Tambah Merek</div>
                                             </a>
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.brands') }}" class="">
-                                                <div class="text">Brands</div>
+                                                <div class="text">Tambah Merek</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -102,17 +112,17 @@
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
                                         <div class="icon"><i class="icon-layers"></i></div>
-                                        <div class="text">Category</div>
+                                        <div class="text">Kategori</div>
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.category.add') }}" class="">
-                                                <div class="text">New Category</div>
+                                                <div class="text">Tambah Kategori</div>
                                             </a>
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.categories') }}" class="">
-                                                <div class="text">Categories</div>
+                                                <div class="text">Daftar Kategori</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -121,17 +131,17 @@
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
                                         <div class="icon"><i class="icon-file-plus"></i></div>
-                                        <div class="text">Order</div>
+                                        <div class="text">Pesanan</div>
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.orders') }}" class="">
-                                                <div class="text">Orders</div>
+                                                <div class="text">Daftar Pesanan</div>
                                             </a>
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="order-tracking.html" class="">
-                                                <div class="text">Order tracking</div>
+                                                <div class="text">Lacak Pesanan</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -145,26 +155,26 @@
                                 <li class="menu-item">
                                     <a href="{{ route('admin.coupons') }}" class="">
                                         <div class="icon"><i class="icon-grid"></i></div>
-                                        <div class="text">Coupns</div>
+                                        <div class="text">Kupon Diskon</div>
                                     </a>
                                 </li>
                                 <li class="menu-item">
                                     <a href="{{ route('admin.contacts') }}" class="">
                                         <div class="icon"><i class="icon-mail"></i></div>
-                                        <div class="text">Message</div>
+                                        <div class="text">Pesan</div>
                                     </a>
                                 </li>
                                 <li class="menu-item">
                                     <a href="users.html" class="">
                                         <div class="icon"><i class="icon-user"></i></div>
-                                        <div class="text">User</div>
+                                        <div class="text">Pengguna</div>
                                     </a>
                                 </li>
 
                                 <li class="menu-item">
                                     <a href="settings.html" class="">
                                         <div class="icon"><i class="icon-settings"></i></div>
-                                        <div class="text">Settings</div>
+                                        <div class="text">Pengaturan</div>
                                     </a>
                                 </li>
 
