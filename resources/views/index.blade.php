@@ -2,7 +2,8 @@
 @section('content')
     <main>
 
-        <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow"
+    @if (isset($slides) && !$slides->isEmpty())
+    <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow"
             data-settings='{
         "autoplay": {
           "delay": 5000
@@ -49,80 +50,47 @@
                 </div>
             </div>
         </section>
+    @endif
+
         <div class="container mw-1620 bg-white border-radius-10">
             <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-            <section class="category-carousel container">
-                <h2 class="section-title text-center mb-3 pb-xl-2 mb-xl-4">Mungkin Kamu Suka</h2>
-
-                <div class="position-relative">
-                    <div class="swiper-container js-swiper-slider"
-                        data-settings='{
-                                        "autoplay": {
-                                            "delay": 5000
-                                        },
-                                        "slidesPerView": 8,
-                                        "slidesPerGroup": 1,
-                                        "effect": "none",
-                                        "loop": true,
-                                        "navigation": {
-                                            "nextEl": ".products-carousel__next-1",
-                                            "prevEl": ".products-carousel__prev-1"
-                                        },
-                                        "breakpoints": {
-                                            "320": {
-                                            "slidesPerView": 2,
-                                            "slidesPerGroup": 2,
-                                            "spaceBetween": 15
-                                            },
-                                            "768": {
-                                            "slidesPerView": 4,
-                                            "slidesPerGroup": 4,
-                                            "spaceBetween": 30
-                                            },
-                                            "992": {
-                                            "slidesPerView": 6,
-                                            "slidesPerGroup": 1,
-                                            "spaceBetween": 45,
-                                            "pagination": false
-                                            },
-                                            "1200": {
-                                            "slidesPerView": 8,
-                                            "slidesPerGroup": 1,
-                                            "spaceBetween": 60,
-                                            "pagination": false
-                                            }
-                                        }
-                                        }'>
-                        <div class="swiper-wrapper">
-                            @foreach ($categories as $category)
-                                <div class="swiper-slide">
-                                    <a href="{{ route('shop.index', ['categories' => $category->id]) }}">
-                                        <img loading="lazy" class="w-100 h-auto mb-3"
-                                            src="{{ asset('uploads/categories') }}/{{ $category->image }}" width="124"
-                                            height="124" alt="" />
-                                        <div class="text-center">
-                                            {{ $category->name }}
-                                        </div>
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div><!-- /.swiper-wrapper -->
-                    </div><!-- /.swiper-container js-swiper-slider -->
-
-                    <div
-                        class="products-carousel__prev products-carousel__prev-1 position-absolute top-50 d-flex align-items-center justify-content-center">
-                        <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
-                            <use href="#icon_prev_md" />
-                        </svg>
-                    </div><!-- /.products-carousel__prev -->
-                    <div
-                        class="products-carousel__next products-carousel__next-1 position-absolute top-50 d-flex align-items-center justify-content-center">
-                        <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
-                            <use href="#icon_next_md" />
-                        </svg>
-                    </div><!-- /.products-carousel__next -->
-                </div><!-- /.position-relative -->
-            </section>
+            
+            
+            <section class="container">
+    <h2 class="section-title text-center mb-3 pb-xl-2 mb-xl-4">Mungkin Kamu Suka</h2>
+    <div class="swiper-container js-swiper-slider"
+         data-settings='{
+            "autoplay": {
+                "delay": 5000
+            },
+            "slidesPerView": 1,
+            "effect": "fade",
+            "loop": true,
+            "pagination": {
+                "el": ".swiper-pagination-mks",
+                "clickable": true
+            }
+        }'>
+        <div class="swiper-wrapper">
+            @foreach ($categories as $category)
+                <div class="swiper-slide">
+                    <div class="position-relative">
+                        {{-- Background Image --}}
+                        <img loading="lazy" src="{{ asset('uploads/categories') }}/{{ $category->image }}"
+                             alt="{{ $category->name }}" class="w-100" style="height: 350px; object-fit: cover; border-radius: 10px;" />
+                        {{-- Empty Overlay --}}
+                        <div class="position-absolute start-0 top-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background-color: rgba(0, 0, 0, 0.35); border-radius: 10px;">
+                            {{-- Konten dihilangkan --}}
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        {{-- Pagination --}}
+        <div class="swiper-pagination swiper-pagination-mks"></div>
+    </div>
+</section>
+            
 
             <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
@@ -224,48 +192,12 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                        </div><!-- /.swiper-wrapper -->
-                                    @endforeach
-                                </div><!-- /.swiper-container js-swiper-slider -->
-                            </div><!-- /.position-relative -->
-                        </div>
+                                        </div>@endforeach
+                                </div></div></div>
                     </div>
             </section>
 
             <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
-            {{-- <section class="category-banner container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="category-banner__item border-radius-10 mb-5">
-                            <img loading="lazy" class="h-auto"
-                                src="{{ asset('assets/images/home/demo3/category_9.jpg') }}" width="690"
-                                height="665" alt="" />
-                            <div class="category-banner__item-mark">
-                                Starting at $19
-                            </div>
-                            <div class="category-banner__item-content">
-                                <h3 class="mb-0">Blazers</h3>
-                                <a href="#" class="btn-link default-underline text-uppercase fw-medium">Belanja Sekarang</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="category-banner__item border-radius-10 mb-5">
-                            <img loading="lazy" class="h-auto"
-                                src="{{ asset('assets/images/home/demo3/category_10.jpg') }}" width="690"
-                                height="665" alt="" />
-                            <div class="category-banner__item-mark">
-                                Starting at $19
-                            </div>
-                            <div class="category-banner__item-content">
-                                <h3 class="mb-0">Sportswear</h3>
-                                <a href="#" class="btn-link default-underline text-uppercase fw-medium">Belanja Sekarang</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section> --}}
 
             <section class="category-banner container">
                 <div class="row">
@@ -291,7 +223,7 @@
                                 <img loading="lazy" class="h-auto"
                                     src="{{ $productImage ? asset('uploads/products/' . $productImage) : asset('assets/images/placeholder.jpg') }}"
                                     width="690" height="665" alt="{{ $category->name }}"
-                                    style="{{ $isPng ? 'background-color: #f2f2f2;' : '' }}" />
+                                    @style(['background-color: #f2f2f2' => $isPng]) />
 
 
                                 <div class="category-banner__item-mark">
@@ -341,13 +273,13 @@
                                             @endif
                                         </span>
                                     </div>
+                                overscroll-style: 
+                                overscroll-behavior-y: 
                                 </div>
                             </div>
                         </div>
                     @endforeach
-                </div><!-- /.row -->
-
-                {{-- <div class="text-center mt-2">
+                </div>{{-- <div class="text-center mt-2">
                     <a class="btn-link btn-link_lg default-underline text-uppercase fw-medium" href="#">Load
                         More</a>
                 </div> --}}

@@ -438,90 +438,55 @@
 
 
     <header id="header" class="header header-fullwidth header-transparent-bg">
-        <div class="container">
-            <div class="header-desk header-desk_type_1">
+    <div class="container">
+        <div class="header-desk header-desk_type_1 d-flex flex-column align-items-center">
+            {{-- Bagian Atas: Logo, Pencarian, dan Ikon --}}
+            <div class="header-top d-flex align-items-center justify-content-between w-100 mb-2">
                 <div class="logo">
                     <a href="{{ route('home.index') }}">
-                        <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy"
-                            class="logo__image d-block" />
+                        <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="logo__image d-block" />
                     </a>
                 </div>
 
-                <nav class="navigation">
-                    <ul class="navigation__list list-unstyled d-flex">
-                        <li class="navigation__item">
-                            <a href="{{ route('home.index') }}" class="navigation__link">Home</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('shop.index') }}" class="navigation__link">Shop</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('home.about') }}" class="navigation__link">About</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('home.contact') }}" class="navigation__link">Contact</a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="header-tools__item hover-container flex-grow-1 mx-4">
+                    <div class="js-hover__open position-relative w-100">
+                        <form action="#" method="GET" class="search-field m-0 p-0 w-100 d-flex">
+                            <div class="position-relative w-100">
+                                <input class="search-field__input w-100 fw-medium p-3 ps-4 rounded-5 border-1"
+                                    type="text" name="search-keyword" id="search-input"
+                                    placeholder="Cari produk, tren, dan merek" style="border-color: #dee2e6;" />
+                                <button class="btn-icon search-popup__submit position-absolute top-50 end-0 translate-middle-y me-3" type="submit">
+                                    <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
+                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <use href="#icon_search" />
+                                    </svg>
+                                </button>
+                                <button class="btn-icon btn-close-lg search-popup__reset" type="reset"></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
                 <div class="header-tools d-flex align-items-center">
-                    <div class="header-tools__item hover-container">
-                        <div class="js-hover__open position-relative">
-                            <a class="js-search-popup search-field__actor" href="#">
-                                <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
-                                    fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_search" />
-                                </svg>
-                                <i class="btn-icon btn-close-lg"></i>
-                            </a>
-                        </div>
-
-                        <div class="search-popup js-hidden-content">
-                            <form action="#" method="GET" class="search-field container">
-                                <p class="text-uppercase text-secondary fw-medium mb-4">What are you looking for?</p>
-                                <div class="position-relative">
-                                    <input class="search-field__input search-popup__input w-100 fw-medium"
-                                        type="text" name="search-keyword" id="search-input"
-                                        placeholder="Search products" />
-                                    <button class="btn-icon search-popup__submit" type="submit">
-                                        <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
-                                            fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <use href="#icon_search" />
-                                        </svg>
-                                    </button>
-                                    <button class="btn-icon btn-close-lg search-popup__reset" type="reset"></button>
-                                </div>
-
-                                <div class="search-popup__results">
-                                    <ul id="box-content-search">
-
-                                    </ul>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
                     @guest
                         <div class="header-tools__item hover-container">
-                            <a href="{{ route('login') }}" class="header-tools__item">
+                            <a href="{{ route('login') }}" class="header-tools__item d-flex align-items-center">
                                 <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <use href="#icon_user" />
                                 </svg>
+                                <span class="ms-2">Masuk / Daftar</span>
                             </a>
                         </div>
                     @else
                         <div class="header-tools__item hover-container">
                             <a href="{{ Auth::user()->utype === 'ADM' ? route('admin.index') : route('user.index') }}"
-                                class="header-tools__item">
-                                <span class="pr-6px">{{ Auth::user()->name }}</span>
+                                class="header-tools__item d-flex align-items-center">
                                 <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <use href="#icon_user" />
                                 </svg>
+                                <span class="ms-2">{{ Auth::user()->name }}</span>
                             </a>
                         </div>
                     @endguest
@@ -551,8 +516,32 @@
                     </a>
                 </div>
             </div>
+            
+            {{-- Bagian Bawah: Navigasi --}}
+            <div class="w-100">
+                <nav class="navigation">
+                    <ul class="navigation__list list-unstyled d-flex p-0">
+                        <li class="navigation__item">
+                            <a href="{{ route('home.index') }}" class="navigation__link">Home</a>
+                        </li>
+                        <li class="navigation__item">
+                            <a href="{{ route('shop.index') }}" class="navigation__link">Shop</a>
+                        </li>
+                        <li class="navigation__item">
+                            <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
+                        </li>
+                        <li class="navigation__item">
+                            <a href="{{ route('home.about') }}" class="navigation__link">About</a>
+                        </li>
+                        <li class="navigation__item">
+                            <a href="{{ route('home.contact') }}" class="navigation__link">Contact</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
-    </header>
+    </div>
+</header>
 
     @yield('content')
 
