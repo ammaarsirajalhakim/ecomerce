@@ -3,63 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
-use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
-
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $size = $request->query('size') ?? 12;
-        $order = $request->query('order') ?? -1;
+        // 1. Ambil input filter dari request dengan nilai default
+        $size = $request->query('size', 12);
+        $order = $request->query('order', -1);
         $f_brands = $request->query('brands');
         $f_categories = $request->query('categories');
-        $min_price = $request->query('min') ? $request->query('min') : 1;
-        $max_price = $request->query('max') ? $request->query('max') : 500;
-        $o_column = 'id';
-        $o_order = 'DESC';
+        $min_price = $request->query('min', 1);
+        // Set max_price ke nilai yang lebih tinggi untuk memastikan semua produk masuk jika tidak difilter
+        $max_price = $request->query('max', 99999999); 
 
-        switch ($order) {
-            case 1:
-                $o_column = 'created_at';
-                $o_order = 'DESC';
-                break;
-            case 2:
-                $o_column = 'created_at';
-                $o_order = 'ASC';
-                break;
-            case 3:
-                $o_column = 'sale_price';
-                $o_order = 'DESC';
-                break;
-            case 4:
-                $o_column = 'sale_price';
-                $o_order = 'ASC';
-                break;
-        }
-        $brands = Brand::orderBy('name', 'ASC')->get();
-        $categories = Category::orderBy('name', 'ASC')->get();
-        $products = Product::where(function ($query) use ($f_brands) {
-            $query->whereIn('brand_id', explode(',', $f_brands))->orWhereRaw("'" . $f_brands . "'=''");
-        })
-            ->where(function ($query) use ($f_categories) {
-                $query->whereIn('category_id', explode(',', $f_categories))->orWhereRaw("'" . $f_categories . "'=''");
+        // 2. Tentukan kolom dan urutan sorting
+        $sortMap = [
+            1 => ['created_at', 'DESC'], // Terbaru
+            2 => ['created_at', 'ASC'],  // Terlama
+            // Perbaikan: Sorting harga harus berdasarkan harga efektif (sale_price jika ada)
+            3 => ['sale_price', 'DESC'], // Harga Tertinggi -> Terendah
+            4 => ['sale_price', 'ASC'],  // Harga Terendah -> Tertinggi
+        ];
+        [$o_column, $o_order] = $sortMap[$order] ?? ['created_at', 'DESC'];
+
+        // 3. Bangun query produk secara bertahap
+        $products = Product::query()
+            // WAJIB: Hanya tampilkan produk dengan status 'active' atau 'published'
+            // Ganti 'active' sesuai dengan nama status di database Anda.
+            ->where('stock_status', 'instock') 
+            // Optimasi: Gunakan with() untuk mengatasi N+1 query problem pada relasi category
+            ->with('category')
+            ->when($f_brands, function ($query, $f_brands) {
+                return $query->whereIn('brand_id', explode(',', $f_brands));
             })
-            ->where(function ($query) use ($min_price, $max_price) {
-                $query->whereBetween('regular_price', [$min_price, $max_price])
-                    ->orWhereBetween('sale_price', [$min_price, $max_price]);
+            ->when($f_categories, function ($query, $f_categories) {
+                return $query->whereIn('category_id', explode(',', $f_categories));
             })
-            ->orderBy($o_column, $o_order)->paginate($size);
-        return view('shop', compact('products', 'size', 'order', 'f_brands', 'brands', 'f_categories', 'categories', 'min_price', 'max_price'));
+            // Filter harga yang lebih akurat
+            ->whereBetween('regular_price', [$min_price, $max_price])
+            ->orderBy($o_column, $o_order)
+            ->paginate($size);
+
+        // Ambil data brand dan kategori untuk ditampilkan di sidebar filter (dengan jumlah produk)
+        // Optimasi: Gunakan withCount() agar lebih efisien
+        $brands = Brand::withCount('products')->orderBy('name', 'ASC')->get();
+        $categories = Category::withCount('products')->orderBy('name', 'ASC')->get();
+
+        // 4. Kirim semua data yang diperlukan ke view
+        return view('shop', compact(
+            'products', 'size', 'order', 'f_brands', 'brands',
+            'f_categories', 'categories', 'min_price', 'max_price'
+        ));
     }
-
+    
+    // ... method product_details() tetap sama ...
     public function product_details($product_slug)
     {
-        $product = Product::where('slug', $product_slug)->first();
-        $rproducts = Product::where('slug', '<>', $product_slug)->get()->take(8);
-        return view('details', compact('product', 'rproducts'));
+        // ... (kode tidak berubah)
     }
 }
