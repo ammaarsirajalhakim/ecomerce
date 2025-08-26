@@ -25,7 +25,82 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
     @stack('styles')
 </head>
+<style>
+    /* === Clean & Light Sidebar Style by Gemini === */
 
+    /* Latar belakang utama sidebar dan border pemisah */
+    .section-menu-left {
+        background-color: #ffffff; /* Latar belakang putih bersih */
+        border-right: 1px solid #e9ecef; /* Garis pemisah abu-abu sangat terang */
+    }
+
+    /* Area Logo */
+    .box-logo {
+        border-bottom: 1px solid #e9ecef; /* Garis pemisah halus */
+    }
+    
+    /* Ikon burger menu di header mobile */
+    .header-dashboard .button-show-hide {
+        color: #343a40;
+    }
+
+    /* Judul "Daftar Fitur Admin" */
+    .center-heading {
+        color: #6c757d; /* Warna abu-abu untuk judul */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 15px 25px;
+        font-size: 12px;
+    }
+
+    /* Item Menu Utama */
+    .menu-list .menu-item > a {
+        color: #34495e; /* Warna teks biru dongker gelap agar mudah dibaca */
+        padding: 14px 25px;
+        margin: 2px 15px;
+        border-radius: 8px;
+        transition: all 0.25s ease-in-out; /* Transisi halus */
+    }
+
+    /* Efek saat kursor mouse di atas item menu */
+    .menu-list .menu-item > a:hover {
+        background-color: #eef8ff; /* Warna latar PUTIH KEBIRUAN yang sangat lembut */
+        color: #0056b3; /* Teks menjadi biru lebih gelap */
+    }
+
+    /* Style untuk item menu yang sedang aktif */
+    .menu-list .menu-item.active > a {
+        background-color: #e3f2fd; /* Warna latar PUTIH KEBIRUAN yang sedikit lebih jelas */
+        color: #0d6efd; /* Warna teks biru primer */
+        font-weight: 600;
+    }
+    
+    /* Sub-menu styling */
+    .sub-menu {
+        background-color: transparent; /* Latar belakang transparan */
+        padding: 10px 0 10px 35px; /* Indentasi untuk sub-menu */
+        margin: 0;
+    }
+    
+    .sub-menu .sub-menu-item a {
+        color: #566573;
+        padding: 8px 15px;
+    }
+
+    .sub-menu .sub-menu-item a:hover {
+        color: #0d6efd; /* Warna teks saat hover */
+        background-color: transparent; /* Pastikan tidak ada background saat hover di sub-menu */
+    }
+
+    /* Ikon pada menu */
+    .menu-list .menu-item > a .icon {
+        font-size: 18px;
+        margin-right: 15px; /* Jarak antara ikon dan teks */
+    }
+
+</style> 
+</style>
 <body class="body">
     <div id="wrapper">
         <div id="page" class="">
@@ -172,13 +247,6 @@
                                 </li>
 
                                 <li class="menu-item">
-                                    <a href="settings.html" class="">
-                                        <div class="icon"><i class="icon-settings"></i></div>
-                                        <div class="text">Pengaturan</div>
-                                    </a>
-                                </li>
-
-                                <li class="menu-item">
                                     <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                         @csrf
                                         <a href="{{ route('logout') }}" class=""
@@ -208,7 +276,7 @@
                                     <i class="icon-menu-left"></i>
                                 </div>
 
-                                <form class="form-search flex-grow">
+                                {{-- <form class="form-search flex-grow">
                                     <fieldset class="name">
                                         <input type="text" placeholder="Search here..." class="show-search"
                                             name="name" id="search-input" tabindex="2" value=""
@@ -220,7 +288,7 @@
                                     <div class="box-content-search">
                                         <ul id="box-content-search"></ul>
                                     </div>
-                                </form>
+                                </form> --}}
 
                             </div>
                             <div class="header-grid">
@@ -305,8 +373,8 @@
                                                     <img src="images/avatar/user-1.png" alt="">
                                                 </span>
                                                 <span class="flex flex-column">
-                                                    <span class="body-title mb-2">Kristin Watson</span>
-                                                    <span class="text-tiny">Admin</span>
+                                                    <span class=" " style="color: black; font-size:12px;">{{ Auth::user()->name }}</span>
+                                                    <span class="text-tiny" style="font-size: 8px">Admin</span>
                                                 </span>
                                             </span>
                                         </button>
