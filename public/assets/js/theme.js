@@ -1335,13 +1335,19 @@ function pureFadeOut(e) {
     window.location.href='./shop_checkout.html';
   });
 
-  $('.checkout-form .btn-checkout').off('click').on('click', function() {
-    window.location.href='./shop_order_complete.html';
-  });
+  // $('.checkout-form .btn-checkout').off('click').on('click', function() {
+  //   // window.location.href='./shop_order_complete.html';
+  // });
 
-  document.querySelector('.js-show-register').addEventListener('click', function(e) {
-    document.querySelector(this.getAttribute("href")).click();
+  const registerButton = document.querySelector('.js-show-register');
+if (registerButton) {
+  registerButton.addEventListener('click', function(e) {
+    const targetElement = document.querySelector(this.getAttribute("href"));
+    if (targetElement) {
+        targetElement.click();
+    }
   });
+}
 
   $('button.js-add-wishlist, a.add-to-wishlist').off('click').on('click', function() {
     if($(this).hasClass("active"))
