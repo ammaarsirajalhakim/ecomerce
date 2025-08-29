@@ -194,7 +194,7 @@
                                         </li>
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.brands') }}" class="">
-                                                <div class="text">Tambah Merek</div>
+                                                <div class="text">Daftar Merek</div>
                                             </a>
                                         </li>
                                     </ul>
