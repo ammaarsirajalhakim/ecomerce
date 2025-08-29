@@ -38,10 +38,10 @@
                                 <h4>DETAIL PENGIRIMAN</h4>
                             </div>
                             @if ($address)
-                            <div class="col-6 text-right">
-                                <a href="{{ route('user.address.index') }}" class="btn btn-link fw-semi-bold mt-4"
-                                    style="text-decoration: underline; background: none; border: none;">Ubah Alamat</a>
-                            </div>
+                                <div class="col-6 text-right">
+                                    <a href="{{ route('user.address.index') }}" class="btn btn-link fw-semi-bold mt-4"
+                                        style="text-decoration: underline; background: none; border: none;">Ubah Alamat</a>
+                                </div>
                             @endif
                         </div>
 
@@ -62,7 +62,7 @@
                                 </div>
                             </div>
                         @else
-                            {{-- PERBAIKAN: Form ini hanya muncul jika alamat belum ada --}}
+                            {{-- Form ini hanya muncul jika alamat belum ada --}}
                             <div class="row mt-4">
                                 <p>Anda belum memiliki alamat tersimpan. Silakan isi detail di bawah ini.</p>
                                 
@@ -143,7 +143,7 @@
                                                     {{ $item->product->name }} x {{ $item->quantity }}
                                                 </td>
                                                 <td class="text-right">
-                                                    Rp. {{ $item->subtotal }}
+                                                    Rp. {{ number_format($item->subtotal, 0, ',', '.') }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -154,15 +154,15 @@
                                         <tbody>
                                             <tr>
                                                 <th>Subtotal</th>
-                                                <td class="text-right">Rp. {{ $subtotal }}</td>
+                                                <td class="text-right">Rp. {{ number_format($subtotal, 0, ',', '.') }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Diskon {{ Session::get('coupon')['code'] }}</th>
-                                                <td class="text-right">Rp. {{ Session::get('discounts')['discount'] }}</td>
+                                                <td class="text-right">- Rp. {{ number_format(Session::get('discounts')['discount'], 0, ',', '.') }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Subtotal Setelah Diskon</th>
-                                                <td class="text-right">Rp. {{ Session::get('discounts')['subtotal'] }}</td>
+                                                <td class="text-right">Rp. {{ number_format(Session::get('discounts')['subtotal'], 0, ',', '.') }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Pengiriman</th>
@@ -170,11 +170,11 @@
                                             </tr>
                                             <tr>
                                                 <th>Pajak</th>
-                                                <td class="text-right">Rp. {{ Session::get('discounts')['tax'] }}</td>
+                                                <td class="text-right">Rp. {{ number_format(Session::get('discounts')['tax'], 0, ',', '.') }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Total</th>
-                                                <td class="text-right">Rp. {{ Session::get('discounts')['total'] }}</td>
+                                                <td class="text-right"><strong>Rp. {{ number_format(Session::get('discounts')['total'], 0, ',', '.') }}</strong></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -183,7 +183,7 @@
                                         <tbody>
                                             <tr>
                                                 <th>SUBTOTAL</th>
-                                                <td class="text-right">Rp. {{ $subtotal }}</td>
+                                                <td class="text-right">Rp. {{ number_format($subtotal, 0, ',', '.') }}</td>
                                             </tr>
                                             <tr>
                                                 <th>PENGIRIMAN</th>
@@ -191,19 +191,18 @@
                                             </tr>
                                             <tr>
                                                 <th>PAJAK</th>
-                                                <td class="text-right">Rp. {{ $tax }}</td>
+                                                <td class="text-right">Rp. {{ number_format($tax, 0, ',', '.') }}</td>
                                             </tr>
                                             <tr>
                                                 <th>TOTAL</th>
-                                                <td class="text-right">Rp. {{ $total }}</td>
+                                                <td class="text-right"><strong>Rp. {{ number_format($total, 0, ',', '.') }}</strong></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 @endif
                             </div>
                             <div class="checkout__payment-methods">
-                                {{-- ... (Bagian metode pembayaran tidak perlu diubah, default 'cod' sudah bagus) ... --}}
-                               
+                                {{-- ... (Bagian metode pembayaran tidak perlu diubah) ... --}}
                                 <div class="form-check">
                                     <input class="form-check-input form-check-input_fill" type="radio" name="mode"
                                         id="mode3" value="cod" {{ old('mode', 'cod') == 'cod' ? 'checked' : '' }}>
@@ -218,7 +217,8 @@
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <button type="submit" class="btn btn-primary btn-checkout">BUAT PESANAN</button>
+                            {{-- PERUBAHAN: Menambahkan id="place-order-btn" --}}
+                            <button type="submit" class="btn btn-primary btn-checkout" id="place-order-btn">BUAT PESANAN</button>
                         </div>
                     </div>
                 </div>
@@ -226,3 +226,37 @@
         </section>
     </main>
 @endsection
+
+{{-- PENAMBAHAN: Section untuk JavaScript --}}
+@push('scripts')
+{{-- Sertakan library SweetAlert2 dari CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Pastikan script berjalan setelah semua elemen HTML dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Cek kondisi menggunakan Blade. Script ini hanya akan ditambahkan
+        // ke halaman jika variabel $address tidak ada (null).
+        @if (!$address)
+            // Ambil tombol berdasarkan ID yang sudah kita buat
+            const placeOrderBtn = document.getElementById('place-order-btn');
+
+            // Tambahkan event listener untuk event 'click'
+            placeOrderBtn.addEventListener('click', function(event) {
+                // Hentikan aksi default dari tombol submit (yaitu mengirim form)
+                event.preventDefault();
+
+                // Tampilkan pop-up peringatan menggunakan SweetAlert2
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Alamat Diperlukan',
+                    text: 'Anda harus mengisi detail alamat pengiriman terlebih dahulu sebelum membuat pesanan.',
+                    confirmButtonText: 'Baik, Saya Mengerti'
+                });
+            });
+        @endif
+
+    });
+</script>
+@endpush
