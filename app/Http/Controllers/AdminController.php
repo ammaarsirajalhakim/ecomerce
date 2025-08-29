@@ -11,15 +11,67 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Slide;
 use App\Models\Transaction;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Hash;
+
 
 class AdminController extends Controller
 {
+    public function users()
+    {
+        $users = User::orderBy('created_at', 'DESC')->paginate(15); // Mengambil data user dengan pagination
+        return view('admin.user', compact('users')); // Mengirim data ke view user.blade.php
+    }
+
+    public function user_add()
+    {
+        return view('admin.tambah-user');
+    }
+
+    /**
+     * Menyimpan data user baru ke database.
+     */
+    public function user_store(Request $request)
+    {
+        // Validasi input dari form
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'utype' => 'required|in:ADM,USR', // Memastikan nilai hanya ADM atau USR
+        ]);
+
+        // Membuat instance User baru
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password); // Enkripsi password
+        $user->utype = $request->utype;
+        $user->save();
+
+        // Redirect kembali ke halaman daftar pengguna dengan pesan sukses
+        return redirect()->route('admin.users')->with('status', 'Pengguna baru berhasil ditambahkan!');
+    }
+
+    public function user_details($user_id)
+    {
+        // Mengambil data user beserta relasi 'orders'
+        $user = User::with('orders')->find($user_id);
+
+        if (!$user) {
+            // Jika user tidak ditemukan, kembali ke halaman daftar pengguna
+            return redirect()->route('admin.users')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        return view('admin.detail-user', compact('user'));
+    }
+
     public function index()
     {
         $orders = Order::orderBy('created_at', 'DESC')->get()->take(10);
