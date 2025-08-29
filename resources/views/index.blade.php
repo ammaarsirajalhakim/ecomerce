@@ -273,8 +273,7 @@
                                             @endif
                                         </span>
                                     </div>
-                                overscroll-style: 
-                                overscroll-behavior-y: 
+                                
                                 </div>
                             </div>
                         </div>

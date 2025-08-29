@@ -9,7 +9,7 @@
         <div class="mb-4 pb-4"></div>
         <section class="contact-us container">
             <div class="mw-930">
-                <h2 class="page-title">CONTACT US</h2>
+                <h2 class="page-title">PUSAT BANTUAN</h2>
             </div>
         </section>
 
@@ -27,11 +27,11 @@
                     <form action="{{ route('home.contact.store') }}" method="POST" name="contact-us-form"
                         class="needs-validation" novalidate="">
                         @csrf
-                        <h3 class="mb-5">Get In Touch</h3>
+                        <h3 class="mb-5">Hubungi kami</h3>
                         <div class="form-floating my-4">
                             <input type="text" class="form-control" name="name" placeholder="Name *"
                                 value="{{ old('name') }}" required="">
-                            <label for="contact_us_name">Name *</label>
+                            <label for="contact_us_name">Nama *</label>
                             @error('name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -39,7 +39,7 @@
                         <div class="form-floating my-4">
                             <input type="text" class="form-control" name="phone" placeholder="Phone *"
                                 value="{{ old('phone') }}" required="">
-                            <label for="contact_us_name">Phone *</label>
+                            <label for="contact_us_name">Nomor Telepon *</label>
                             @error('phone')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -47,20 +47,20 @@
                         <div class="form-floating my-4">
                             <input type="email" class="form-control" name="email" placeholder="Email address *"
                                 value="{{ old('email') }}" required="">
-                            <label for="contact_us_name">Email address *</label>
+                            <label for="contact_us_name">Gmail *</label>
                             @error('email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="my-4">
-                            <textarea class="form-control form-control_gray" name="comment" placeholder="Your Message *" cols="30"
+                            <textarea class="form-control form-control_gray" name="comment" placeholder="Ketik Pesan *" cols="30"
                                 rows="8" required="">{{ old('comment') }}</textarea>
                             @error('comment')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="my-4">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Kirim</button>
                         </div>
                     </form>
                 </div>

@@ -522,19 +522,19 @@
                 <nav class="navigation">
                     <ul class="navigation__list list-unstyled d-flex p-0">
                         <li class="navigation__item">
-                            <a href="{{ route('home.index') }}" class="navigation__link">Home</a>
+                            <a href="{{ route('home.index') }}" class="navigation__link">Beranda</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('shop.index') }}" class="navigation__link">Shop</a>
+                            <a href="{{ route('shop.index') }}" class="navigation__link">Produk</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
+                            <a href="{{ route('cart.index') }}" class="navigation__link">Keranjang</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('home.about') }}" class="navigation__link">About</a>
+                            <a href="{{ route('home.about') }}" class="navigation__link">Tentang Kami</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('home.contact') }}" class="navigation__link">Contact</a>
+                            <a href="{{ route('home.contact') }}" class="navigation__link">Bantuan</a>
                         </li>
                     </ul>
                 </nav>
@@ -606,10 +606,9 @@
                 </div>
 
                 <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Company</h6>
+                    <h6 class="sub-menu__title text-uppercase">Perusahaan</h6>
                     <ul class="sub-menu__list list-unstyled">
-                        <li class="sub-menu__item"><a href="about-2.html" class="menu-link menu-link_us-s">About
-                                Us</a></li>
+                        <li class="sub-menu__item"><a href="{{ route('home.about') }}" class="navigation_link">Tentang Kami </a></li>
                         {{-- <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Careers</a>
                         </li>
                         <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Affiliates</a>
@@ -617,46 +616,41 @@
                         <li class="sub-menu__item"><a href="blog_list1.html"
                                 class="menu-link menu-link_us-s">Blog</a></li> --}}
                         <li class="sub-menu__item"><a href="{{ route('home.contact') }}"
-                                class="menu-link menu-link_us-s">Contact
-                                Us</a></li>
+                                class="menu-link menu-link_us-s">Hubungi Kami</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Shop</h6>
+                    <h6 class="sub-menu__title text-uppercase">Belanja</h6>
                     <ul class="sub-menu__list list-unstyled">
                         <li class="sub-menu__item"><a href="{{ url('/shop?order=' . 1) }}"
-                                class="menu-link menu-link_us-s">New
-                                Arrivals</a></li>
+                                class="menu-link menu-link_us-s">Produk Terbaru</a></li>
                         <li class="sub-menu__item"><a href="{{ url('/shop?featured=' . 1) }}"
-                                class="menu-link menu-link_us-s">Featured</a></li>
+                                class="menu-link menu-link_us-s">Unggulan</a></li>
                         <li class="sub-menu__item"><a href="{{ route('shop.index') }}"
-                                class="menu-link menu-link_us-s">Shop
-                                All</a></li>
+                                class="menu-link menu-link_us-s">Semua Produk</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Help</h6>
+                    <h6 class="sub-menu__title text-uppercase">Bantuan</h6>
                     <ul class="sub-menu__list list-unstyled">
-                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Customer
-                                Service</a></li>
+                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Layanan Pelanggan</a></li>
                         <li class="sub-menu__item"><a
                                 href="{{ auth()->check() ? route('user.index') : route('login') }}"
-                                class="menu-link menu-link_us-s">My Account</a>
+                                class="menu-link menu-link_us-s">Akun Saya</a>
                         </li>
                         {{-- <li class="sub-menu__item"><a href="store_location.html"
                                 class="menu-link menu-link_us-s">Find a Store</a>
                         </li> --}}
-                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Legal &
-                                Privacy</a></li>
+                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Hukum & Privasi</a></li>
                         {{-- <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Gift
                                 Card</a></li> --}}
                     </ul>
                 </div>
 
                 <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Categories</h6>
+                    <h6 class="sub-menu__title text-uppercase">Kategori</h6>
                     <ul class="sub-menu__list list-unstyled">
                         @foreach ($footerCategories as $category)
                             <li class="sub-menu__item"><a href="{{ url('/shop?categories=' . $category->id) }}"
