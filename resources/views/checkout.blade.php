@@ -1,11 +1,11 @@
 @extends('layouts.app')
+
 @section('content')
     <main class="pt-90">
         <div class="mb-4 pb-4"></div>
         <section class="shop-checkout container">
             <h2 class="page-title">Pengiriman dan Checkout</h2>
             <div class="checkout-steps">
-                {{-- ... (Bagian steps tidak perlu diubah) ... --}}
                 <a href="{{ route('cart.index') }}" class="checkout-steps__item active">
                     <span class="checkout-steps__item-number">01</span>
                     <span class="checkout-steps__item-title">
@@ -45,8 +45,8 @@
                             @endif
                         </div>
 
+                        {{-- Jika alamat sudah ada, tampilkan detailnya --}}
                         @if ($address)
-                            {{-- BAGIAN INI TIDAK BERUBAH: Jika alamat sudah ada, tampilkan saja --}}
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="my-account__address-list">
@@ -61,58 +61,81 @@
                                     </div>
                                 </div>
                             </div>
+                        {{-- Jika alamat belum ada, tampilkan form untuk mengisinya --}}
                         @else
-                            {{-- Form ini hanya muncul jika alamat belum ada --}}
-                            <div class="row mt-4">
+                            <div class="row mt-4" id="address-form-fields">
                                 <p>Anda belum memiliki alamat tersimpan. Silakan isi detail di bawah ini.</p>
                                 
-                                {{-- Field-field form sesuai dengan yang Anda tampilkan --}}
+                                <p class="mb-3">Kolom dengan tanda <span class="text-danger">*</span> wajib diisi.</p>
+                                
                                 <div class="col-md-6 mb-3">
-                                    <label for="name">Nama Penerima*</label>
+                                    <label for="name">Nama Penerima <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required>
                                     @error('name') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="phone">No. Telepon*</label>
+                                    <label for="phone">No. Telepon <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" required>
                                     @error('phone') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-12 mb-3">
-                                    <label for="address">Alamat Lengkap*</label>
+                                    <label for="address">Alamat Lengkap <span class="text-danger">*</span></label>
                                     <textarea class="form-control" id="address" name="address" rows="3" required>{{ old('address') }}</textarea>
                                     @error('address') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
+                                
                                 <div class="col-md-6 mb-3">
-                                    <label for="landmark">Patokan (Opsional)</label>
-                                    <input type="text" class="form-control" id="landmark" name="landmark" value="{{ old('landmark') }}">
+                                    <label for="landmark">Patokan <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="landmark" name="landmark" value="{{ old('landmark') }}" required>
+                                    @error('landmark') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
+
                                 <div class="col-md-6 mb-3">
-                                    <label for="locality">Kelurahan/Desa*</label>
+                                    <label for="locality">Kelurahan/Desa <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="locality" name="locality" value="{{ old('locality') }}" required>
                                     @error('locality') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
+
+                                <div class="col-12 mb-3">
+                                    <label>Tipe Alamat <span class="text-danger">*</span></label>
+                                    <div class="d-flex mt-2">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="type" id="type_rumah" value="Rumah" {{ old('type', 'Rumah') == 'Rumah' ? 'checked' : '' }} required>
+                                            <label class="form-check-label" for="type_rumah">Rumah</label>
+                                        </div>
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="type" id="type_kantor" value="Kantor" {{ old('type') == 'Kantor' ? 'checked' : '' }} required>
+                                            <label class="form-check-label" for="type_kantor">Kantor</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="type" id="type_lainnya" value="Lainnya" {{ old('type') == 'Lainnya' ? 'checked' : '' }} required>
+                                            <label class="form-check-label" for="type_lainnya">Lainnya</label>
+                                        </div>
+                                    </div>
+                                    @error('type') <div class="text-danger mt-1">{{ $message }}</div> @enderror
+                                </div>
+
                                 <div class="col-md-6 mb-3">
-                                    <label for="city">Kota/Kabupaten*</label>
+                                    <label for="city">Kota/Kabupaten <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="city" name="city" value="{{ old('city') }}" required>
                                     @error('city') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="state">Provinsi*</label>
+                                    <label for="state">Provinsi <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="state" name="state" value="{{ old('state') }}" required>
                                     @error('state') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="zip">Kode Pos*</label>
+                                    <label for="zip">Kode Pos <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="zip" name="zip" value="{{ old('zip') }}" required>
                                     @error('zip') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="country">Negara*</label>
+                                    <label for="country">Negara <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="country" name="country" value="{{ old('country', 'Indonesia') }}" required>
                                     @error('country') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                                 </div>
-
-                                {{-- PENAMBAHAN: Checkbox untuk menyimpan alamat --}}
+                                
                                 <div class="col-12">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="save_address" id="save_address" value="1" checked>
@@ -124,11 +147,11 @@
                             </div>
                         @endif
                     </div>
+                    
                     <div class="checkout__totals-wrapper">
                         <div class="sticky-content">
                             <div class="checkout__totals">
                                 <h3>Pesanan Anda</h3>
-                                {{-- ... (Bagian tabel pesanan tidak perlu diubah) ... --}}
                                 <table class="checkout-cart-items">
                                     <thead>
                                         <tr>
@@ -202,7 +225,6 @@
                                 @endif
                             </div>
                             <div class="checkout__payment-methods">
-                                {{-- ... (Bagian metode pembayaran tidak perlu diubah) ... --}}
                                 <div class="form-check">
                                     <input class="form-check-input form-check-input_fill" type="radio" name="mode"
                                         id="mode3" value="cod" {{ old('mode', 'cod') == 'cod' ? 'checked' : '' }}>
@@ -217,8 +239,7 @@
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            {{-- PERUBAHAN: Menambahkan id="place-order-btn" --}}
-                            <button type="submit" class="btn btn-primary btn-checkout" id="place-order-btn">BUAT PESANAN</button>
+                            <button type="submit" class="btn btn-primary btn-checkout">BUAT PESANAN</button>
                         </div>
                     </div>
                 </div>
@@ -227,36 +248,6 @@
     </main>
 @endsection
 
-{{-- PENAMBAHAN: Section untuk JavaScript --}}
+{{-- SEMUA JAVASCRIPT KUSTOM DIHAPUS. HANYA MENINGGALKAN BLOK KOSONG. --}}
 @push('scripts')
-{{-- Sertakan library SweetAlert2 dari CDN --}}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    // Pastikan script berjalan setelah semua elemen HTML dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        // Cek kondisi menggunakan Blade. Script ini hanya akan ditambahkan
-        // ke halaman jika variabel $address tidak ada (null).
-        @if (!$address)
-            // Ambil tombol berdasarkan ID yang sudah kita buat
-            const placeOrderBtn = document.getElementById('place-order-btn');
-
-            // Tambahkan event listener untuk event 'click'
-            placeOrderBtn.addEventListener('click', function(event) {
-                // Hentikan aksi default dari tombol submit (yaitu mengirim form)
-                event.preventDefault();
-
-                // Tampilkan pop-up peringatan menggunakan SweetAlert2
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Alamat Diperlukan',
-                    text: 'Anda harus mengisi detail alamat pengiriman terlebih dahulu sebelum membuat pesanan.',
-                    confirmButtonText: 'Baik, Saya Mengerti'
-                });
-            });
-        @endif
-
-    });
-</script>
 @endpush
