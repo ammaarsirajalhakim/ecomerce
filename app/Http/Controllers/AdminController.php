@@ -21,7 +21,7 @@ use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\Hash;
 
 
-class AdminController extends Controller
+class AdminController extends BaseController
 {
     public function users()
     {
@@ -34,9 +34,6 @@ class AdminController extends Controller
         return view('admin.tambah-user');
     }
 
-    /**
-     * Menyimpan data user baru ke database.
-     */
     public function user_store(Request $request)
     {
         // Validasi input dari form

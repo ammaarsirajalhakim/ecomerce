@@ -129,12 +129,9 @@
 
                 <div class="section-menu-left">
                     <div class="box-logo">
-                        <a href="{{ route('admin.index') }}" id="site-logo-inner">
-                            <img class="" id="logo_header" alt=""
-                                src="{{ asset('images/logo/logo.png') }}"
-                                data-light="{{ asset('images/logo/logo.png') }}"
-                                data-dark="{{ asset('images/logo/logo.png') }}">
-                        </a>
+                        <a href="{{ route('home.index') }}" id="site-logo-inner">
+                    <img src="{{ asset('images/logo/logo.png') }}" alt="Loozy" class="logo__image d-block" />
+                </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
                         </div>
@@ -229,17 +226,12 @@
                                                 <div class="text">Daftar Pesanan</div>
                                             </a>
                                         </li>
-                                        <li class="sub-menu-item">
-                                            <a href="order-tracking.html" class="">
-                                                <div class="text">Lacak Pesanan</div>
-                                            </a>
-                                        </li>
                                     </ul>
                                 </li>
                                 <li class="menu-item">
                                     <a href="{{ route('admin.slides') }}" class="">
                                         <div class="icon"><i class="icon-image"></i></div>
-                                        <div class="text">Slides</div>
+                                        <div class="text">slide</div>
                                     </a>
                                 </li>
                                 <li class="menu-item">
@@ -279,7 +271,7 @@
                                         <a href="{{ route('logout') }}" class=""
                                             onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                                             <div class="icon"><i class="icon-log-out"></i></div>
-                                            <div class="text">Logout</div>
+                                            <div class="text">Keluar</div>
                                         </a>
                                     </form>
                                 </li>
@@ -361,12 +353,11 @@
                                             <li>
                                                 <div class="message-item item-3">
                                                     <div class="image">
-                                                        <i class="icon-noti-3"></i>
+                                                        <i class="icon-mail"></i>
                                                     </div>
                                                     <div>
-                                                        <div class="body-title-2">Order shipped successfully</div>
-                                                        <div class="text-tiny">Integer aliquam eros nec sollicitudin
-                                                            sollicitudin</div>
+                                                        <div class="body-title-2">Pesan</div>
+                                                        <div class="text-tiny">Kamu punya Pesan yang belum dibaca <a href="{{ route('admin.orders') }}" class="color: blue important! ;"> Lihat</a></div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -376,9 +367,10 @@
                                                         <i class="icon-noti-4"></i>
                                                     </div>
                                                     <div>
-                                                        <div class="body-title-2">Order pending: <span>ID 305830</span>
+                                                        <div class="body-title-2">pesanan tertunda:
+                                                            <span>{{ $dashboardDatas[0]->TotalOrdered }}</span>
                                                         </div>
-                                                        <div class="text-tiny">Ultricies at rhoncus at ullamcorper
+                                                        <div class="text-tiny">lihat daftar pesanan tertunda<a href="{{ route('admin.orders') }}" class="color: blue important! ;"> Lihat</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -397,7 +389,8 @@
                                             id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-user wg-user">
                                                 <span class="image">
-                                                    <img src="images/avatar/user-1.png" alt="">
+                                                    <img src="{{ asset('images/avatar/user-1.png') }}"
+                                                        alt="">
                                                 </span>
                                                 <span class="flex flex-column">
                                                     <span class=" "

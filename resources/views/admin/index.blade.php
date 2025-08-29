@@ -62,7 +62,7 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="body-text mb-2">Prndapatan Pesanan Tertunda</div>
+                                        <div class="body-text mb-2">Pendapatan Pesanan Tertunda</div>
                                         <h4>{{ $dashboardDatas[0]->TotalOrderedAmount }}</h4>
                                     </div>
                                 </div>
