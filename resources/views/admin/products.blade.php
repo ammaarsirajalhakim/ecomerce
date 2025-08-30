@@ -3,18 +3,18 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>All Products</h3>
+                <h3>Semua Produk</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">All Products</div>
+                        <div class="text-tiny">Semua Produk</div>
                     </li>
                 </ul>
             </div>
@@ -24,7 +24,7 @@
                     <div class="wg-filter flex-grow">
                         <form class="form-search">
                             <fieldset class="name">
-                                <input type="text" placeholder="Search here..." class="" name="name"
+                                <input type="text" placeholder="Cari..." class="" name="name"
                                     tabindex="2" value="" aria-required="true" required="">
                             </fieldset>
                             <div class="button-submit">
@@ -32,8 +32,7 @@
                             </div>
                         </form>
                     </div>
-                    <a class="tf-button style-1 w208" href="{{ route('admin.product.add') }}"><i class="icon-plus"></i>Add
-                        new</a>
+                    <a class="tf-button style-1 w208" href="{{ route('admin.product.add') }}"><i class="icon-plus"></i>Tambah Produk</a>
                 </div>
                 <div class="table-responsive">
                     @if (Session::has('status'))
@@ -42,17 +41,17 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>SalePrice</th>
-                                <th>SKU</th>
-                                <th>Category</th>
-                                <th>Brand</th>
-                                <th>Featured</th>
-                                <th>Stock</th>
-                                <th>Quantity</th>
-                                <th>Action</th>
+                                <th>Id</th>
+                                <th>Nama</th>
+                                <th>Harga</th>
+                                <th>Harga Jual</th>
+                                <th>Kode Barang</th>
+                                <th>Kategori</th>
+                                <th>Merek</th>
+                                <th>Produk Unggulan</th>
+                                <th>Stok</th>
+                                <th>Jumlah</th>
+                                <th>Opsi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -122,10 +121,10 @@
                 e.preventDefault();
                 var form = $(this).closest('form');
                 swal({
-                        title: "Are you sure?",
-                        text: "You want to delete this record?",
+                        title: "Apakah Anda Yakin?",
+                        text: "Anda Yakin Menghapus Baris Ini?",
                         type: "warning",
-                        buttons: ["No", "Yes"],
+                        buttons: ["Tidak", "Ya"],
                         comfirmBuutonColor: '#dc3545'
                     })
                     .then(function(result) {

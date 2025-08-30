@@ -4,11 +4,11 @@
         <!-- main-content-wrap -->
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>Edit Slide</h3>
+                <h3>Edit Produk Sorotan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
@@ -16,14 +16,14 @@
                     </li>
                     <li>
                         <a href="{{ route('admin.slide.add') }}">
-                            <div class="text-tiny">Slides</div>
+                            <div class="text-tiny">Produk Sorotan</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">Edit Slide</div>
+                        <div class="text-tiny">Edit Produk Sorotan</div>
                     </li>
                 </ul>
             </div>
@@ -35,24 +35,24 @@
                     @method('PUT')
                     <input type="hidden" name="id" value="{{ $slide->id }}">
                     <fieldset class="name">
-                        <div class="body-title">Tagline <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Tagline" name="tagline" tabindex="0"
+                        <div class="body-title">Slogan <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="text" placeholder="Slogan" name="tagline" tabindex="0"
                             value="{{ $slide->tagline }}" aria-required="true" required="">
                     </fieldset>
                     @error('tagline')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
                     <fieldset class="name">
-                        <div class="body-title">Title<span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Title" name="title" tabindex="0"
+                        <div class="body-title">Judul<span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="text" placeholder="Judul" name="title" tabindex="0"
                             value="{{ $slide->title }}" aria-required="true" required="">
                     </fieldset>
                     @error('title')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
                     <fieldset class="name">
-                        <div class="body-title">Subtitle<span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Subtitle" name="subtitle" tabindex="0"
+                        <div class="body-title">Keterangan<span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="text" placeholder="Keterangan" name="subtitle" tabindex="0"
                             value="{{ $slide->subtitle }}" aria-required="true" required="">
                     </fieldset>
                     @error('subtitle')
@@ -67,7 +67,7 @@
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
                     <fieldset>
-                        <div class="body-title">Upload images <span class="tf-color-1">*</span>
+                        <div class="body-title">Unggah Gambar <span class="tf-color-1">*</span>
                         </div>
                         <div class="upload-image flex-grow">
                             @if ($slide->image)
@@ -81,9 +81,8 @@
                                     <span class="icon">
                                         <i class="icon-upload-cloud"></i>
                                     </span>
-                                    <span class="body-text">Drop your images here or select <span class="tf-color">click
-                                            to
-                                            browse</span></span>
+                                    <span class="body-text">Letakkan gambar di sini <span
+                                            class="tf-color">cari</span></span>
                                     <input type="file" id="myFile" name="image">
                                 </label>
                             </div>
@@ -96,9 +95,9 @@
                         <div class="body-title">Status</div>
                         <div class="select flex-grow">
                             <select class="" name="status">
-                                <option>Select</option>
-                                <option value="1" @if ($slide->status == '1') selected @endif>Active</option>
-                                <option value="0" @if ($slide->status == '0') selected @endif>Inactive</option>
+                                <option>Pilih</option>
+                                <option value="1" @if ($slide->status == '1') selected @endif>Aktif</option>
+                                <option value="0" @if ($slide->status == '0') selected @endif>Tidak Aktif</option>
                             </select>
                         </div>
                     </fieldset>
@@ -107,7 +106,7 @@
                     @enderror
                     <div class="bot">
                         <div></div>
-                        <button class="tf-button w208" type="submit">Save</button>
+                        <button class="tf-button w208" type="submit">Simpan</button>
                     </div>
                 </form>
             </div>

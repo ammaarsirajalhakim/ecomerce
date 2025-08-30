@@ -4,11 +4,11 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>User Infomation</h3>
+                <h3>Tambah Pengguna</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
@@ -16,14 +16,14 @@
                     </li>
                     <li>
                         <a href="{{ route('admin.users') }}">
-                            <div class="text-tiny">Users</div>
+                            <div class="text-tiny">Pengguna</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">New User</div>
+                        <div class="text-tiny">Tambah Pengguna</div>
                     </li>
                 </ul>
             </div>
@@ -31,8 +31,8 @@
                 <form class="form-new-product form-style-1" action="{{ route('admin.user.store') }}" method="POST">
                     @csrf
                     <fieldset class="name">
-                        <div class="body-title">Full Name <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="User Name" name="name"
+                        <div class="body-title">Nama Lengkap <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="text" placeholder="Nama Lengkap" name="name"
                             value="{{ old('name') }}" required="">
                     </fieldset>
                     @error('name')
@@ -40,8 +40,8 @@
                     @enderror
 
                     <fieldset class="email">
-                        <div class="body-title">Email Address <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="email" placeholder="User Email" name="email"
+                        <div class="body-title">Alamat Email <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="email" placeholder="Email Pengguna" name="email"
                             value="{{ old('email') }}" required="">
                     </fieldset>
                     @error('email')
@@ -57,9 +57,9 @@
                     @enderror
 
                     <fieldset class="utype">
-                        <div class="body-title">User Type <span class="tf-color-1">*</span></div>
+                        <div class="body-title">Tipe Pengguna <span class="tf-color-1">*</span></div>
                         <select name="utype" class="flex-grow">
-                            <option value="USR">User</option>
+                            <option value="USR">Pelanggan </option>
                             <option value="ADM">Admin</option>
                         </select>
                     </fieldset>
@@ -69,7 +69,7 @@
 
                     <div class="bot">
                         <div></div>
-                        <button class="tf-button w208" type="submit">Save</button>
+                        <button class="tf-button w208" type="submit">Simpan</button>
                     </div>
                 </form>
             </div>

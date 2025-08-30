@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
+use App\Models\Contact;
 
 class BaseController extends Controller
 {
@@ -14,8 +15,10 @@ class BaseController extends Controller
             SELECT SUM(IF(status='ordered', 1, 0)) AS TotalOrdered 
             FROM Orders
         ");
-
         // Bagikan variabel $dashboardDatas ke SEMUA view
         View::share('dashboardDatas', $dashboardDatas);
+
+        $totalContacts = Contact::count();
+        View::share('totalContacts', $totalContacts);
     }
 }

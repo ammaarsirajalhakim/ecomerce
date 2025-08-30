@@ -3,18 +3,18 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>Brands</h3>
+                <h3>Merek</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">Brands</div>
+                        <div class="text-tiny">Merek</div>
                     </li>
                 </ul>
             </div>
@@ -32,8 +32,8 @@
                             </div>
                         </form>
                     </div>
-                    <a class="tf-button style-1 w208" href="{{ route('admin.brand.add') }}"><i class="icon-plus"></i>Add
-                        new</a>
+                    <a class="tf-button style-1 w208" href="{{ route('admin.brand.add') }}"><i class="icon-plus"></i> Tambah
+                        Merek</a>
                 </div>
                 <div class="wg-table table-all-user">
                     @if (Session::has('status'))
@@ -43,11 +43,11 @@
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Slug</th>
-                                    <th>Products</th>
-                                    <th>Action</th>
+                                    <th>Id</th>
+                                    <th>Nama</th>
+                                    <th>URL Merek</th>
+                                    <th>Produk</th>
+                                    <th>Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -104,10 +104,10 @@
                 e.preventDefault();
                 var form = $(this).closest('form');
                 swal({
-                        title: "Are you sure?",
-                        text: "You want to delete this record?",
+                        title: "Apakah Anda Yakin?",
+                        text: "Anda Yakin Menghapus Baris Ini?",
                         type: "warning",
-                        buttons: ["No", "Yes"],
+                        buttons: ["Tidak", "Ya"],
                         confirmButtonColor: '#dc3545'
                     })
                     .then(function(result) {

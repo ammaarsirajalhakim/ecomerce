@@ -3,18 +3,18 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>All Messages</h3>
+                <h3>Semua Pesan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">All Messages</div>
+                        <div class="text-tiny">Semua Pesan</div>
                     </li>
                 </ul>
             </div>
@@ -43,13 +43,13 @@
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
+                                    <th>Id</th>
+                                    <th>Nama</th>
                                     <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Message</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
+                                    <th>Nomor Telepon</th>
+                                    <th>Pesan</th>
+                                    <th>Tanggal</th>
+                                    <th>Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,10 +95,10 @@
                 e.preventDefault();
                 var form = $(this).closest('form');
                 swal({
-                        title: "Are you sure?",
-                        text: "You want to delete this record?",
+                        title: "Apakah Anda Yakin?",
+                        text: "Anda Yakin Menghapus Baris Ini?",
                         type: "warning",
-                        buttons: ["No", "Yes"],
+                        buttons: ["Tidak", "Ya"],
                         comfirmBuutonColor: '#dc3545'
                     })
                     .then(function(result) {

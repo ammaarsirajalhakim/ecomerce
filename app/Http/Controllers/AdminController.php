@@ -696,7 +696,9 @@ class AdminController extends BaseController
     public function contacts()
     {
         $contacts = Contact::orderBy('created_at', 'DESC')->paginate(10);
-        return view('admin.contacts', compact('contacts'));
+        $totalContacts = Contact::count();
+
+        return view('admin.contacts', compact('contacts', 'totalContacts'));
     }
 
     public function contact_delete($id)

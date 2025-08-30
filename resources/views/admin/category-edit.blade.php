@@ -3,11 +3,11 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>Category infomation</h3>
+                <h3>Edit Kategori</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
@@ -15,14 +15,14 @@
                     </li>
                     <li>
                         <a href="{{ route('admin.categories') }}">
-                            <div class="text-tiny">Categories</div>
+                            <div class="text-tiny">Kategori</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">Edit Category</div>
+                        <div class="text-tiny">Edit Kategori</div>
                     </li>
                 </ul>
             </div>
@@ -34,23 +34,23 @@
                     @method('PUT')
                     <input type="hidden" name="id" value={{ $category->id }} />
                     <fieldset class="name">
-                        <div class="body-title">Category Name <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Category Name" name="name" tabindex="0"
+                        <div class="body-title">Nama Kategori<span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="text" placeholder="Nama Kategori" name="name" tabindex="0"
                             value="{{ $category->name }}" aria-required="true" required="">
                     </fieldset>
                     @error('name')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
                     <fieldset class="name">
-                        <div class="body-title">Category Slug <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Category Slug" name="slug" tabindex="0"
+                        <div class="body-title">Link Kategori <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow" type="text" placeholder="Link Kategori" name="slug" tabindex="0"
                             value="{{ $category->slug }}" aria-required="true" required="">
                     </fieldset>
                     @error('slug')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
                     <fieldset>
-                        <div class="body-title">Upload images <span class="tf-color-1">*</span>
+                        <div class="body-title">Unggah Gambar <span class="tf-color-1">*</span>
                         </div>
                         <div class="upload-image flex-grow">
                             @if ($category->image)
@@ -64,8 +64,7 @@
                                     <span class="icon">
                                         <i class="icon-upload-cloud"></i>
                                     </span>
-                                    <span class="body-text">Drop your images here or select <span class="tf-color">click to
-                                            browse</span></span>
+                                    <span class="body-text">Letakkan gambar di sini <span class="tf-color">cari</span></span>
                                     <input type="file" id="myFile" name="image" accept="image/*">
                                 </label>
                             </div>
@@ -77,7 +76,7 @@
 
                     <div class="bot">
                         <div></div>
-                        <button class="tf-button w208" type="submit">Save</button>
+                        <button class="tf-button w208" type="submit">Simpan</button>
                     </div>
                 </form>
             </div>

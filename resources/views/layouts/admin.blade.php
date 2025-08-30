@@ -26,93 +26,7 @@
     @stack('styles')
 </head>
 <style>
-    /* === Clean & Light Sidebar Style by Gemini === */
 
-    /* Latar belakang utama sidebar dan border pemisah */
-    .section-menu-left {
-        background-color: #ffffff;
-        /* Latar belakang putih bersih */
-        border-right: 1px solid #e9ecef;
-        /* Garis pemisah abu-abu sangat terang */
-    }
-
-    /* Area Logo */
-    .box-logo {
-        border-bottom: 1px solid #e9ecef;
-        /* Garis pemisah halus */
-    }
-
-    /* Ikon burger menu di header mobile */
-    .header-dashboard .button-show-hide {
-        color: #343a40;
-    }
-
-    /* Judul "Daftar Fitur Admin" */
-    .center-heading {
-        color: #6c757d;
-        /* Warna abu-abu untuk judul */
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 15px 25px;
-        font-size: 12px;
-    }
-
-    /* Item Menu Utama */
-    .menu-list .menu-item>a {
-        color: #34495e;
-        /* Warna teks biru dongker gelap agar mudah dibaca */
-        padding: 14px 25px;
-        margin: 2px 15px;
-        border-radius: 8px;
-        transition: all 0.25s ease-in-out;
-        /* Transisi halus */
-    }
-
-    /* Efek saat kursor mouse di atas item menu */
-    .menu-list .menu-item>a:hover {
-        background-color: #eef8ff;
-        /* Warna latar PUTIH KEBIRUAN yang sangat lembut */
-        color: #0056b3;
-        /* Teks menjadi biru lebih gelap */
-    }
-
-    /* Style untuk item menu yang sedang aktif */
-    .menu-list .menu-item.active>a {
-        background-color: #e3f2fd;
-        /* Warna latar PUTIH KEBIRUAN yang sedikit lebih jelas */
-        color: #0d6efd;
-        /* Warna teks biru primer */
-        font-weight: 600;
-    }
-
-    /* Sub-menu styling */
-    .sub-menu {
-        background-color: transparent;
-        /* Latar belakang transparan */
-        padding: 10px 0 10px 35px;
-        /* Indentasi untuk sub-menu */
-        margin: 0;
-    }
-
-    .sub-menu .sub-menu-item a {
-        color: #566573;
-        padding: 8px 15px;
-    }
-
-    .sub-menu .sub-menu-item a:hover {
-        color: #0d6efd;
-        /* Warna teks saat hover */
-        background-color: transparent;
-        /* Pastikan tidak ada background saat hover di sub-menu */
-    }
-
-    /* Ikon pada menu */
-    .menu-list .menu-item>a .icon {
-        font-size: 18px;
-        margin-right: 15px;
-        /* Jarak antara ikon dan teks */
-    }
 </style>
 </style>
 
@@ -130,8 +44,9 @@
                 <div class="section-menu-left">
                     <div class="box-logo">
                         <a href="{{ route('home.index') }}" id="site-logo-inner">
-                    <img src="{{ asset('images/logo/logo.png') }}" alt="Loozy" class="logo__image d-block" />
-                </a>
+                            <img src="{{ asset('images/logo/logo.png') }}" alt="Loozy"
+                                class="logo__image d-block" />
+                        </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
                         </div>
@@ -231,7 +146,7 @@
                                 <li class="menu-item">
                                     <a href="{{ route('admin.slides') }}" class="">
                                         <div class="icon"><i class="icon-image"></i></div>
-                                        <div class="text">slide</div>
+                                        <div class="text">Produk Sorotan</div>
                                     </a>
                                 </li>
                                 <li class="menu-item">
@@ -317,65 +232,74 @@
                                         <button class="btn btn-secondary dropdown-toggle" type="button"
                                             id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-item">
-                                                <span class="text-tiny">1</span>
+
+                                                {{-- Angka notifikasi HANYA TAMPIL jika totalnya lebih dari 0 --}}
+                                                @if ($totalContacts + $dashboardDatas[0]->TotalOrdered > 0)
+                                                    <span
+                                                        class="text-tiny">{{ $totalContacts + $dashboardDatas[0]->TotalOrdered }}</span>
+                                                @endif
+
                                                 <i class="icon-bell"></i>
                                             </span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end has-content"
                                             aria-labelledby="dropdownMenuButton2">
                                             <li>
-                                                <h6>Notifications</h6>
+                                                <h6>Notifikasi</h6>
                                             </li>
-                                            <li>
-                                                <div class="message-item item-1">
-                                                    <div class="image">
-                                                        <i class="icon-noti-1"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Discount available</div>
-                                                        <div class="text-tiny">Morbi sapien massa, ultricies at rhoncus
-                                                            at, ullamcorper nec diam</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-2">
-                                                    <div class="image">
-                                                        <i class="icon-noti-2"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Account has been verified</div>
-                                                        <div class="text-tiny">Mauris libero ex, iaculis vitae rhoncus
-                                                            et</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-3">
-                                                    <div class="image">
-                                                        <i class="icon-mail"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Pesan</div>
-                                                        <div class="text-tiny">Kamu punya Pesan yang belum dibaca <a href="{{ route('admin.orders') }}" class="color: blue important! ;"> Lihat</a></div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-4">
-                                                    <div class="image">
-                                                        <i class="icon-noti-4"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">pesanan tertunda:
-                                                            <span>{{ $dashboardDatas[0]->TotalOrdered }}</span>
+
+                                            {{-- Cek jika ada pesan baru --}}
+                                            @if ($totalContacts > 0)
+                                                <li>
+                                                    <div class="message-item item-3">
+                                                        <div class="image">
+                                                            <i class="icon-mail"></i>
                                                         </div>
-                                                        <div class="text-tiny">lihat daftar pesanan tertunda<a href="{{ route('admin.orders') }}" class="color: blue important! ;"> Lihat</a>
+                                                        <div>
+                                                            <div class="body-title-2">Pesan belum terbaca:
+                                                                <span>{{ $totalContacts }}</span>
+                                                            </div>
+                                                            <div class="text-tiny">Anda memiliki pesan yang belum
+                                                                dibaca.
+                                                                <a href="{{ route('admin.contacts') }}"
+                                                                   class="tf-color">Lihat</a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </li>
-                                            <li><a href="#" class="tf-button w-full">View all</a></li>
+                                                </li>
+                                            @endif
+
+                                            {{-- Cek jika ada pesanan tertunda --}}
+                                            @if ($dashboardDatas[0]->TotalOrdered > 0)
+                                                <li>
+                                                    <div class="message-item item-4">
+                                                        <div class="image">
+                                                            <i class="icon-noti-4"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div class="body-title-2">Pesanan tertunda:
+                                                                <span>{{ $dashboardDatas[0]->TotalOrdered }}</span>
+                                                            </div>
+                                                            <div class="text-tiny">Lihat daftar pesanan yang tertunda.
+                                                                <a href="{{ route('admin.orders') }}"
+                                                                    class="tf-color">Lihat</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @endif
+
+                                            {{-- Tampilkan pesan jika tidak ada notifikasi sama sekali --}}
+                                            @if ($totalContacts + $dashboardDatas[0]->TotalOrdered == 0)
+                                                <li>
+                                                    <div class="message-item">
+                                                        <div class="text-tiny" style="padding: 10px 20px;">
+                                                            Tidak ada notifikasi baru.
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @endif
+
                                         </ul>
                                     </div>
                                 </div>
@@ -399,55 +323,7 @@
                                                 </span>
                                             </span>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end has-content"
-                                            aria-labelledby="dropdownMenuButton3">
-                                            <li>
-                                                <a href="#" class="user-item">
-                                                    <div class="icon">
-                                                        <i class="icon-user"></i>
-                                                    </div>
-                                                    <div class="body-title-2">Account</div>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="user-item">
-                                                    <div class="icon">
-                                                        <i class="icon-mail"></i>
-                                                    </div>
-                                                    <div class="body-title-2">Inbox</div>
-                                                    <div class="number">27</div>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="user-item">
-                                                    <div class="icon">
-                                                        <i class="icon-file-text"></i>
-                                                    </div>
-                                                    <div class="body-title-2">Taskboard</div>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="user-item">
-                                                    <div class="icon">
-                                                        <i class="icon-headphones"></i>
-                                                    </div>
-                                                    <div class="body-title-2">Support</div>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <form method="POST" action="{{ route('logout') }}"
-                                                    id="logout-form">
-                                                    @csrf
-                                                    <a href="{{ route('logout') }}" class="user-item"
-                                                        onclick="event.preventDefault();document.getElementById('logout-form').submit();">
-                                                        <div class="icon">
-                                                            <i class="icon-log-out"></i>
-                                                        </div>
-                                                        <div class="body-title-2">Log out</div>
-                                                    </a>
-                                                </form>
-                                            </li>
-                                        </ul>
+
                                     </div>
                                 </div>
 

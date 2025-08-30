@@ -3,18 +3,18 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>Slides</h3>
+                <h3>Tambah Produk Sorotan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">Slides</div>
+                        <div class="text-tiny">Tambah Produk Sorotan</div>
                     </li>
                 </ul>
             </div>
@@ -24,16 +24,16 @@
                     <div class="wg-filter flex-grow">
                         <form class="form-search">
                             <fieldset class="name">
-                                <input type="text" placeholder="Search here..." class="" name="name"
-                                    tabindex="2" value="" aria-required="true" required="">
+                                <input type="text" placeholder="cari......" class="" name="name" tabindex="2"
+                                    value="" aria-required="true" required="">
                             </fieldset>
                             <div class="button-submit">
                                 <button class="" type="submit"><i class="icon-search"></i></button>
                             </div>
                         </form>
                     </div>
-                    <a class="tf-button style-1 w208" href="{{ route('admin.slide.add') }}"><i class="icon-plus"></i>Add
-                        new</a>
+                    <a class="tf-button style-1 w208" href="{{ route('admin.slide.add') }}"><i class="icon-plus"></i>Tambah
+                        Tambah Produk Sorotan</a>
                 </div>
                 <div class="wg-table table-all-user">
                     @if (Session::has('status'))
@@ -43,13 +43,13 @@
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Image</th>
-                                    <th>Tagline</th>
-                                    <th>Title</th>
-                                    <th>Subtitle</th>
+                                    <th>Id</th>
+                                    <th>Gambar</th>
+                                    <th>Slogan</th>
+                                    <th>Judul</th>
+                                    <th>Keterangan</th>
                                     <th>Link</th>
-                                    <th>Action</th>
+                                    <th>Option</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -105,10 +105,10 @@
                 e.preventDefault();
                 var form = $(this).closest('form');
                 swal({
-                        title: "Are you sure?",
-                        text: "You want to delete this record?",
+                        title: "Apakah Anda Yakin?",
+                        text: "Anda Yakin Menghapus Baris Ini?",
                         type: "warning",
-                        buttons: ["No", "Yes"],
+                        buttons: ["Tidak", "Ya"],
                         confirmButtonColor: '#dc3545'
                     })
                     .then(function(result) {

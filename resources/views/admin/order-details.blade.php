@@ -8,18 +8,18 @@
     <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-                <h3>Order Details</h3>
+                <h3>Detail Pesanan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
                         <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Dashboard</div>
+                            <div class="text-tiny">Menu Utama</div>
                         </a>
                     </li>
                     <li>
                         <i class="icon-chevron-right"></i>
                     </li>
                     <li>
-                        <div class="text-tiny">Order Details</div>
+                        <div class="text-tiny">Detail Pesanan</div>
                     </li>
                 </ul>
             </div>
@@ -27,9 +27,9 @@
             <div class="wg-box">
                 <div class="flex items-center justify-between gap10 flex-wrap">
                     <div class="wg-filter flex-grow">
-                        <h5>Ordered Details</h5>
+                        <h5>Detail Pesanan</h5>
                     </div>
-                    <a class="tf-button style-1 w208" href="{{ route('admin.orders') }}">Back</a>
+                    <a class="tf-button style-1 w208" href="{{ route('admin.orders') }}">Kembali</a>
                 </div>
                 <div class="table-responsive">
                     @if (Session::has('status'))
@@ -37,30 +37,30 @@
                     @endif
                     <table class="table table-striped table-bordered">
                         <tr>
-                            <th>Order No</th>
+                            <th>No Pesanan</th>
                             <td>{{ $order->id }}</td>
-                            <th>Mobile</th>
+                            <th>No Telepon</th>
                             <td>{{ $order->phone }}</td>
-                            <th>Zip Code</th>
+                            <th>Kode Pos</th>
                             <td>{{ $order->zip }}</td>
                         </tr>
                         <tr>
-                            <th>Order Date</th>
+                            <th>Tanggal Pemesanan</th>
                             <td>{{ $order->created_at }}</td>
-                            <th>Delivered Date</th>
+                            <th>Tanggal Diantar</th>
                             <td>{{ $order->delivered_date }}</td>
-                            <th>Cancel Date</th>
+                            <th>Tanggal Ditolak</th>
                             <td>{{ $order->canceled_date }}</td>
                         </tr>
                         <tr>
-                            <th>Order Status</th>
+                            <th>Status Pesanan</th>
                             <td colspan="5">
                                 @if ($order->status == 'delivered')
-                                    <span class="badge bg-success">Delivered</span>
+                                    <span class="badge bg-success">Dikirim</span>
                                 @elseif ($order->status == 'canceled')
-                                    <span class="badge bg-danger">Canceled</span>
+                                    <span class="badge bg-danger">Ditolak</span>
                                 @else
-                                    <span class="badge bg-warning">Ordered</span>
+                                    <span class="badge bg-warning">Dipesan</span>
                                 @endif
                             </td>
                         </tr>
@@ -71,22 +71,21 @@
             <div class="wg-box mt-5">
                 <div class="flex items-center justify-between gap10 flex-wrap">
                     <div class="wg-filter flex-grow">
-                        <h5>Ordered Items</h5>
+                        <h5>Daftar Pesanan</h5>
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th class="text-center">Price</th>
-                                <th class="text-center">Quantity</th>
-                                <th class="text-center">SKU</th>
-                                <th class="text-center">Category</th>
-                                <th class="text-center">Brand</th>
-                                <th class="text-center">Options</th>
-                                <th class="text-center">Return Status</th>
-                                <th class="text-center">Action</th>
+                                <th>Nama Barang</th>
+                                <th class="text-center">Harga</th>
+                                <th class="text-center">Jumlah</th>
+                                <th class="text-center">Kode Barang</th>
+                                <th class="text-center">Kategori</th>
+                                <th class="text-center">Merek</th>
+                                <th class="text-center">Pilihan</th>
+                                <th class="text-center">Status Pengembalian</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,14 +107,7 @@
                                     <td class="text-center">{{ $item->product->category->name }}</td>
                                     <td class="text-center">{{ $item->product->brand->name }}</td>
                                     <td class="text-center">{{ $item->option }}</td>
-                                    <td class="text-center">{{ $item->rstatus == 0 ? 'No' : 'Yes' }}</td>
-                                    <td class="text-center">
-                                        <div class="list-icon-function view-icon">
-                                            <div class="item eye">
-                                                <i class="icon-eye"></i>
-                                            </div>
-                                        </div>
-                                    </td>
+                                    <td class="text-center">{{ $item->rstatus == 0 ? 'Tidak' : 'Iya' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -129,7 +121,7 @@
             </div>
 
             <div class="wg-box mt-5">
-                <h5>Shipping Address</h5>
+                <h5>Alamat Pemesan</h5>
                 <div class="my-account__address-item col-md-6">
                     <div class="my-account__address-item__detail">
                         <p>{{ $order->name }}</p>
@@ -139,39 +131,39 @@
                         <p>{{ $order->landmark }}</p>
                         <p>{{ $order->zip }}</p>
                         <br>
-                        <p>Mobile : {{ $order->phone }}</p>
+                        <p>No Telepon : {{ $order->phone }}</p>
                     </div>
                 </div>
             </div>
 
             <div class="wg-box mt-5">
-                <h5>Transactions</h5>
+                <h5>Transaksi</h5>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-transaction">
                         <tbody>
                             <tr>
-                                <th>Subtotal</th>
+                                <th>Jumlah Sementara</th>
                                 <td>${{ $order->subtotal }}</td>
-                                <th>Tax</th>
+                                <th>Pajak</th>
                                 <td>${{ $order->tax }}</td>
-                                <th>Discount</th>
+                                <th>Diskon</th>
                                 <td>${{ $order->discount }}</td>
                             </tr>
                             <tr>
-                                <th>Total</th>
+                                <th>Jumlah</th>
                                 <td>${{ $order->total }}</td>
-                                <th>Payment Mode</th>
+                                <th>Metode Pembayaran</th>
                                 <td>{{ $order->transaction->mode }}</td>
                                 <th>Status</th>
                                 <td>
                                     @if ($transaction->status == 'approved')
-                                        <span class="badge bg-success">Approved</span>
+                                        <span class="badge bg-success">Dikirim</span>
                                     @elseif ($transaction->status == 'declined')
-                                        <span class="badge bg-danger">Declined</span>
+                                        <span class="badge bg-danger">Tolak</span>
                                     @elseif ($transaction->status == 'refunded')
-                                        <span class="badge bg-secondary">Refunded</span>
+                                        <span class="badge bg-secondary">Dikembalikan</span>
                                     @else
-                                        <span class="badge bg-warning">Pending</span>
+                                        <span class="badge bg-warning">Ditunda</span>
                                     @endif
                                 </td>
                             </tr>
@@ -181,7 +173,7 @@
             </div>
 
             <div class="wg-box mt-5">
-                <h5>Update Order Status</h5>
+                <h5>Perbarui Status Pemesanan</h5>
                 <form action="{{ route('admin.order.status.update') }}" method="POST">
                     @csrf
                     @method('PUT')
@@ -190,17 +182,17 @@
                         <div class="col-md-3">
                             <div class="select">
                                 <select name="order_status" id="order_status">
-                                    <option value="ordered" {{ $order->status == 'ordered' ? 'selected' : '' }}>Ordered
+                                    <option value="ordered" {{ $order->status == 'ordered' ? 'selected' : '' }}>Dalam Pemesanan
                                     </option>
                                     <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>
-                                        Delivered</option>
-                                    <option value="canceled" {{ $order->status == 'canceled' ? 'selected' : '' }}>Canceled
+                                        Dikirim</option>
+                                    <option value="canceled" {{ $order->status == 'canceled' ? 'selected' : '' }}>Ditolak
                                     </option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary tf-button w208">Update Status</button>
+                            <button type="submit" class="btn btn-primary tf-button w208">Perbarui Status Pemesanan</button>
                         </div>
                     </div>
                 </form>
