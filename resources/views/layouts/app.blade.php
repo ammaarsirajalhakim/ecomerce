@@ -546,133 +546,81 @@
     @yield('content')
 
     <hr class="mt-5 text-secondary" />
-    <footer class="footer footer_type_2">
-        <div class="footer-middle container">
-            <div class="row row-cols-lg-5 row-cols-2">
-                <div class="footer-column footer-store-info col-12 mb-4 mb-lg-0">
-                    <div class="logo">
-                        <a href="{{ route('home.index') }}">
-                            <img src="{{ asset('assets/images/logo.png') }}" alt="SurfsideMedia"
-                                class="logo__image d-block" />
-                        </a>
-                    </div>
-                    <p class="footer-address">Malo, Bojonegoro, Jawa Timur, 62153</p>
-                    <p class="m-0"><strong class="fw-medium">mizabun0108@gmail.com</strong></p>
-                    <p><strong class="fw-medium">+62 889-0285-4021</strong></p>
 
-                    <ul class="social-links list-unstyled d-flex flex-wrap mb-0">
-                        {{-- <li>
-                            <a href="#" class="footer__social-link d-block">
-                                <svg class="svg-icon svg-icon_facebook" width="9" height="15"
-                                    viewBox="0 0 9 15" xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_facebook" />
-                                </svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="footer__social-link d-block">
-                                <svg class="svg-icon svg-icon_twitter" width="14" height="13"
-                                    viewBox="0 0 14 13" xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_twitter" />
-                                </svg>
-                            </a>
-                        </li> --}}
-                        <li>
-                            <a href="https://www.instagram.com/loozy.clothing/" class="footer__social-link d-block">
-                                <svg class="svg-icon svg-icon_instagram" width="14" height="13"
-                                    viewBox="0 0 14 13" xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_instagram" />
-                                </svg>
-                            </a>
-                        </li>
-                        {{-- <li>
-                            <a href="#" class="footer__social-link d-block">
-                                <svg class="svg-icon svg-icon_youtube" width="16" height="11"
-                                    viewBox="0 0 16 11" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M15.0117 1.8584C14.8477 1.20215 14.3281 0.682617 13.6992 0.518555C12.5234 0.19043 7.875 0.19043 7.875 0.19043C7.875 0.19043 3.19922 0.19043 2.02344 0.518555C1.39453 0.682617 0.875 1.20215 0.710938 1.8584C0.382812 3.00684 0.382812 5.46777 0.382812 5.46777C0.382812 5.46777 0.382812 7.90137 0.710938 9.07715C0.875 9.7334 1.39453 10.2256 2.02344 10.3896C3.19922 10.6904 7.875 10.6904 7.875 10.6904C7.875 10.6904 12.5234 10.6904 13.6992 10.3896C14.3281 10.2256 14.8477 9.7334 15.0117 9.07715C15.3398 7.90137 15.3398 5.46777 15.3398 5.46777C15.3398 5.46777 15.3398 3.00684 15.0117 1.8584ZM6.34375 7.68262V3.25293L10.2266 5.46777L6.34375 7.68262Z" />
-                                </svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="footer__social-link d-block">
-                                <svg class="svg-icon svg-icon_pinterest" width="14" height="15"
-                                    viewBox="0 0 14 15" xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_pinterest" />
-                                </svg>
-                            </a>
-                        </li> --}}
-                    </ul>
+    <footer class="footer bg-dark text-white pt-5 pb-4">
+    <div class="container">
+        <div class="row gy-4">
+            <!-- Logo & Kontak -->
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-logo mb-3">
+                    <a href="{{ route('home.index') }}">
+                        <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="img-fluid" style="max-height: 60px;" />
+                    </a>
                 </div>
+                <p class="mb-1">Malo, Bojonegoro, Jawa Timur, 62153</p>
+                <p class="mb-1"><strong>Email:</strong> mizabun0108@gmail.com</p>
+                <p><strong>Telp:</strong> +62 889-0285-4021</p>
 
-                <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Perusahaan</h6>
-                    <ul class="sub-menu__list list-unstyled">
-                        <li class="sub-menu__item"><a href="{{ route('home.about') }}" class="navigation_link">Tentang Kami </a></li>
-                        {{-- <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Careers</a>
-                        </li>
-                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Affiliates</a>
-                        </li>
-                        <li class="sub-menu__item"><a href="blog_list1.html"
-                                class="menu-link menu-link_us-s">Blog</a></li> --}}
-                        <li class="sub-menu__item"><a href="{{ route('home.contact') }}"
-                                class="menu-link menu-link_us-s">Hubungi Kami</a></li>
-                    </ul>
+                <div class="d-flex gap-3 mt-3">
+                    <a href="https://www.instagram.com/universitas_ngudiwaluyo/" class="text-white fs-5" aria-label="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="#" class="text-white fs-5" aria-label="Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="text-white fs-5" aria-label="Twitter">
+                        <i class="bi bi-twitter"></i>
+                    </a>
                 </div>
+            </div>
 
-                <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Belanja</h6>
-                    <ul class="sub-menu__list list-unstyled">
-                        <li class="sub-menu__item"><a href="{{ url('/shop?order=' . 1) }}"
-                                class="menu-link menu-link_us-s">Produk Terbaru</a></li>
-                        <li class="sub-menu__item"><a href="{{ url('/shop?featured=' . 1) }}"
-                                class="menu-link menu-link_us-s">Unggulan</a></li>
-                        <li class="sub-menu__item"><a href="{{ route('shop.index') }}"
-                                class="menu-link menu-link_us-s">Semua Produk</a></li>
-                    </ul>
-                </div>
+            <!-- Perusahaan -->
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="fw-bold mb-3 text-white  ">Perusahaan</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{{ route('home.about') }}" class="text-white text-decoration-none">Tentang Kami</a></li>
+                    <li><a href="{{ route('home.contact') }}" class="text-white text-decoration-none">Hubungi Kami</a></li>
+                </ul>
+            </div>
 
-                <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Bantuan</h6>
-                    <ul class="sub-menu__list list-unstyled">
-                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Layanan Pelanggan</a></li>
-                        <li class="sub-menu__item"><a
-                                href="{{ auth()->check() ? route('user.index') : route('login') }}"
-                                class="menu-link menu-link_us-s">Akun Saya</a>
-                        </li>
-                        {{-- <li class="sub-menu__item"><a href="store_location.html"
-                                class="menu-link menu-link_us-s">Find a Store</a>
-                        </li> --}}
-                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Hukum & Privasi</a></li>
-                        {{-- <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Gift
-                                Card</a></li> --}}
-                    </ul>
-                </div>
+            <!-- Belanja -->
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="fw-bold mb-3 text-white">Belanja</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url('/shop?order=' . 1) }}" class="text-white text-decoration-none">Produk Terbaru</a></li>
+                    <li><a href="{{ url('/shop?featured=' . 1) }}" class="text-white text-decoration-none">Unggulan</a></li>
+                    <li><a href="{{ route('shop.index') }}" class="text-white text-decoration-none">Semua Produk</a></li>
+                </ul>
+            </div>
 
-                <div class="footer-column footer-menu mb-4 mb-lg-0">
-                    <h6 class="sub-menu__title text-uppercase">Kategori</h6>
-                    <ul class="sub-menu__list list-unstyled">
-                        @foreach ($footerCategories as $category)
-                            <li class="sub-menu__item"><a href="{{ url('/shop?categories=' . $category->id) }}"
-                                    class="menu-link menu-link_us-s">{{ $category->name }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+            <!-- Bantuan -->
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="fw-bold mb-3 text-white">Bantuan</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white text-decoration-none">Layanan Pelanggan</a></li>
+                    <li><a href="{{ auth()->check() ? route('user.index') : route('login') }}" class="text-white text-decoration-none">Akun Saya</a></li>
+                    <li><a href="#" class="text-white text-decoration-none">Hukum & Privasi</a></li>
+                </ul>
+            </div>
+
+            <!-- Kategori -->
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="fw-bold mb-3 text-white">Kategori</h6>
+                <ul class="list-unstyled">
+                    @foreach ($footerCategories as $category)
+                        <li><a href="{{ url('/shop?categories=' . $category->id) }}" class="text-white text-decoration-none">{{ $category->name }}</a></li>
+                    @endforeach
+                </ul>
             </div>
         </div>
 
-        <div class="footer-bottom">
-            <div class="container d-md-flex align-items-center">
-                <span class="footer-copyright me-auto">©2025 Mars Web App</span>
-                <div class="footer-settings d-md-flex align-items-center">
-                    <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp; <a
-                        href="terms-conditions.html">Terms &amp;
-                        Conditions</a>
-                </div>
-            </div>
+        <hr class="border-secondary my-4" />
+
+        <div class="text-center small">
+            ©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights Reserved.
         </div>
-    </footer>
+    </div>
+</footer>
 
 
     <footer class="footer-mobile container w-100 px-5 d-md-none bg-body">
