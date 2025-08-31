@@ -62,6 +62,12 @@ class CartController extends Controller
 
         $userId = Auth::id();
         $productId = $request->id;
+        $product = Product::find($productId);
+
+        // Validasi Stok
+        if (!$product || $product->quantity <= 0) {
+            return redirect()->route('shop.index')->with('error', 'Barang tidak tersedia atau stok telah habis!');
+        }
 
         // Cek apakah produk sudah ada di cart
         $item = CartItem::where('user_id', $userId)
@@ -69,18 +75,17 @@ class CartController extends Controller
             ->first();
 
         if ($item) {
-            // Kalau sudah ada, tambah quantity
             $item->increment('quantity', $request->quantity ?? 1);
         } else {
-            // Kalau belum ada, buat baru
             CartItem::create([
                 'user_id' => $userId,
                 'product_id' => $productId,
                 'quantity' => $request->quantity ?? 1,
-                'price' => $request->price,
+                'price' => $product->sale_price > 0 ? $product->sale_price : $product->regular_price,
             ]);
         }
-        return redirect()->back();
+
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
     }
 
     public function updateQty(Request $request, $id)
@@ -340,12 +345,24 @@ class CartController extends Controller
 
         foreach ($cartItems as $item) {
             $orderItem = new OrderItem();
-            $orderItem->product_id = $item->product_id;  // pastikan CartItem ada relasi product_id
+            $orderItem->product_id = $item->product_id;
             $orderItem->order_id = $order->id;
             $orderItem->price = $item->price;
             $orderItem->quantity = $item->quantity;
             $orderItem->save();
+
+            // --- [LOGIKA PENGURANGAN STOK DITAMBAHKAN DI SINI] ---
+            // Cari produk berdasarkan ID dari item keranjang
+            $product = Product::find($item->product_id);
+            if ($product) {
+                // Kurangi kuantitas produk dengan kuantitas yang dibeli
+                $product->quantity -= $item->quantity;
+                // Simpan perubahan pada produk
+                $product->save();
+            }
+            // --- [AKHIR DARI LOGIKA PENGURANGAN STOK] ---
         }
+
 
         // Simpan transaksi
         if ($request->mode == "card") {
