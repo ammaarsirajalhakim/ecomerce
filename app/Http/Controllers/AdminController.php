@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\Slide;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\About;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,61 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends BaseController
 {
+    public function about_edit()
+    {
+        // Menggunakan firstOrCreate agar jika data belum ada, akan dibuat baris baru yang kosong.
+        // Ini mencegah error saat halaman diakses pertama kali.
+        $about = About::firstOrCreate(['id' => 1]);
+        return view('admin.edit-about', compact('about'));
+    }
+
+    public function about_update(Request $request)
+    {
+        $request->validate([
+            'our_story' => 'required|string',
+            'our_vision' => 'required|string',
+            'our_mission' => 'required|string',
+            'the_company' => 'required|string',
+            'poster_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // 'nullable' karena gambar mungkin tidak diubah
+        ]);
+
+        $about = About::find(1);
+        $about->our_story = $request->our_story;
+        $about->our_vision = $request->our_vision;
+        $about->our_mission = $request->our_mission;
+        $about->the_company = $request->the_company;
+
+        if ($request->hasFile('poster_image')) {
+            // Hapus gambar lama jika ada
+            if ($about->poster_image && File::exists(public_path('uploads/about') . '/' . $about->poster_image)) {
+                File::delete(public_path('uploads/about') . '/' . $about->poster_image);
+            }
+
+            $image = $request->file('poster_image');
+            $file_extension = $image->extension();
+            $file_name = Carbon::now()->timestamp . '.' . $file_extension;
+            $this->GenerateAboutPosterImage($image, $file_name);
+            $about->poster_image = $file_name;
+        }
+        
+        $about->save();
+
+        return redirect()->route('admin.about.edit')->with('status', 'Informasi "About Us" berhasil diperbarui!');
+    }
+
+    public function GenerateAboutPosterImage($image, $imageName)
+    {
+        $destinationPath = public_path('uploads/about');
+        if (!File::isDirectory($destinationPath)) {
+            File::makeDirectory($destinationPath, 0755, true, true);
+        }
+
+        $img = Image::read($image->path());
+        // Mengatur gambar agar sesuai rasio 4:1, contoh ukuran 1200x300
+        $img->cover(1200, 300, "top"); 
+        $img->save($destinationPath . '/' . $imageName);
+    }
+    
     public function users()
     {
         $users = User::orderBy('created_at', 'DESC')->paginate(15); // Mengambil data user dengan pagination
@@ -808,7 +864,7 @@ class AdminController extends BaseController
         $contact = Contact::findOrFail($id);
         return view('admin.detail-contacts', compact('contact'));
     }
-    
+
     public function contact_delete($id)
     {
         $contact = Contact::find($id);
