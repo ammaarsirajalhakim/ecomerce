@@ -46,8 +46,8 @@ Route::post('/place-an-order', [CartController::class, 'place_an_order'])->name(
 Route::get('/order-confirmation', [CartController::class, 'order_confirmation'])->name('cart.order.confirmation');
 
 // Rute untuk halaman Bantuan
-Route::get('/bantuan', [HomeController::class, 'help'])->name('home.help');
-Route::get('/bantuan/{category}', [App\Http\Controllers\HomeController::class, 'showHelpCategory'])->name('help.category');
+Route::get('/help', [HomeController::class, 'help'])->name('home.help');
+Route::get('/help/{category}', [App\Http\Controllers\HomeController::class, 'showHelpCategory'])->name('help.category');
 
 // Rute untuk halaman Kontak (terpisah)
 Route::get('/contact-us', [HomeController::class, 'contact'])->name('home.contact');

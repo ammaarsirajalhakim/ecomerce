@@ -229,7 +229,7 @@ class AdminController extends BaseController
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:brands,slug',
-            'image' => 'mimes:png,jpg,jpeg|max:2048',
+            'image' => 'mimes:png,jpg,jpeg',
         ]);
 
         $brand = new Brand();
@@ -255,7 +255,7 @@ class AdminController extends BaseController
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:brands,slug,' . $request->id,
-            'image' => 'mimes:png,jpg,jpeg|max:2048',
+            'image' => 'mimes:png,jpg,jpeg',
         ]);
 
         $brand = Brand::find($request->id);
@@ -279,8 +279,8 @@ class AdminController extends BaseController
     {
         $destinationPath = public_path('uploads/brands');
         $img = Image::read($image->path());
-        $img->cover(124, 124, "top");
-        $img->resize(124, 124, function ($contraint) {
+        $img->cover(800, 800, "top");
+        $img->resize(800, 800, function ($contraint) {
             $contraint->aspectRatio();
         })->save($destinationPath . '/' . $imageName);
     }
@@ -311,7 +311,7 @@ class AdminController extends BaseController
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:categories,slug',
-            'image' => 'mimes:png,jpg,jpeg|max:2048',
+            'image' => 'mimes:png,jpg,jpeg',
         ]);
 
         $category = new Category();
@@ -338,7 +338,7 @@ class AdminController extends BaseController
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:categories,slug,' . $request->id,
-            'image' => 'mimes:png,jpg,jpeg|max:2048',
+            'image' => 'mimes:png,jpg,jpeg',
         ]);
 
         $category = Category::find($request->id);
@@ -362,8 +362,8 @@ class AdminController extends BaseController
     {
         $destinationPath = public_path('uploads/categories');
         $img = Image::read($image->path());
-        $img->cover(124, 124, "top");
-        $img->resize(124, 124, function ($contraint) {
+        $img->cover(800, 800, "top");
+        $img->resize(800, 800, function ($contraint) {
             $contraint->aspectRatio();
         })->save($destinationPath . '/' . $imageName);
     }
@@ -461,8 +461,8 @@ class AdminController extends BaseController
         $destinationPathThumbnails = public_path('uploads/products/thumbnails');
         $destinationPath = public_path('uploads/products');
         $img = Image::read($image->path());
-        $img->cover(540, 689, "top");
-        $img->resize(540, 689, function ($contraint) {
+        $img->cover(800, 800, "top");
+        $img->resize(800, 800, function ($contraint) {
             $contraint->aspectRatio();
         })->save($destinationPath . '/' . $imageName);
 
@@ -741,8 +741,8 @@ class AdminController extends BaseController
     {
         $destinationPath = public_path('uploads/slides');
         $img = Image::read($image->path());
-        $img->cover(400, 690, "top");
-        $img->resize(400, 690, function ($contraint) {
+        $img->cover(800, 800, "top");
+        $img->resize(800, 800, function ($contraint) {
             $contraint->aspectRatio();
         })->save($destinationPath . '/' . $imageName);
     }
