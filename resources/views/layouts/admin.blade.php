@@ -334,7 +334,7 @@
                         @yield('content')
 
                         <div class="bottom-page">
-                            <div class="body-text">Copyright © 2024 SurfsideMedia</div>
+                            <div class="body-text">©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights Reserved.</div>
                         </div>
                     </div>
 

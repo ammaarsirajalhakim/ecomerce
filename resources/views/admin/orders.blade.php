@@ -22,10 +22,12 @@
             <div class="wg-box">
                 <div class="flex items-center justify-between gap10 flex-wrap">
                     <div class="wg-filter flex-grow">
-                        <form class="form-search">
+                        {{-- Form Pencarian untuk Live Search --}}
+                        <form class="form-search" id="searchForm">
                             <fieldset class="name">
-                                <input type="text" placeholder="cari Pesanan..." class="" name="name"
-                                    tabindex="2" value="" aria-required="true" required="">
+                                <input type="text" id="searchInput"
+                                    placeholder="Cari No Pesanan, Nama, atau No Telepon..." class="" name="name"
+                                    tabindex="2" value="">
                             </fieldset>
                             <div class="button-submit">
                                 <button class="" type="submit"><i class="icon-search"></i></button>
@@ -44,23 +46,22 @@
                                     <th class="text-center">Total Sementara</th>
                                     <th class="text-center">Pajak</th>
                                     <th class="text-center">Total</th>
-
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Tanggal Pemesanan</th>
                                     <th class="text-center">Total Barang</th>
-                                    <th class="text-center">Status Pemesanan</th>
+                                    <th class="text-center">Tgl Pengiriman</th>
                                     <th class="text-center">Opsi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="orderTableBody">
                                 @foreach ($orders as $order)
                                     <tr>
                                         <td class="text-center">{{ $order->id }}</td>
                                         <td class="text-center">{{ $order->name }}</td>
                                         <td class="text-center">{{ $order->phone }}</td>
-                                        <td class="text-center">${{ $order->subtotal }}</td>
-                                        <td class="text-center">${{ $order->tax }}</td>
-                                        <td class="text-center">${{ $order->total }}</td>
+                                        <td class="text-center">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</td>
+                                        <td class="text-center">Rp {{ number_format($order->tax, 0, ',', '.') }}</td>
+                                        <td class="text-center">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                                         <td class="text-center">
                                             @if ($order->status == 'delivered')
                                                 <span class="badge bg-success">Dikirim</span>
@@ -70,9 +71,12 @@
                                                 <span class="badge bg-warning">Dalam Pemesanan</span>
                                             @endif
                                         </td>
-                                        <td class="text-center">{{ $order->created_at }}</td>
+                                        <td class="text-center">
+                                            {{ \Carbon\Carbon::parse($order->created_at)->format('d F Y') }}</td>
                                         <td class="text-center">{{ $order->orderItems->count() }}</td>
-                                        <td class="text-center">{{ $order->delivered_date }}</td>
+                                        <td class="text-center">
+                                            {{ $order->delivered_date ? \Carbon\Carbon::parse($order->delivered_date)->format('d F Y') : '-' }}
+                                        </td>
                                         <td class="text-center">
                                             <a href="{{ route('admin.order.details', ['order_id' => $order->id]) }}">
                                                 <div class="list-icon-function view-icon">
@@ -96,3 +100,108 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            // Mencegah form pencarian melakukan submit dan refresh halaman
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+            });
+
+            // SCRIPT UNTUK LIVE SEARCH
+            $('#searchInput').on('keyup', function() {
+                var query = $(this).val();
+                var orderTableBody = $('#orderTableBody');
+
+                if (query.length > 0) {
+                    $('.wgp-pagination').hide();
+                } else {
+                    $('.wgp-pagination').show();
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.order.search') }}",
+                    type: "GET",
+                    data: {
+                        'query': query
+                    },
+                    success: function(data) {
+                        orderTableBody.empty();
+
+                        if (data.length > 0) {
+                            $.each(data, function(index, order) {
+                                var detailUrl =
+                                    "{{ route('admin.order.details', ['order_id' => ':id']) }}"
+                                    .replace(':id', order.id);
+
+                                // Logic untuk status badge
+                                var statusBadge = '';
+                                if (order.status == 'delivered') {
+                                    statusBadge =
+                                        '<span class="badge bg-success">Dikirim</span>';
+                                } else if (order.status == 'canceled') {
+                                    statusBadge =
+                                        '<span class="badge bg-danger">Ditolak</span>';
+                                } else {
+                                    statusBadge =
+                                        '<span class="badge bg-warning">Dalam Pemesanan</span>';
+                                }
+
+                                // Formatting tanggal
+                                var orderDate = new Date(order.created_at)
+                                    .toLocaleDateString('id-ID', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    });
+                                var deliveredDate = order.delivered_date ? new Date(
+                                    order.delivered_date).toLocaleDateString(
+                                    'id-ID', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    }) : '-';
+
+                                // Formatting mata uang
+                                var subtotal = 'Rp ' + new Intl.NumberFormat('id-ID')
+                                    .format(order.subtotal);
+                                var tax = 'Rp ' + new Intl.NumberFormat('id-ID').format(
+                                    order.tax);
+                                var total = 'Rp ' + new Intl.NumberFormat('id-ID')
+                                    .format(order.total);
+
+                                var row = `
+                                    <tr>
+                                        <td class="text-center">${order.id}</td>
+                                        <td class="text-center">${order.name}</td>
+                                        <td class="text-center">${order.phone}</td>
+                                        <td class="text-center">${subtotal}</td>
+                                        <td class="text-center">${tax}</td>
+                                        <td class="text-center">${total}</td>
+                                        <td class="text-center">${statusBadge}</td>
+                                        <td class="text-center">${orderDate}</td>
+                                        <td class="text-center">${order.order_items.length}</td>
+                                        <td class="text-center">${deliveredDate}</td>
+                                        <td class="text-center">
+                                            <a href="${detailUrl}">
+                                                <div class="list-icon-function view-icon">
+                                                    <div class="item eye"><i class="icon-eye"></i></div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `;
+                                orderTableBody.append(row);
+                            });
+                        } else {
+                            orderTableBody.append(
+                                '<tr><td colspan="11" class="text-center">Pesanan tidak ditemukan.</td></tr>'
+                                );
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+@endpush
