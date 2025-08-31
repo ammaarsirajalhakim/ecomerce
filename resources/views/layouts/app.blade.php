@@ -355,19 +355,19 @@
                 <div class="overflow-hidden">
                     <ul class="navigation__list list-unstyled position-relative">
                         <li class="navigation__item">
-                            <a href="{{ route('home.index') }}" class="navigation__link">Home</a>
+                            <a href="{{ route('home.index') }}" class="navigation__link">Beranda</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('shop.index') }}" class="navigation__link">Shop</a>
+                            <a href="{{ route('shop.index') }}" class="navigation__link">Produk</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
+                            <a href="{{ route('cart.index') }}" class="navigation__link">Keranjang</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('home.about') }}" class="navigation__link">About</a>
+                            <a href="{{ route('home.about') }}" class="navigation__link">Tentang Kami</a>
                         </li>
                         <li class="navigation__item">
-                            <a href="{{ route('home.contact') }}" class="navigation__link">Contact</a>
+                            <a href="{{ route('home.contact') }}" class="navigation__link">Bantuan</a>
                         </li>
                     </ul>
                 </div>
@@ -547,9 +547,11 @@
     </div>
 </header>
 
+    <main>
     @yield('content')
+</main>
 
-    <hr class="mt-5 text-secondary" />
+<hr class="mt-5 text-secondary" />
 
     <footer class="footer bg-dark text-white pt-5 pb-4">
     <div class="container">
