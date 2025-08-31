@@ -437,7 +437,7 @@
     </div>
 
 
-    <header id="header" class="header header-fullwidth header-transparent-bg">
+    <header id="header" class="header header-fullwidth">
     <div class="container">
         <div class="header-desk header-desk_type_1 d-flex flex-column align-items-center">
             {{-- Bagian Atas: Logo, Pencarian, dan Ikon --}}

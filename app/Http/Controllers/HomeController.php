@@ -35,9 +35,16 @@ class HomeController extends Controller
         return view('index', compact('slides', 'categories', 'bannerRandomCategories', 'sproducts', 'fproducts', 'maxDiscount'));
     }
 
+    // Metode untuk halaman kontak yang bersih
     public function contact()
     {
         return view('contact');
+    }
+    
+    // Metode baru untuk halaman bantuan
+    public function help()
+    {
+        return view('help.index');
     }
 
     public function contact_store(Request $request)
