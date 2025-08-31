@@ -39,25 +39,39 @@ class WishlistController extends Controller
         ]);
     }
 
-    public function remove_item($product_id)
-    {
-        if (!Auth::check()) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+    // Jangan lupa tambahkan "Request $request" di dalam parameter fungsi
+public function remove_item(Request $request, $product_id)
+{
+    if (!Auth::check()) {
+        // Jika ini permintaan AJAX, kirim error JSON
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'error', 'message' => 'Silakan login terlebih dahulu.'], 401);
         }
+        // Jika tidak, redirect ke halaman login
+        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+    }
 
-        $deleted = Wishlist::where('user_id', Auth::id())
-            ->where('product_id', $product_id)
-            ->delete();
-        
-        // Hitung jumlah wishlist terbaru setelah menghapus item
-        $wishlistCount = Auth::user()->wishlists()->count();
+    // Logika penghapusan data tetap sama
+    Wishlist::where('user_id', Auth::id())
+        ->where('product_id', $product_id)
+        ->delete();
+    
+    // Cek apakah permintaan ini menginginkan balasan JSON (berarti dari AJAX)
+    if ($request->wantsJson()) {
+        // Hitung jumlah item untuk balasan AJAX
+        $newCount = Wishlist::where('user_id', Auth::id())->count();
 
+        // Kirim balasan JSON
         return response()->json([
             'status' => 'success',
             'message' => 'Produk berhasil dihapus dari wishlist.',
-            'count' => $wishlistCount // Kirim jumlah terbaru ke JavaScript
+            'count' => $newCount
         ]);
     }
+
+    // Jika bukan permintaan AJAX, lakukan redirect (untuk form di halaman wishlist)
+    return redirect()->back()->with('success', 'Produk berhasil dihapus dari wishlist.');
+}
 
     public function empty_wishlist()
     {
