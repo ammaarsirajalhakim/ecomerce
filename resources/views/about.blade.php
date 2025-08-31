@@ -1,8 +1,7 @@
 @extends('layouts.app')
 @section('content')
-    <main class="pt-90">
-        <div class="mb-4 pb-4"></div>
-        <section class="contact-us container">
+    <main>
+        <section class="contact-us container pt-4">
             <div class="mw-930">
                 <h2 class="page-title">About US</h2>
             </div>

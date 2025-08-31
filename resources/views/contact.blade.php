@@ -5,7 +5,7 @@
             color: #e72010 !important;
         }
         .search-banner {
-            padding-top: 120px;
+            padding-top: 0px;
             text-align: center;
             color: #333;
         }
