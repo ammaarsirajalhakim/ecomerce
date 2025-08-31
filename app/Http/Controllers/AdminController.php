@@ -69,6 +69,108 @@ class AdminController extends BaseController
         return view('admin.detail-user', compact('user'));
     }
 
+    public function user_destroy($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $user = User::findOrFail($id);
+
+        // Hapus pengguna
+        $user->delete();
+
+        // Arahkan kembali ke halaman daftar pengguna dengan pesan sukses
+        return redirect()->route('admin.users')->with('status', 'Pengguna berhasil dihapus!');
+    }
+
+    public function search_users(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari user berdasarkan nama atau email
+        $users = User::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($users);
+    }
+
+    public function search_brands(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari merek berdasarkan nama atau slug
+        $brands = Brand::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('slug', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($brands);
+    }
+
+    public function search_contacts(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari kontak berdasarkan nama, email, telepon, atau isi komentar
+        $contacts = Contact::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->orWhere('phone', 'LIKE', "%{$query}%")
+            ->orWhere('comment', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($contacts);
+    }
+
+    public function search_coupons(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari kupon berdasarkan kode
+        $coupons = Coupon::where('code', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($coupons);
+    }
+
+    public function search_orders(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari pesanan berdasarkan id, nama, atau nomor telepon
+        // Pastikan untuk memuat relasi orderItems untuk mendapatkan jumlah item
+        $orders = Order::with('orderItems')
+            ->where('id', 'LIKE', "%{$query}%")
+            ->orWhere('name', 'LIKE', "%{$query}%")
+            ->orWhere('phone', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($orders);
+    }
+
+    public function search_products(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari produk dengan relasi category dan brand
+        $products = Product::with(['category', 'brand'])
+            ->where('name', 'LIKE', "%{$query}%")
+            ->orWhere('slug', 'LIKE', "%{$query}%")
+            ->orWhere('SKU', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($products);
+    }
+
     public function index()
     {
         $orders = Order::orderBy('created_at', 'DESC')->get()->take(10);
