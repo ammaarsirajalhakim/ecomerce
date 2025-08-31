@@ -315,7 +315,7 @@
                                             id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-user wg-user">
                                                 <span class="image">
-                                                    <img src="{{ asset('images/avatar/user-1.png') }}"
+                                                    <img src="{{ asset('images/avatar/user.png') }}"
                                                         alt="">
                                                 </span>
                                                 <span class="flex flex-column">

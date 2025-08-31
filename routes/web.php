@@ -51,6 +51,7 @@ Route::get('/bantuan/{category}', [App\Http\Controllers\HomeController::class, '
 
 // Rute untuk halaman Kontak (terpisah)
 Route::get('/contact-us', [HomeController::class, 'contact'])->name('home.contact');
+Route::get('/admin/contact/{id}/details', [AdminController::class, 'contact_details'])->name('admin.contact.details');
 Route::post('/contact/store', [HomeController::class, 'contact_store'])->name('home.contact.store');
 
 Route::get('/search', [HomeController::class, 'search'])->name('home.search');

@@ -140,23 +140,40 @@ class CartController extends Controller
     public function apply_coupon_code(Request $request)
     {
         $coupon_code = $request->coupon_code;
-        $user_id = Auth::id();
-        $items = CartItem::where('user_id', $user_id)->get();
-        $subtotal = $items->sum(function ($item) {
-            return $item->price * $item->quantity;
-        });
+
+        // Hapus pengecekan subtotal dari sini karena tidak lagi relevan
+        // $user_id = Auth::id();
+        // $items = CartItem::where('user_id', $user_id)->get();
+        // $subtotal = $items->sum(function ($item) {
+        //     return $item->price * $item->quantity;
+        // });
+
         if (isset($coupon_code)) {
-            $coupon = Coupon::where('code', $coupon_code)->where('expiry_date', '>=', Carbon::today())->where('cart_value', '<=', $subtotal)->first();
+            // --- PERUBAHAN LOGIKA VALIDASI ---
+            // Cari kupon berdasarkan kode, tanggal, DAN kuota yang masih tersedia (cart_value > 0)
+            $coupon = Coupon::where('code', $coupon_code)
+                ->where('expiry_date', '>=', Carbon::today())
+                ->where('cart_value', '>', 0) // Cek apakah kuota masih ada
+                ->first();
+
             if (!$coupon) {
-                return redirect()->back()->with('error', 'Voucher tidak valid!');
+                // Pesan error diperbarui untuk mencakup kondisi kupon habis
+                return redirect()->back()->with('error', 'Voucher tidak valid atau sudah habis!');
             } else {
+                // Simpan kupon ke session
                 Session::put('coupon', [
                     'code' => $coupon->code,
                     'type' => $coupon->type,
                     'value' => $coupon->value,
                     'cart_value' => $coupon->cart_value
                 ]);
+
                 $this->calculateDiscount();
+
+                // --- LOGIKA PENGURANGAN KUOTA ---
+                // Kurangi nilai cart_value (kuota) sebanyak 1 di database
+                $coupon->decrement('cart_value');
+
                 return redirect()->back()->with('success', 'Voucher Berhasil digunakan!');
             }
         } else {

@@ -151,7 +151,7 @@
 
                     <div class="cols gap22">
                         <fieldset class="name">
-                            <div class="body-title mb-10">Harga Standar <span class="tf-color-1">*</span></div>
+                            <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
                             <input class="mb-10" type="number" placeholder="Masukkan Harga Standar"
                                 name="regular_price" tabindex="0" value="{{ old('regular_price') }}" required>
                         </fieldset>
@@ -159,7 +159,7 @@
                             <span class="alert alert-danger text-center">{{ $message }}</span>
                         @enderror
                         <fieldset class="name">
-                            <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
+                            <div class="body-title mb-10">Harga Promo <span class="tf-color-1">*</span></div>
                             <input class="mb-10" type="number" placeholder="Masukkan Harga Jual" name="sale_price"
                                 tabindex="0" value="{{ old('sale_price') }}" required>
                         </fieldset>
