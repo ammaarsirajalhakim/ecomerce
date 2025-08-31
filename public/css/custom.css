@@ -6,6 +6,13 @@ body {
     max-width: 190px;
 }
 
+.page-header {
+  background-color: white !important; 
+  padding: 1rem !important; /* Sesuai dengan p-4 */
+  border-radius: 1.5rem !important; /* Sesuai dengan rounded-lg */
+  box-shadow: 0 0 15px rgba(183, 183, 183, 0.407) !important; /* Warna biru-500 */
+}
+
 .wg-table.table-all-user>* {
     min-width: 1260px;
 }

@@ -803,6 +803,12 @@ class AdminController extends BaseController
         return view('admin.contacts', compact('contacts', 'totalContacts'));
     }
 
+    public function contact_details($id)
+    {
+        $contact = Contact::findOrFail($id);
+        return view('admin.detail-contacts', compact('contact'));
+    }
+    
     public function contact_delete($id)
     {
         $contact = Contact::find($id);

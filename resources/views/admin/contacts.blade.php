@@ -3,7 +3,7 @@
 @section('content')
     <div class="main-content-inner">
         <div class="main-content-wrap">
-            <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
                 <h3>Semua Pesan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
@@ -59,10 +59,14 @@
                                         <td>{{ $contact->name }}</td>
                                         <td>{{ $contact->email }}</td>
                                         <td>{{ $contact->phone }}</td>
-                                        <td>{{ $contact->comment }}</td>
+                                        <td>{{ Str::limit($contact->comment, 50) }}</td>
                                         <td>{{ $contact->created_at->format('d F Y H:i') }}</td>
                                         <td>
                                             <div class="list-icon-function">
+                                                {{-- PERUBAHAN 1: Tambah Ikon Mata di sini --}}
+                                                <a href="{{ route('admin.contact.details', ['id' => $contact->id]) }}">
+                                                    <div class="item text-info"><i class="icon-eye"></i></div>
+                                                </a>
                                                 <form action="{{ route('admin.contact.delete', ['id' => $contact->id]) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
@@ -117,10 +121,16 @@
                             $.each(data, function(index, contact) {
                                 var deleteUrl = "{{ route('admin.contact.delete', ['id' => ':id']) }}".replace(':id', contact.id);
                                 
+                                // --- PERUBAHAN 2: Tambah URL Detail di sini ---
+                                var detailsUrl = "{{ route('admin.contact.details', ['id' => ':id']) }}".replace(':id', contact.id);
+                                
                                 // Format tanggal agar lebih mudah dibaca
                                 var sentDate = new Date(contact.created_at).toLocaleString('id-ID', {
                                     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                                 });
+                                
+                                // Fungsi untuk membatasi panjang teks
+                                const comment = contact.comment.length > 50 ? contact.comment.substring(0, 50) + '...' : contact.comment;
 
                                 var row = `
                                     <tr>
@@ -128,10 +138,14 @@
                                         <td>${contact.name}</td>
                                         <td>${contact.email}</td>
                                         <td>${contact.phone}</td>
-                                        <td>${contact.comment}</td>
+                                        <td>${comment}</td>
                                         <td>${sentDate}</td>
                                         <td>
                                             <div class="list-icon-function">
+                                                {{-- PERUBAHAN 3: Tambah Ikon Mata di sini --}}
+                                                <a href="${detailsUrl}">
+                                                    <div class="item text-info"><i class="icon-eye"></i></div>
+                                                </a>
                                                 <form action="${deleteUrl}" method="POST">
                                                     @csrf
                                                     @method('DELETE')

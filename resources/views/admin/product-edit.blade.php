@@ -3,7 +3,7 @@
     <div class="main-content-inner">
         <!-- main-content-wrap -->
         <div class="main-content-wrap">
-            <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
                 <h3>Edit Produk</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
@@ -184,7 +184,7 @@
 
                     <div class="cols gap22">
                         <fieldset class="name">
-                            <div class="body-title mb-10">Harga standar <span class="tf-color-1">*</span></div>
+                            <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
                             <input class="mb-10" type="text" placeholder="masukkan Harga standar" name="regular_price"
                                 tabindex="0" value="{{ $product->regular_price }}" aria-required="true"
                                 required="">
@@ -193,7 +193,7 @@
                             <span class="alert alert-danger text-center">{{ $message }}</span>
                         @enderror
                         <fieldset class="name">
-                            <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
+                            <div class="body-title mb-10">Harga Promo <span class="tf-color-1">*</span></div>
                             <input class="mb-10" type="text" placeholder="masukkan Harga Jual" name="sale_price"
                                 tabindex="0" value="{{ $product->sale_price }}" aria-required="true" required="">
                         </fieldset>

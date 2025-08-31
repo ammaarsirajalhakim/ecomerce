@@ -1,9 +1,8 @@
 @extends('layouts.admin')
 @section('content')
     <div class="main-content-inner">
-        <!-- main-content-wrap -->
         <div class="main-content-wrap">
-            <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
                 <h3>Tambah Produk</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
@@ -27,16 +26,15 @@
                     </li>
                 </ul>
             </div>
-            <!-- form-add-product -->
             <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data"
-                action="{{ route('admin.product.store') }}">
+                action="{{ route('admin.product.store') }}" id="productForm" novalidate>
                 @csrf
                 <div class="wg-box">
                     <fieldset class="name">
                         <div class="body-title mb-10">Nama Produk<span class="tf-color-1">*</span>
                         </div>
                         <input class="mb-10" type="text" placeholder="Masukkan Nama Produk" name="name"
-                            tabindex="0" value="{{ old('name') }}" aria-required="true" required="">
+                            tabindex="0" value="{{ old('name') }}" required>
                         <div class="text-tiny">Nama produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('name')
@@ -46,7 +44,7 @@
                     <fieldset class="name">
                         <div class="body-title mb-10">Link produk <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="masukkan Link Produk" name="slug" tabindex="0"
-                            value="{{ old('slug') }}" aria-required="true" required="">
+                            value="{{ old('slug') }}" required>
                         <div class="text-tiny">Link produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('slug')
@@ -58,10 +56,10 @@
                             <div class="body-title mb-10">Kategori <span class="tf-color-1">*</span>
                             </div>
                             <div class="select">
-                                <select class="" name="category_id">
-                                    <option>Pilih Kategori</option>
+                                <select name="category_id" required>
+                                    <option value="">Pilih Kategori</option>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -73,12 +71,11 @@
                             <div class="body-title mb-10">Merek <span class="tf-color-1">*</span>
                             </div>
                             <div class="select">
-                                <select class="" name="brand_id">
-                                    <option>Pilih Merek</option>
+                                <select name="brand_id" required>
+                                    <option value="">Pilih Merek</option>
                                     @foreach ($brands as $brand)
-                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                        <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
                                     @endforeach
-
                                 </select>
                             </div>
                         </fieldset>
@@ -99,8 +96,8 @@
                     <fieldset class="description">
                         <div class="body-title mb-10">Deskripsi <span class="tf-color-1">*</span>
                         </div>
-                        <textarea class="mb-10" name="description" placeholder="Deskripsi" tabindex="0" aria-required="true"
-                            required="">{{ old('description') }}</textarea>
+                        <textarea class="mb-10" name="description" placeholder="Deskripsi" tabindex="0"
+                            required>{{ old('description') }}</textarea>
                         <div class="text-tiny">Deskripsi produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('description')
@@ -113,8 +110,7 @@
                         </div>
                         <div class="upload-image flex-grow">
                             <div class="item" id="imgpreview" style="display:none">
-                                <img src="../../../localhost_8000/images/upload/upload-1.png" class="effect8"
-                                    alt="">
+                                <img src="" class="effect8" alt="Preview Gambar Utama">
                             </div>
                             <div id="upload-file" class="item up-load">
                                 <label class="uploadfile" for="myFile">
@@ -123,7 +119,7 @@
                                     </span>
                                     <span class="body-text">Letakkan gambar di sini <span
                                             class="tf-color">cari</span></span>
-                                    <input type="file" id="myFile" name="image" accept="image/*">
+                                    <input type="file" id="myFile" name="image" accept="image/*" required>
                                 </label>
                             </div>
                         </div>
@@ -135,9 +131,6 @@
                     <fieldset>
                         <div class="body-title mb-10">Unggah Galeri Gambar</div>
                         <div class="upload-image mb-16">
-                            <!-- <div class="item">
-                                                                                                                                                            <img src="images/upload/upload-1.png" alt="">
-                                                                                                                                                        </div>                                                 -->
                             <div id="galUpload" class="item up-load">
                                 <label class="uploadfile" for="gFile">
                                     <span class="icon">
@@ -146,15 +139,10 @@
                                     <span class="body-text">Letakkan gambar di sini <span
                                             class="tf-color">cari</span></span>
                                 </label>
-
-                                <!-- input untuk memilih file, bisa diklik -->
                                 <input type="file" id="gFile" accept="image/*" multiple style="display: none;">
-
-                                <!-- input tersembunyi untuk menyimpan semua file (yang akan dikirim saat submit) -->
                                 <input type="file" id="allImages" name="images[]" accept="image/*" multiple
                                     style="display: none;">
                             </div>
-
                         </div>
                     </fieldset>
                     @error('images')
@@ -163,31 +151,29 @@
 
                     <div class="cols gap22">
                         <fieldset class="name">
-                            <div class="body-title mb-10">Harga Standar <span class="tf-color-1">*</span></div>
-                            <input class="mb-10" type="text" placeholder="Masukkan Harga Standar"
-                                name="regular_price" tabindex="0" value="{{ old('regular_price') }}"
-                                aria-required="true" required="">
+                            <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
+                            <input class="mb-10" type="number" placeholder="Masukkan Harga Standar"
+                                name="regular_price" tabindex="0" value="{{ old('regular_price') }}" required>
                         </fieldset>
                         @error('regular_price')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
                         @enderror
                         <fieldset class="name">
-                            <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
-                            <input class="mb-10" type="text" placeholder="Masukkan Harga Jual" name="sale_price"
-                                tabindex="0" value="{{ old('sale_price') }}" aria-required="true" required="">
+                            <div class="body-title mb-10">Harga Promo <span class="tf-color-1">*</span></div>
+                            <input class="mb-10" type="number" placeholder="Masukkan Harga Jual" name="sale_price"
+                                tabindex="0" value="{{ old('sale_price') }}" required>
                         </fieldset>
                         @error('sale_price')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
                         @enderror
                     </div>
 
-
                     <div class="cols gap22">
                         <fieldset class="name">
                             <div class="body-title mb-10">Kode Barang <span class="tf-color-1">*</span>
                             </div>
                             <input class="mb-10" type="text" placeholder="Masukkan Kode Barang " name="SKU"
-                                tabindex="0" value="{{ old('SKU') }}" aria-required="true" required="">
+                                tabindex="0" value="{{ old('SKU') }}" required>
                         </fieldset>
                         @error('SKU')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
@@ -195,8 +181,8 @@
                         <fieldset class="name">
                             <div class="body-title mb-10">Jumlah <span class="tf-color-1">*</span>
                             </div>
-                            <input class="mb-10" type="text" placeholder="Massukkan Jumlah" name="quantity"
-                                tabindex="0" value="{{ old('quantity') }}" aria-required="true" required="">
+                            <input class="mb-10" type="number" placeholder="Massukkan Jumlah" name="quantity"
+                                tabindex="0" value="{{ old('quantity') }}" required>
                         </fieldset>
                         @error('quantity')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
@@ -207,9 +193,9 @@
                         <fieldset class="name">
                             <div class="body-title mb-10">Stok</div>
                             <div class="select mb-10">
-                                <select class="" name="stock_status">
-                                    <option value="instock">Tersedia</option>
-                                    <option value="outofstock">Stok Habis</option>
+                                <select name="stock_status">
+                                    <option value="instock" {{ old('stock_status') == 'instock' ? 'selected' : '' }}>Tersedia</option>
+                                    <option value="outofstock" {{ old('stock_status') == 'outofstock' ? 'selected' : '' }}>Stok Habis</option>
                                 </select>
                             </div>
                         </fieldset>
@@ -219,9 +205,9 @@
                         <fieldset class="name">
                             <div class="body-title mb-10">Produk Unggulan</div>
                             <div class="select mb-10">
-                                <select class="" name="featured">
-                                    <option value="0">Tidak</option>
-                                    <option value="1">Ya</option>
+                                <select name="featured">
+                                    <option value="0" {{ old('featured') == '0' ? 'selected' : '' }}>Tidak</option>
+                                    <option value="1" {{ old('featured') == '1' ? 'selected' : '' }}>Ya</option>
                                 </select>
                             </div>
                         </fieldset>
@@ -234,32 +220,87 @@
                     </div>
                 </div>
             </form>
-            <!-- /form-add-product -->
+            </div>
         </div>
-        <!-- /main-content-wrap -->
-    </div>
 @endsection
 
 @push('scripts')
     <script>
         $(function() {
-            let dataTransfer = new DataTransfer(); // untuk menyimpan file secara dinamis
+            /**
+             * Fungsi untuk menampilkan notifikasi eror dengan gaya kustom.
+             * @param {string} message - Pesan eror yang akan ditampilkan.
+             */
+            function showErrorToast(message) {
+                Toastify({
+                    text: message,
+                    duration: 3500,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        padding: "16px",
+                        fontSize: "15px",
+                        background: "white",
+                        color: "#3498db",
+                        border: "1px solid #3498db",
+                        borderRadius: "8px"
+                    }
+                }).showToast();
+            }
+
+            // Mencegat event submit pada form
+            $('#productForm').on('submit', function(e) {
+                let formIsValid = true;
+                
+                // Memeriksa setiap input, select, dan textarea yang wajib diisi
+                $(this).find('input[required], select[required], textarea[required]').each(function() {
+                    const fieldName = $(this).closest('fieldset').find('.body-title').text().trim().replace('*', '').trim();
+                    let errorMessage = '';
+
+                    // Validasi untuk dropdown/select
+                    if ($(this).is('select') && $(this).val() === "") {
+                        errorMessage = 'Anda harus memilih salah satu opsi untuk kolom "' + fieldName + '".';
+                        formIsValid = false;
+                    }
+
+                    // Validasi untuk input file
+                    if ($(this).is(':file') && $(this).get(0).files.length === 0) {
+                        errorMessage = 'Anda harus mengunggah gambar untuk kolom "' + fieldName + '".';
+                        formIsValid = false;
+                    }
+
+                    // Validasi untuk input dan textarea lainnya
+                    if (!$(this).is('select') && !$(this).is(':file') && !$(this).val()) {
+                        errorMessage = 'Kolom "' + fieldName + '" tidak boleh kosong.';
+                        formIsValid = false;
+                    }
+
+                    // Jika ada pesan eror, tampilkan notifikasi dan hentikan loop
+                    if (errorMessage) {
+                        showErrorToast(errorMessage);
+                        return false;
+                    }
+                });
+
+                // Mencegah form untuk submit jika tidak valid
+                if (!formIsValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // --- Logika lain yang sudah ada ---
+            let dataTransfer = new DataTransfer();
 
             $("#gFile").on("change", function(e) {
                 const newFiles = Array.from(this.files);
-
                 newFiles.forEach((file) => {
-                    dataTransfer.items.add(file); // tambahkan file ke dataTransfer
-
-                    // preview gambar
+                    dataTransfer.items.add(file);
                     $(`<div class="item gitems"><img src="${URL.createObjectURL(file)}"/></div>`)
                         .insertBefore("#galUpload");
                 });
-
-                // set file list hasil gabungan ke input hidden
                 document.getElementById("allImages").files = dataTransfer.files;
-
-                // reset input utama supaya bisa pilih file yang sama lagi
                 this.value = "";
             });
 

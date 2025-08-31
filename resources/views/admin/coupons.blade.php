@@ -2,7 +2,7 @@
 @section('content')
     <div class="main-content-inner">
         <div class="main-content-wrap">
-            <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
                 <h3>Kupon Diskon</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
@@ -48,7 +48,7 @@
                                     <th>Kode Kupon</th>
                                     <th>Tipe Kupon</th>
                                     <th>Nominal Kupon</th>
-                                    <th>Min. Belanja</th>
+                                    <th>Jumlah Kupon</th>
                                     <th>Tgl Kadaluarsa</th>
                                     <th>Opsi</th>
                                 </tr>
@@ -67,7 +67,7 @@
                                                 {{ $coupon->value }}%
                                             @endif
                                         </td>
-                                        <td>Rp {{ number_format($coupon->cart_value, 0, ',', '.') }}</td>
+                                        <td> {{ number_format($coupon->cart_value, 0, ',', '.') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($coupon->expiry_date)->format('d F Y') }}</td>
                                         <td>
                                             <div class="list-icon-function">

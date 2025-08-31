@@ -7,7 +7,7 @@
     </style>
     <div class="main-content-inner">
         <div class="main-content-wrap">
-            <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
                 <h3>Detail Pesanan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                     <li>
