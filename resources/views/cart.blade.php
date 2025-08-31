@@ -16,7 +16,7 @@
             cursor: not-allowed;
         }
     </style>
-    <main class="pt-90">
+    <main class="pt-40">
         <div class="mb-4 pb-4"></div>
         <section class="shop-checkout container">
             <h2 class="page-title">Keranjang</h2>
