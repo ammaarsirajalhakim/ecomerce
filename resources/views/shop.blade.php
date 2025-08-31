@@ -397,25 +397,23 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (methodInput) methodInput.remove();
                     }
 
-                    // Logika untuk memperbarui angka di badge header
-                    const badge = document.getElementById('wishlist-count-badge');
-                    if (badge) {
-                        if (typeof data.count !== 'undefined') {
-                            if (data.count > 0) {
-                                badge.textContent = data.count;
-                                // GANTI DARI STYLE KE CLASS
-                                badge.classList.remove('d-none');
-                            } else {
-                                badge.textContent = ''; // Kosongkan angka
-                                // GANTI DARI STYLE KE CLASS
-                                badge.classList.add('d-none'); 
-                            }
-                        } else {
-                            console.error("[WISHLIST DEBUG] Error: Respon dari server tidak mengandung 'count'.");
-                        }
-                    } else {
-                        console.error("[WISHLIST DEBUG] Error: Elemen dengan id='wishlist-count-badge' tidak ditemukan.");
-                    }
+                    // Logika untuk memperbarui angka di semua badge wishlist
+const badges = document.querySelectorAll('.js-wishlist-count');
+if (badges.length > 0) {
+    badges.forEach(badge => {
+        if (typeof data.count !== 'undefined') {
+            if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.classList.remove('d-none');
+            } else {
+                badge.textContent = ''; // Kosongkan angka
+                badge.classList.add('d-none');
+            }
+        }
+    });
+} else {
+    console.error("[WISHLIST DEBUG] Error: Elemen dengan class='.js-wishlist-count' tidak ditemukan.");
+}
 
                 } else {
                     alert(data.message || 'Terjadi kesalahan.');

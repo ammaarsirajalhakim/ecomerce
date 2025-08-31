@@ -1,11 +1,10 @@
 @extends('layouts.app')
 @section('content')
-    <main class="pt-90">
-        <div class="mb-4 pb-4"></div>
-        <section class="shop-checkout container">
-            <h2 class="page-title">Wishlist</h2>
+    <main>
+        <section class="shop-checkout container pt-4">
+            <h2 class="page-title mb-0">Wishlist</h2>
 
-            <div class="shopping-cart">
+            <div class="shopping-cart mt-0">
                 @if (auth()->check() && auth()->user()->wishlists()->count() > 0)
                     <div class="cart-table__wrapper">
                         <table class="cart-table">

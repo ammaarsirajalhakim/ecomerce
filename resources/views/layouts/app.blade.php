@@ -491,18 +491,15 @@
                         </div>
                     @endguest
 
-                    <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
+                   <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
         xmlns="http://www.w3.org/2000/svg">
         <use href="#icon_heart" />
     </svg>
     @php
-        // Ambil jumlah wishlist sekali saja untuk efisiensi
         $wishlistCount = auth()->check() ? auth()->user()->wishlists()->count() : 0;
     @endphp
-    {{-- Gunakan class d-none dari Bootstrap untuk menyembunyikan badge --}}
-    <span id="wishlist-count-badge" 
-          class="cart-amount d-block position-absolute @if($wishlistCount == 0) d-none @endif">
+    <span class="cart-amount d-block position-absolute js-wishlist-count @if($wishlistCount == 0) d-none @endif">
         {{ $wishlistCount > 0 ? $wishlistCount : '' }}
     </span>
 </a>
@@ -653,23 +650,23 @@
                 </a>
             </div>
 
-            <div class="col-4">
-                <a href="{{ route('wishlist.index') }}"
-                    class="footer-mobile__link d-flex flex-column align-items-center">
-                    <div class="position-relative">
-                        <svg class="d-block" width="18" height="18" viewBox="0 0 20 20" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <use href="#icon_heart" />
-                        </svg>
-                        @if (auth()->check() && auth()->user()->wishlists()->count())
-                            <span class="cart-amount d-block position-absolute js-cart-items-count">
-                                {{ auth()->user()->wishlists()->count() }}
-                            </span>
-                        @endif
-                    </div>
-                    <span>Wishlist</span>
-                </a>
-            </div>
+           <div class="col-4">
+    <a href="{{ route('wishlist.index') }}"
+        class="footer-mobile__link d-flex flex-column align-items-center">
+        <div class="position-relative">
+            <svg class="d-block" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <use href="#icon_heart" />
+            </svg>
+            @if (auth()->check() && auth()->user()->wishlists()->count())
+                <span class="cart-amount d-block position-absolute js-wishlist-count">
+                    {{ auth()->user()->wishlists()->count() }}
+                </span>
+            @endif
+        </div>
+        <span>Wishlist</span>
+    </a>
+</div>
         </div>
     </footer>
 
