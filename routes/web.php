@@ -18,6 +18,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::get('/shop/search', [ShopController::class, 'search'])->name('shop.search');
+
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{product_slug}', [ShopController::class, 'product_details'])->name('shop.product.details');
@@ -58,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account-orders', [UserController::class, 'orders'])->name('user.orders');
     Route::get('/account-orders/{order_id}/details', [UserController::class, 'order_details'])->name('user.order.details');
     Route::put('/account-orders/cancel-order', [UserController::class, 'order_cancel'])->name('user.order.cancel');
+    Route::get('/admin/orders/search', [AdminController::class, 'search_orders'])->name('admin.order.search');
 
     Route::get('/addresses', [AddressController::class, 'index'])->name('user.address.index');
     Route::get('/address/add', [AddressController::class, 'address_add'])->name('user.address.add');
@@ -75,6 +78,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/brand/{id}/edit', [AdminController::class, 'brand_edit'])->name('admin.brand.edit');
     Route::put('/admin/brand/update', [AdminController::class, 'brand_update'])->name('admin.brand.update');
     Route::delete('/admin/brand/{id}/delete', [AdminController::class, 'brand_delete'])->name('admin.brand.delete');
+    Route::get('/admin/brands/search', [AdminController::class, 'search_brands'])->name('admin.brand.search');
 
     Route::get('/admin/categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::get('/admin/category/add', [AdminController::class, 'add_category'])->name('admin.category.add');
@@ -90,6 +94,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::put('/admin/product/update', [AdminController::class, 'product_update'])->name('admin.product.update');
     Route::delete('/admin/product/{id}/delete', [AdminController::class, 'product_delete'])->name('admin.product.delete');
     Route::delete('/admin/product/delete-image', [AdminController::class, 'deleteProductImageAjax'])->name('admin.product.deleteImage.ajax');
+    Route::get('/admin/products/search', [AdminController::class, 'search_products'])->name('admin.product.search');
 
     Route::get('/admin/coupons', [AdminController::class, 'coupons'])->name('admin.coupons');
     Route::get('/admin/coupon/add', [AdminController::class, 'coupon_add'])->name('admin.coupon.add');
@@ -97,6 +102,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/coupon/{id}/edit', [AdminController::class, 'coupon_edit'])->name('admin.coupon.edit');
     Route::put('/admin/coupon/update', [AdminController::class, 'coupon_update'])->name('admin.coupon.update');
     Route::delete('/admin/coupon/{id}/delete', [AdminController::class, 'coupon_delete'])->name('admin.coupon.delete');
+    Route::get('/admin/coupons/search', [AdminController::class, 'search_coupons'])->name('admin.coupon.search');
 
     Route::get('/admin/orders', [AdminController::class, 'orders'])->name('admin.orders');
     Route::get('/admin/order/{order_id}/details', [AdminController::class, 'order_details'])->name('admin.order.details');
@@ -118,4 +124,8 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/user/{user_id}/details', [AdminController::class, 'user_details'])->name('admin.user.details');
     Route::get('/admin/user/add', [AdminController::class, 'user_add'])->name('admin.user.add');
     Route::post('/admin/user/store', [AdminController::class, 'user_store'])->name('admin.user.store');
+    Route::delete('/admin/user/delete/{id}', [AdminController::class, 'user_destroy'])->name('admin.user.destroy');
+    Route::get('/admin/users/search', [AdminController::class, 'search_users'])->name('admin.user.search');
+    Route::get('/admin/contacts/search', [AdminController::class, 'search_contacts'])->name('admin.contact.search');
+    
 });
