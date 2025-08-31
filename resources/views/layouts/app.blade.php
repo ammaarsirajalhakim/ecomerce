@@ -497,6 +497,21 @@
                             </div>
                         @endguest
 
+                    <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <use href="#icon_heart" />
+    </svg>
+    @php
+        // Ambil jumlah wishlist sekali saja untuk efisiensi
+        $wishlistCount = auth()->check() ? auth()->user()->wishlists()->count() : 0;
+    @endphp
+    {{-- Gunakan class d-none dari Bootstrap untuk menyembunyikan badge --}}
+    <span id="wishlist-count-badge" 
+          class="cart-amount d-block position-absolute @if($wishlistCount == 0) d-none @endif">
+        {{ $wishlistCount > 0 ? $wishlistCount : '' }}
+    </span>
+</a>
                         <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
