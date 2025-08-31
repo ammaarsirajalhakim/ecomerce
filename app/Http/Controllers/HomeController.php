@@ -74,4 +74,15 @@ class HomeController extends Controller
     {
         return view('welcome');
     }
+
+    public function showHelpCategory($category)
+    {
+        $viewName = 'help.' . $category;
+
+        if (view()->exists($viewName)) {
+            return view($viewName);
+        }
+        
+        abort(404);
+    }
 }
