@@ -437,17 +437,16 @@
     </div>
 
 
-    <header id="header" class="header header-fullwidth header-transparent-bg">
-        <div class="container">
-            <div class="header-desk header-desk_type_1 d-flex flex-column align-items-center">
-                {{-- Bagian Atas: Logo, Pencarian, dan Ikon --}}
-                <div class="header-top d-flex align-items-center justify-content-between w-100 mb-2">
-                    <div class="logo">
-                        <a href="{{ route('home.index') }}">
-                            <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy"
-                                class="logo__image d-block" />
-                        </a>
-                    </div>
+    <header id="header" class="header header-fullwidth">
+    <div class="container">
+        <div class="header-desk header-desk_type_1 d-flex flex-column align-items-center">
+            {{-- Bagian Atas: Logo, Pencarian, dan Ikon --}}
+            <div class="header-top d-flex align-items-center justify-content-between w-100 mb-2">
+                <div class="logo">
+                    <a href="{{ route('home.index') }}">
+                        <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="logo__image d-block" />
+                    </a>
+                </div>
 
                     <div class="header-tools__item hover-container flex-grow-1 mx-4">
                         <div class="js-hover__open position-relative w-100">
