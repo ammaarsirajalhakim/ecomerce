@@ -6,7 +6,6 @@ use App\Models\CartItem;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Surfsidemedia\Shoppingcart\Facades\Cart;
 
 class WishlistController extends Controller
 {
@@ -18,42 +17,52 @@ class WishlistController extends Controller
             ->get();
         return view('wishlist', compact('items'));
     }
+
     public function add_to_wishlist(Request $request)
     {
         if (!Auth::check()) {
-            return redirect()->route('login');
+            return response()->json(['status' => 'error', 'message' => 'Silakan login terlebih dahulu.'], 401);
         }
 
-        $userId = Auth::id();
-        $productId = $request->id;
-
         Wishlist::firstOrCreate([
-            'user_id' => $userId,
-            'product_id' => $productId,
+            'user_id' => Auth::id(),
+            'product_id' => $request->id,
         ]);
 
-        // Cart::instance('wishlist')
-        //     ->add($productId, $request->name, $request->quantity, $request->price)
-        //     ->associate('App\Models\Product');
+        // Hitung jumlah wishlist terbaru setelah menambahkan item
+        $wishlistCount = Auth::user()->wishlists()->count();
 
-        return redirect()->back();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Produk berhasil ditambahkan ke wishlist.',
+            'count' => $wishlistCount // Kirim jumlah terbaru ke JavaScript
+        ]);
     }
-
 
     public function remove_item($product_id)
     {
-        Wishlist::where('user_id', Auth::id())
+        if (!Auth::check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        $deleted = Wishlist::where('user_id', Auth::id())
             ->where('product_id', $product_id)
             ->delete();
+        
+        // Hitung jumlah wishlist terbaru setelah menghapus item
+        $wishlistCount = Auth::user()->wishlists()->count();
 
-        return back();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Produk berhasil dihapus dari wishlist.',
+            'count' => $wishlistCount // Kirim jumlah terbaru ke JavaScript
+        ]);
     }
-
 
     public function empty_wishlist()
     {
-        Cart::instance('wishlist')->destroy();
-        return redirect()->back();
+        Wishlist::where('user_id', Auth::id())->delete();
+        return redirect()->back()->with('success', 'Wishlist berhasil dikosongkan.');
     }
 
     public function move_to_cart($id)
@@ -62,7 +71,6 @@ class WishlistController extends Controller
             ->where('user_id', Auth::id())
             ->findOrFail($id);
 
-        // Tambahkan ke cart_items
         CartItem::updateOrCreate(
             [
                 'user_id' => Auth::id(),
@@ -70,12 +78,11 @@ class WishlistController extends Controller
             ],
             [
                 'quantity' => 1,
-                'price' => $wishlistItem->product->active_price,
+                'price' => $wishlistItem->product->sale_price ?? $wishlistItem->product->regular_price,
             ]
         );
 
-        // Hapus dari wishlist
         $wishlistItem->delete();
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Produk berhasil dipindahkan ke keranjang.');
     }
 }

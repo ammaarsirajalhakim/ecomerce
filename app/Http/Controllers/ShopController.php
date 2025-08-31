@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Wishlist; // --- TAMBAHAN UNTUK OPTIMASI WISHLIST ---
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // --- TAMBAHAN UNTUK OPTIMASI WISHLIST ---
 
 class ShopController extends Controller
 {
@@ -40,20 +42,26 @@ class ShopController extends Controller
             ->when($f_categories, function ($query, $f_categories) {
                 return $query->whereIn('category_id', explode(',', $f_categories));
             })
-            // --- KODE FILTER HARGA YANG SUDAH DIPERBARUI ---
             ->when($request->has('min') && $request->has('max') && $request->min != null && $request->max != null, function ($query) use ($request) {
                 return $query->where(function ($q) use ($request) {
                     $q->whereBetween('regular_price', [$request->min, $request->max])
                       ->orWhereBetween('sale_price', [$request->min, $request->max]);
                 });
             })
-            // --- AKHIR DARI KODE FILTER HARGA ---
             ->orderBy($o_column, $o_order)
             ->paginate($size);
 
         // Ambil data brand dan kategori untuk sidebar
         $brands = Brand::withCount('products')->orderBy('name', 'ASC')->get();
         $categories = Category::withCount('products')->orderBy('name', 'ASC')->get();
+
+        // --- TAMBAHAN UNTUK OPTIMASI WISHLIST ---
+        // Ambil semua ID produk yang ada di wishlist pengguna dalam satu kueri
+        $wishlistedProductIds = [];
+        if (Auth::check()) {
+            $wishlistedProductIds = Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray();
+        }
+        // --- AKHIR DARI TAMBAHAN ---
 
         // 4. Kirim data ke view
         return view('shop', [
@@ -66,6 +74,7 @@ class ShopController extends Controller
             'categories' => $categories,
             'min_price' => $min_price,
             'max_price' => $max_price,
+            'wishlistedProductIds' => $wishlistedProductIds, // Kirim data wishlist ke view
         ]);
     }
 
@@ -98,10 +107,10 @@ class ShopController extends Controller
     {
         $product = Product::where('slug', $product_slug)->with('category')->firstOrFail();
         $related_products = Product::where('category_id', $product->category_id)
-                                    ->where('slug', '!=', $product_slug)
-                                    ->inRandomOrder()
-                                    ->limit(8)
-                                    ->get();
+                                        ->where('slug', '!=', $product_slug)
+                                        ->inRandomOrder()
+                                        ->limit(8)
+                                        ->get();
         $prev_product = Product::where('id', '<', $product->id)->orderBy('id', 'desc')->first();
         $next_product = Product::where('id', '>', $product->id)->orderBy('id', 'asc')->first();
 
