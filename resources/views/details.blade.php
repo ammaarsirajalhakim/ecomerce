@@ -26,7 +26,7 @@
                                         </a>
                                     </div>
 
-                                    {{-- PERBAIKAN: Looping Galeri Gambar yang Aman --}}
+                                    {{-- Looping Galeri Gambar yang Aman --}}
                                     @if($product->images)
                                         @foreach (explode(',', $product->images) as $gimg)
                                             @if (trim($gimg) != '')
@@ -76,7 +76,7 @@
                             <a href="{{ route('shop.index') }}" class="menu-link menu-link_us-s text-uppercase fw-medium">Shop</a>
                         </div>
                         <div class="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
-                            {{-- PERBAIKAN: Tombol Prev/Next dari Controller --}}
+                            {{-- Tombol Prev/Next dari Controller --}}
                             @if ($prev_product)
                                 <a href="{{ route('shop.product.details', ['product_slug' => $prev_product->slug]) }}" class="text-uppercase fw-medium">
                                     <svg width="10" height="10" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg"><use href="#icon_prev_md" /></svg>
@@ -93,7 +93,7 @@
                     </div>
                     <h1 class="product-single__name">{{ $product->name }}</h1>
                     <div class="product-single__price">
-                        {{-- PERBAIKAN: Logika Tampilan Harga --}}
+                        {{-- Logika Tampilan Harga --}}
                         @if ($product->sale_price > 0)
                             <span class="current-price text-danger">Rp. {{ number_format($product->sale_price) }}</span>
                             <span class="old-price text-muted"><del>Rp. {{ number_format($product->regular_price) }}</del></span>
@@ -105,26 +105,38 @@
                         <p>{!! $product->short_description !!}</p>
                     </div>
                     
-                    @php
-                        $inCart = auth()->check() && \App\Models\CartItem::where('user_id', auth()->id())->where('product_id', $product->id)->exists();
-                    @endphp
-                    @if ($inCart)
-                        <a href="{{ route('cart.index') }}" class="btn btn-warning mb-3 w-100">Lihat Keranjang</a>
-                    @else
-                        <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
-                            @csrf
-                            <div class="product-single__addtocart">
-                                <div class="qty-control position-relative">
-                                    <input type="number" name="quantity" value="1" min="1" class="qty-control__number text-center">
-                                    <div class="qty-control__reduce">-</div>
-                                    <div class="qty-control__increase">+</div>
+                    {{-- Cek Stok Produk --}}
+                    @if ($product->quantity > 0)
+
+                        {{-- Cek apakah produk sudah ada di keranjang --}}
+                        @php
+                            $inCart = auth()->check() && \App\Models\CartItem::where('user_id', auth()->id())->where('product_id', $product->id)->exists();
+                        @endphp
+
+                        @if ($inCart)
+                            <a href="{{ route('cart.index') }}" class="btn btn-warning mb-3 w-100">Lihat Keranjang</a>
+                        @else
+                            <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
+                                @csrf
+                                <div class="product-single__addtocart">
+                                    <div class="qty-control position-relative">
+                                        <input type="number" name="quantity" value="1" min="1" max="{{ $product->quantity }}" class="qty-control__number text-center">
+                                        <div class="qty-control__reduce">-</div>
+                                        <div class="qty-control__increase">+</div>
+                                    </div>
+                                    <input type="hidden" name="id" value="{{ $product->id }}" />
+                                    <button type="submit" class="btn btn-primary btn-addtocart">Masukkan Keranjang</button>
                                 </div>
-                                <input type="hidden" name="id" value="{{ $product->id }}" />
-                                {{-- PERBAIKAN: Logika harga untuk form --}}
-                                <input type="hidden" name="price" value="{{ $product->sale_price > 0 ? $product->sale_price : $product->regular_price }}" />
-                                <button type="submit" class="btn btn-primary btn-addtocart" data-aside="cartDrawer">Masukkan Keranjang</button>
-                            </div>
-                        </form>
+                            </form>
+                        @endif
+
+                    @else
+                        {{-- Jika Stok Habis, Tampilkan Tombol Nonaktif --}}
+                        <div class="product-single__addtocart">
+                            <button class="btn btn-primary btn-addtocart w-100" disabled style="background-color: #ccc; border-color: #ccc; cursor: not-allowed;">
+                                Stok Habis
+                            </button>
+                        </div>
                     @endif
 
                     <div class="product-single__meta-info">
@@ -135,6 +147,10 @@
                         <div class="meta-item">
                             <label>Kategori:</label>
                             <span>{{ $product->category->name }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Stok:</label>
+                            <span>{{ $product->quantity }}</span>
                         </div>
                     </div>
                 </div>
@@ -151,7 +167,7 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab-description" role="tabpanel" aria-labelledby="tab-description-tab">
                         <div class="product-single__description">
-                           {{-- PERBAIKAN: Gunakan {!! !!} untuk render HTML dari deskripsi --}}
+                           {{-- Gunakan {!! !!} untuk render HTML dari deskripsi --}}
                            {!! $product->description !!}
                         </div>
                     </div>

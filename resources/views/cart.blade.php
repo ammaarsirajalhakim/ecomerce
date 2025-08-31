@@ -8,6 +8,13 @@
         .text-danger {
             color: #dc3545 !important
         }
+
+        /* Tambahkan style untuk tombol yang dinonaktifkan */
+        .btn-checkout.disabled {
+            background-color: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
     </style>
     <main class="pt-90">
         <div class="mb-4 pb-4"></div>
@@ -52,7 +59,8 @@
                             </thead>
                             <tbody>
                                 @foreach ($items as $item)
-                                    <tr>
+                                    {{-- Tambahkan atribut data untuk menyimpan sisa stok --}}
+                                    <tr class="cart-item" data-stock="{{ $item->product->quantity }}">
                                         <td>
                                             <div class="shopping-cart__product-item">
                                                 <a
@@ -70,8 +78,9 @@
                                                     <h4>{{ $item->product->name }}</h4>
                                                 </a>
                                                 <ul class="shopping-cart__product-item__options">
-                                                    <li>Color: Yellow</li>
-                                                    <li>Size: L</li>
+                                                    <li>sisa stok: <span
+                                                            class="stock-quantity">{{ $item->product->quantity }}</span>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -222,7 +231,8 @@
                             </div>
                             <div class="mobile_fixed-btn_wrapper">
                                 <div class="button-wrapper container">
-                                    <a href="{{ route('cart.checkout') }}"
+                                    {{-- PERUBAHAN: Tambahkan ID dan href default --}}
+                                    <a href="{{ route('cart.checkout') }}" id="checkout-btn"
                                         class="btn btn-primary btn-checkout">CHECKOUT</a>
                                 </div>
                             </div>
@@ -244,6 +254,68 @@
 @push('scripts')
     <script>
         $(function() {
+            function showErrorToast(message) {
+                Toastify({
+                    text: message,
+                    duration: 3500,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        padding: "16px",
+                        fontSize: "15px",
+                        background: "white",
+                        color: "#e74c3c", // Warna merah untuk error
+                        border: "1px solid #e74c3c",
+                        borderRadius: "8px"
+                    }
+                }).showToast();
+            }
+
+            // --- [LOGIKA BARU UNTUK VALIDASI STOK] ---
+            function validateStock() {
+                let isOutOfStock = false;
+
+                // Iterasi setiap item di keranjang
+                $('.cart-item').each(function() {
+                    const stock = parseInt($(this).data('stock'));
+                    if (stock <= 0) {
+                        isOutOfStock = true;
+                        // Tambahkan style visual pada produk yang stoknya habis (opsional)
+                        $(this).css('opacity', '0.6');
+                    }
+                });
+
+                const checkoutBtn = $('#checkout-btn');
+
+                if (isOutOfStock) {
+                    // Nonaktifkan tombol checkout
+                    checkoutBtn.addClass('disabled');
+                    checkoutBtn.attr('href', 'javascript:void(0)'); // Hapus link
+
+                    // Tambahkan event listener untuk menampilkan pesan saat diklik
+                    checkoutBtn.off('click').on('click', function(e) {
+                        e.preventDefault();
+                        showErrorToast(
+                            'Stok salah satu produk habis. Harap hapus produk tersebut dari keranjang Anda.'
+                            );
+                    });
+
+                } else {
+                    // Pastikan tombol aktif jika semua stok tersedia
+                    checkoutBtn.removeClass('disabled');
+                    checkoutBtn.attr('href', '{{ route('cart.checkout') }}');
+                    checkoutBtn.off('click'); // Hapus event listener pesan error
+                }
+            }
+
+            // Panggil fungsi validasi saat halaman dimuat
+            validateStock();
+            // --- [AKHIR LOGIKA BARU] ---
+
+
+            // Event listener untuk tombol lainnya (tidak berubah)
             $(".qty-control__increase").on("click", function() {
                 $(this).closest('form').submit();
             })

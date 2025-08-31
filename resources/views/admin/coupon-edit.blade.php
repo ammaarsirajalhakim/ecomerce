@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('content')
     <div class="main-content-wrap">
-        <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+        <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
             <h3>Edit Kupon Diskon</h3>
             <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
                 <li>
