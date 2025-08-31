@@ -68,6 +68,31 @@ class ShopController extends Controller
             'max_price' => $max_price,
         ]);
     }
+
+    public function search(Request $request)
+    {
+        // 1. Ambil query pencarian dari request
+        $query = $request->input('q');
+
+        // 2. Jika query kosong, redirect kembali ke halaman shop
+        if (!$query) {
+            return redirect()->route('shop.index');
+        }
+
+        // 3. Cari produk berdasarkan nama yang cocok (LIKE)
+        // Gunakan pagination dan withQueryString agar link pagination tetap membawa query pencarian
+        $products = Product::where('name', 'LIKE', "%{$query}%")
+            ->where('stock_status', 'instock')
+            ->orderBy('created_at', 'DESC')
+            ->paginate(12)
+            ->withQueryString();
+
+        // 4. Kirim data produk dan query ke view 'search'
+        return view('search', [
+            'products' => $products,
+            'query' => $query,
+        ]);
+    }
     
     public function product_details($product_slug)
     {

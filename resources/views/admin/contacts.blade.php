@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+
 @section('content')
     <div class="main-content-inner">
         <div class="main-content-wrap">
@@ -22,18 +23,17 @@
             <div class="wg-box">
                 <div class="flex items-center justify-between gap10 flex-wrap">
                     <div class="wg-filter flex-grow">
-                        <form class="form-search">
+                        {{-- Form Pencarian untuk Live Search --}}
+                        <form class="form-search" id="searchForm">
                             <fieldset class="name">
-                                <input type="text" placeholder="Search here..." class="" name="name"
-                                    tabindex="2" value="" aria-required="true" required="">
+                                <input type="text" id="searchInput" placeholder="Ketik untuk mencari pesan..." class="" name="name"
+                                    tabindex="2" value="">
                             </fieldset>
                             <div class="button-submit">
                                 <button class="" type="submit"><i class="icon-search"></i></button>
                             </div>
                         </form>
                     </div>
-                    {{-- <a class="tf-button style-1 w208" href="{{ route('admin.contact.add') }}"><i class="icon-plus"></i>Add
-                        new</a> --}}
                 </div>
                 <div class="wg-table table-all-user">
                     <div class="table-responsive">
@@ -52,7 +52,7 @@
                                     <th>Opsi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="contactTableBody">
                                 @foreach ($contacts as $contact)
                                     <tr>
                                         <td>{{ $contact->id }}</td>
@@ -60,14 +60,13 @@
                                         <td>{{ $contact->email }}</td>
                                         <td>{{ $contact->phone }}</td>
                                         <td>{{ $contact->comment }}</td>
-                                        <td>{{ $contact->created_at }}</td>
+                                        <td>{{ $contact->created_at->format('d F Y H:i') }}</td>
                                         <td>
                                             <div class="list-icon-function">
-                                                <form action="{{ route('admin.contact.delete', ['id' => $contact->id]) }}"
-                                                    method="POST">
+                                                <form action="{{ route('admin.contact.delete', ['id' => $contact->id]) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <div class="item text-danger delete">
+                                                    <div class="item text-danger delete" style="cursor:pointer;">
                                                         <i class="icon-trash-2"></i>
                                                     </div>
                                                 </form>
@@ -90,8 +89,71 @@
 
 @push('scripts')
     <script>
-        $(function() {
-            $('.delete').on('click', function(e) {
+        $(document).ready(function() {
+            // Mencegah form pencarian melakukan submit dan refresh halaman
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+            });
+
+            // SCRIPT UNTUK LIVE SEARCH
+            $('#searchInput').on('keyup', function() {
+                var query = $(this).val();
+                var contactTableBody = $('#contactTableBody');
+
+                if (query.length > 0) {
+                    $('.wgp-pagination').hide();
+                } else {
+                    $('.wgp-pagination').show();
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.contact.search') }}",
+                    type: "GET",
+                    data: { 'query': query },
+                    success: function(data) {
+                        contactTableBody.empty();
+
+                        if (data.length > 0) {
+                            $.each(data, function(index, contact) {
+                                var deleteUrl = "{{ route('admin.contact.delete', ['id' => ':id']) }}".replace(':id', contact.id);
+                                
+                                // Format tanggal agar lebih mudah dibaca
+                                var sentDate = new Date(contact.created_at).toLocaleString('id-ID', {
+                                    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                });
+
+                                var row = `
+                                    <tr>
+                                        <td>${contact.id}</td>
+                                        <td>${contact.name}</td>
+                                        <td>${contact.email}</td>
+                                        <td>${contact.phone}</td>
+                                        <td>${contact.comment}</td>
+                                        <td>${sentDate}</td>
+                                        <td>
+                                            <div class="list-icon-function">
+                                                <form action="${deleteUrl}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <div class="item text-danger delete" style="cursor:pointer;">
+                                                        <i class="icon-trash-2"></i>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                                contactTableBody.append(row);
+                            });
+                        } else {
+                            contactTableBody.append('<tr><td colspan="7" class="text-center">Pesan tidak ditemukan.</td></tr>');
+                        }
+                    }
+                });
+            });
+
+            // SCRIPT UNTUK KONFIRMASI HAPUS (DELETE)
+            $(document).on('click', '.delete', function(e) {
                 e.preventDefault();
                 var form = $(this).closest('form');
                 swal({
@@ -99,14 +161,14 @@
                         text: "Anda Yakin Menghapus Baris Ini?",
                         type: "warning",
                         buttons: ["Tidak", "Ya"],
-                        comfirmBuutonColor: '#dc3545'
+                        dangerMode: true
                     })
                     .then(function(result) {
                         if (result) {
                             form.submit();
                         }
-                    })
-            })
-        })
+                    });
+            });
+        });
     </script>
 @endpush

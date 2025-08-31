@@ -326,17 +326,17 @@
         <nav
             class="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto">
             <div class="container">
-                <form action="#" method="GET" class="search-field position-relative mt-4 mb-3">
+                <form action="{{ route('shop.search') }}" method="GET"
+                    class="search-field position-relative mt-4 mb-3">
                     <div class="position-relative">
-                        <input class="search-field__input w-100 border rounded-1" type="text"
-                            name="search-keyword" id="search-input" placeholder="Search products" />
+                        <input class="search-field__input w-100 border rounded-1 search-input-js" type="text"
+                            name="q" placeholder="Search products" required />
                         <button class="btn-icon search-popup__submit pb-0 me-2" type="submit">
                             <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <use href="#icon_search" />
                             </svg>
                         </button>
-                        <button class="btn-icon btn-close-lg search-popup__reset pb-0 me-2" type="reset"></button>
                     </div>
 
                     <div class="position-absolute start-0 top-100 m-0 w-100">
@@ -448,179 +448,192 @@
                     </a>
                 </div>
 
-                <div class="header-tools__item hover-container flex-grow-1 mx-4">
-                    <div class="js-hover__open position-relative w-100">
-                        <form action="#" method="GET" class="search-field m-0 p-0 w-100 d-flex">
-                            <div class="position-relative w-100">
-                                <input class="search-field__input w-100 fw-medium p-3 ps-4 rounded-5 border-1"
-                                    type="text" name="search-keyword" id="search-input"
-                                    placeholder="Cari produk, tren, dan merek" style="border-color: #dee2e6;" />
-                                <button class="btn-icon search-popup__submit position-absolute top-50 end-0 translate-middle-y me-3" type="submit">
+                    <div class="header-tools__item hover-container flex-grow-1 mx-4">
+                        <div class="js-hover__open position-relative w-100">
+                            <form action="{{ route('shop.search') }}" method="GET"
+                                class="search-field m-0 p-0 w-100 d-flex">
+                                <div class="position-relative w-100">
+                                    <input
+                                        class="search-field__input w-100 fw-medium p-3 ps-4 rounded-5 border-1 search-input-js"
+                                        type="text" name="q" placeholder="Cari produk, tren, dan merek"
+                                        style="border-color: #dee2e6;" required />
+                                    <button
+                                        class="btn-icon search-popup__submit position-absolute top-50 end-0 translate-middle-y me-3"
+                                        type="submit">
+                                        <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
+                                            fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <use href="#icon_search" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="header-tools d-flex align-items-center">
+                        @guest
+                            <div class="header-tools__item hover-container">
+                                <a href="{{ route('home.welcome') }}"
+                                    class="header-tools__item d-flex align-items-center">
                                     <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
                                         fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <use href="#icon_search" />
+                                        <use href="#icon_user" />
                                     </svg>
-                                </button>
-                                <button class="btn-icon btn-close-lg search-popup__reset" type="reset"></button>
+                                    <span class="ms-2">Masuk / Daftar</span>
+                                </a>
                             </div>
-                        </form>
+                        @else
+                            <div class="header-tools__item hover-container">
+                                <a href="{{ Auth::user()->utype === 'ADM' ? route('admin.index') : route('user.index') }}"
+                                    class="header-tools__item d-flex align-items-center">
+                                    <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
+                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <use href="#icon_user" />
+                                    </svg>
+                                    <span class="ms-2">{{ Auth::user()->name }}</span>
+                                </a>
+                            </div>
+                        @endguest
+
+                        <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <use href="#icon_heart" />
+                            </svg>
+                            @if (auth()->check() && auth()->user()->wishlists()->count())
+                                <span class="cart-amount d-block position-absolute js-cart-items-count">
+                                    {{ auth()->user()->wishlists()->count() }}
+                                </span>
+                            @endif
+                        </a>
+
+                        <a href="{{ route('cart.index') }}" class="header-tools__item header-tools__cart">
+                            <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <use href="#icon_cart" />
+                            </svg>
+                            @if (auth()->check() && auth()->user()->cartItems()->count())
+                                <span class="cart-amount d-block position-absolute js-cart-items-count">
+                                    {{ auth()->user()->cartItems()->count() }}
+                                </span>
+                            @endif
+                        </a>
                     </div>
                 </div>
 
-                <div class="header-tools d-flex align-items-center">
-                    @guest
-                        <div class="header-tools__item hover-container">
-                            <a href="{{ route('home.welcome') }}" class="header-tools__item d-flex align-items-center">
-                                <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_user" />
-                                </svg>
-                                <span class="ms-2">Masuk / Daftar</span>
-                            </a>
-                        </div>
-                    @else
-                        <div class="header-tools__item hover-container">
-                            <a href="{{ Auth::user()->utype === 'ADM' ? route('admin.index') : route('user.index') }}"
-                                class="header-tools__item d-flex align-items-center">
-                                <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <use href="#icon_user" />
-                                </svg>
-                                <span class="ms-2">{{ Auth::user()->name }}</span>
-                            </a>
-                        </div>
-                    @endguest
-
-                    <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <use href="#icon_heart" />
-                        </svg>
-                        @if (auth()->check() && auth()->user()->wishlists()->count())
-                            <span class="cart-amount d-block position-absolute js-cart-items-count">
-                                {{ auth()->user()->wishlists()->count() }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <a href="{{ route('cart.index') }}" class="header-tools__item header-tools__cart">
-                        <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <use href="#icon_cart" />
-                        </svg>
-                        @if (auth()->check() && auth()->user()->cartItems()->count())
-                            <span class="cart-amount d-block position-absolute js-cart-items-count">
-                                {{ auth()->user()->cartItems()->count() }}
-                            </span>
-                        @endif
-                    </a>
+                {{-- Bagian Bawah: Navigasi --}}
+                <div class="w-100">
+                    <nav class="navigation">
+                        <ul class="navigation__list list-unstyled d-flex p-0">
+                            <li class="navigation__item">
+                                <a href="{{ route('home.index') }}" class="navigation__link">Beranda</a>
+                            </li>
+                            <li class="navigation__item">
+                                <a href="{{ route('shop.index') }}" class="navigation__link">Produk</a>
+                            </li>
+                            <li class="navigation__item">
+                                <a href="{{ route('cart.index') }}" class="navigation__link">Keranjang</a>
+                            </li>
+                            <li class="navigation__item">
+                                <a href="{{ route('home.about') }}" class="navigation__link">Tentang Kami</a>
+                            </li>
+                            <li class="navigation__item">
+                                <a href="{{ route('home.contact') }}" class="navigation__link">Bantuan</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
-            
-            {{-- Bagian Bawah: Navigasi --}}
-            <div class="w-100">
-                <nav class="navigation">
-                    <ul class="navigation__list list-unstyled d-flex p-0">
-                        <li class="navigation__item">
-                            <a href="{{ route('home.index') }}" class="navigation__link">Beranda</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('shop.index') }}" class="navigation__link">Produk</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('cart.index') }}" class="navigation__link">Keranjang</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('home.about') }}" class="navigation__link">Tentang Kami</a>
-                        </li>
-                        <li class="navigation__item">
-                            <a href="{{ route('home.contact') }}" class="navigation__link">Bantuan</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
         </div>
-    </div>
-</header>
+    </header>
 
     @yield('content')
 
     <hr class="mt-5 text-secondary" />
 
     <footer class="footer bg-dark text-white pt-5 pb-4">
-    <div class="container">
-        <div class="row gy-4">
-            <!-- Logo & Kontak -->
-            <div class="col-lg-4 col-md-6">
-                <div class="footer-logo mb-3">
-                    <a href="{{ route('home.index') }}">
-                        <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="img-fluid" style="max-height: 60px;" />
-                    </a>
+        <div class="container">
+            <div class="row gy-4">
+                <!-- Logo & Kontak -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-logo mb-3">
+                        <a href="{{ route('home.index') }}">
+                            <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="img-fluid"
+                                style="max-height: 60px;" />
+                        </a>
+                    </div>
+                    <p class="mb-1">Malo, Bojonegoro, Jawa Timur, 62153</p>
+                    <p class="mb-1"><strong>Email:</strong> mizabun0108@gmail.com</p>
+                    <p><strong>Telp:</strong> +62 889-0285-4021</p>
+
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="https://www.instagram.com/universitas_ngudiwaluyo/" class="text-white fs-5"
+                            aria-label="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="text-white fs-5" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="text-white fs-5" aria-label="Twitter">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                    </div>
                 </div>
-                <p class="mb-1">Malo, Bojonegoro, Jawa Timur, 62153</p>
-                <p class="mb-1"><strong>Email:</strong> mizabun0108@gmail.com</p>
-                <p><strong>Telp:</strong> +62 889-0285-4021</p>
 
-                <div class="d-flex gap-3 mt-3">
-                    <a href="https://www.instagram.com/universitas_ngudiwaluyo/" class="text-white fs-5" aria-label="Instagram">
-                        <i class="bi bi-instagram"></i>
-                    </a>
-                    <a href="#" class="text-white fs-5" aria-label="Facebook">
-                        <i class="bi bi-facebook"></i>
-                    </a>
-                    <a href="#" class="text-white fs-5" aria-label="Twitter">
-                        <i class="bi bi-twitter"></i>
-                    </a>
+                <!-- Perusahaan -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="fw-bold mb-3 text-white  ">Perusahaan</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ route('home.about') }}" class="text-white text-decoration-none">Tentang
+                                Kami</a></li>
+                        <li><a href="{{ route('home.contact') }}" class="text-white text-decoration-none">Hubungi
+                                Kami</a></li>
+                    </ul>
+                </div>
+
+                <!-- Belanja -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="fw-bold mb-3 text-white">Belanja</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url('/shop?order=' . 1) }}" class="text-white text-decoration-none">Produk
+                                Terbaru</a></li>
+                        <li><a href="{{ url('/shop?featured=' . 1) }}"
+                                class="text-white text-decoration-none">Unggulan</a></li>
+                        <li><a href="{{ route('shop.index') }}" class="text-white text-decoration-none">Semua
+                                Produk</a></li>
+                    </ul>
+                </div>
+
+                <!-- Bantuan -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="fw-bold mb-3 text-white">Bantuan</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white text-decoration-none">Layanan Pelanggan</a></li>
+                        <li><a href="{{ auth()->check() ? route('user.index') : route('login') }}"
+                                class="text-white text-decoration-none">Akun Saya</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Hukum & Privasi</a></li>
+                    </ul>
+                </div>
+
+                <!-- Kategori -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="fw-bold mb-3 text-white">Kategori</h6>
+                    <ul class="list-unstyled">
+                        @foreach ($footerCategories as $category)
+                            <li><a href="{{ url('/shop?categories=' . $category->id) }}"
+                                    class="text-white text-decoration-none">{{ $category->name }}</a></li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
 
-            <!-- Perusahaan -->
-            <div class="col-lg-2 col-md-6 col-6">
-                <h6 class="fw-bold mb-3 text-white  ">Perusahaan</h6>
-                <ul class="list-unstyled">
-                    <li><a href="{{ route('home.about') }}" class="text-white text-decoration-none">Tentang Kami</a></li>
-                    <li><a href="{{ route('home.contact') }}" class="text-white text-decoration-none">Hubungi Kami</a></li>
-                </ul>
-            </div>
+            <hr class="border-secondary my-4" />
 
-            <!-- Belanja -->
-            <div class="col-lg-2 col-md-6 col-6">
-                <h6 class="fw-bold mb-3 text-white">Belanja</h6>
-                <ul class="list-unstyled">
-                    <li><a href="{{ url('/shop?order=' . 1) }}" class="text-white text-decoration-none">Produk Terbaru</a></li>
-                    <li><a href="{{ url('/shop?featured=' . 1) }}" class="text-white text-decoration-none">Unggulan</a></li>
-                    <li><a href="{{ route('shop.index') }}" class="text-white text-decoration-none">Semua Produk</a></li>
-                </ul>
-            </div>
-
-            <!-- Bantuan -->
-            <div class="col-lg-2 col-md-6 col-6">
-                <h6 class="fw-bold mb-3 text-white">Bantuan</h6>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="text-white text-decoration-none">Layanan Pelanggan</a></li>
-                    <li><a href="{{ auth()->check() ? route('user.index') : route('login') }}" class="text-white text-decoration-none">Akun Saya</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Hukum & Privasi</a></li>
-                </ul>
-            </div>
-
-            <!-- Kategori -->
-            <div class="col-lg-2 col-md-6 col-6">
-                <h6 class="fw-bold mb-3 text-white">Kategori</h6>
-                <ul class="list-unstyled">
-                    @foreach ($footerCategories as $category)
-                        <li><a href="{{ url('/shop?categories=' . $category->id) }}" class="text-white text-decoration-none">{{ $category->name }}</a></li>
-                    @endforeach
-                </ul>
+            <div class="text-center small">
+                ©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights Reserved.
             </div>
         </div>
-
-        <hr class="border-secondary my-4" />
-
-        <div class="text-center small">
-            ©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights Reserved.
-        </div>
-    </div>
-</footer>
+    </footer>
 
 
     <footer class="footer-mobile container w-100 px-5 d-md-none bg-body">
@@ -677,65 +690,95 @@
     <script src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/swiper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/countdown.js') }}"></script>
-    <script>
-        function checkSearchResults() {
-            const searchBox = document.getElementById('box-content-search');
-            const container = document.getElementById('nav-mobile');
 
-            if (searchBox && searchBox.children.length > 0) {
-                container.style.display = 'none';
-            }
-            /*else {
-                container.style.display = 'block';
-            }*/
-        }
-        $(function() {
-            $("#search-input").on("keyup", function() {
-                var searchQuery = $(this).val();
-                if (searchQuery.length > 2) {
-                    $.ajax({
-                        type: "GET",
-                        url: "{{ route('home.search') }}",
-                        data: {
-                            query: searchQuery
-                        },
-                        dataType: 'json',
-                        success: function(data) {
-                            $("#box-content-search").html('');
-                            $.each(data, function(index, item) {
-                                var url =
-                                    "{{ route('shop.product.details', ['product_slug' => 'product_slug_pls']) }}";
-                                var link = url.replace('product_slug_pls', item.slug);
+    @push('scripts')
+        <script>
+            function checkSearchResults() {
+                const searchBox = document.getElementById('box-content-search');
+                const container = document.getElementById('nav-mobile');
 
-                                $("#box-content-search").append(`
-                                <li>
-                                    <ul>
-                                        <li class="product-item gap14 mb-10">
-                                            <a href="${link}" style="display: flex; align-items: center; gap: 15px;">
-                                                <div class="image no-bg">
-                                                    <img src="{{ asset('uploads/products/thumbnails') }}/${item.image}" alt="${item.name }">
-                                                </div>
-                                                <div class="flex items-center justify-between gap20 flex-grow">
-                                                    <div class="name">
-                                                        ${item.name }
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li class="mb-10">
-                                            <div class="divider"></div>
-                                        </li>
-                                    </ul>
-                                </li>
-                                `)
-                            })
-                        }
-                    })
-                    checkSearchResults();
+                if (searchBox && searchBox.children.length > 0) {
+                    container.style.display = 'none';
                 }
-            })
-        })
-    </script>
+                /*else {
+                    container.style.display = 'block';
+                }*/
+            }
+            $(document).ready(function() {
+                // Menargetkan input search menggunakan class, bukan ID
+                var searchInputs = $(".search-input-js");
+
+                // --- LOGIKA UTAMA UNTUK MEMPERBAIKI FUNGSI ENTER ---
+                searchInputs.on("keydown", function(e) {
+                    // Hanya berjalan jika tombol yang ditekan adalah 'Enter'
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+
+                        // 1. Mencegah aksi default browser (seperti submit biasa)
+                        e.preventDefault();
+
+                        // 2. INI KUNCINYA: Mencegah event listener lain (dari theme.js) untuk berjalan
+                        e.stopImmediatePropagation();
+
+                        // 3. Ambil form terdekat dan submit secara manual ke tujuan yang benar
+                        var form = $(this).closest('form');
+                        form.submit();
+                    }
+                });
+
+                // --- LOGIKA UNTUK LIVE SEARCH (OPSIONAL TAPI DIANJURKAN) ---
+                // Kode ini memastikan live-search juga berfungsi dengan benar, mengambil data dari Laravel
+                searchInputs.on("keyup", function(e) {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        return; // Jangan lakukan apa-apa jika Enter
+                    }
+
+                    var searchQuery = $(this).val();
+                    var searchResultBox = $("#box-content-search"); // Target untuk hasil live search
+
+                    if (searchQuery.length > 2) {
+                        $.ajax({
+                            type: "GET",
+                            // Menggunakan route home.search untuk AJAX, bukan theme.js
+                            url: "{{ route('home.search') }}",
+                            data: {
+                                query: searchQuery
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                searchResultBox.html(''); // Kosongkan hasil sebelumnya
+
+                                if (data.length > 0) {
+                                    $.each(data, function(index, item) {
+                                        var url =
+                                            "{{ route('shop.product.details', ['product_slug' => 'SLUG']) }}"
+                                            .replace('SLUG', item.slug);
+                                        var imageUrl =
+                                            "{{ asset('uploads/products/thumbnails') }}/" +
+                                            item.image;
+
+                                        var resultItem = `
+                            <li>
+                                <a href="${url}" class="product-item">
+                                    <div class="image"><img src="${imageUrl}" alt="${item.name}"></div>
+                                    <div class="name">${item.name}</div>
+                                </a>
+                            </li>`;
+                                        searchResultBox.append(resultItem);
+                                    });
+                                    checkSearchResults
+                                (); // Fungsi dari app.blade.php untuk menampilkan/menyembunyikan container
+                                }
+                            }
+                        });
+                    } else {
+                        searchResultBox.html(''); // Kosongkan jika input terlalu pendek
+                        checkSearchResults();
+                    }
+                });
+            });
+        </script>
+    @endpush
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const toggleBtn = document.querySelector(".mobile-nav-activator");
