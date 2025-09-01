@@ -166,8 +166,8 @@
             <div class="row">
                 <div
                     class="col-md-6 col-lg-4 col-xl-20per d-flex align-items-center flex-column justify-content-center py-4 align-items-md-start">
-                    <h2>Summer Sale</h2>
-                    <h2 class="fw-bold">Up to {{ $maxDiscount ?? 0 }}% Off</h2>
+                    <h2>Promo Produk</h2>
+                    <h2 class="fw-bold">Diskon hingga {{ $maxDiscount ?? 0 }}% </h2>
 
                     <div class="position-relative d-flex align-items-center text-center pt-xxl-4 js-countdown mb-3"
                         data-date="18-3-2024" data-time="06:50">

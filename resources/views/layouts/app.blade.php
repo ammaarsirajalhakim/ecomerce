@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name') }}</title>
@@ -54,7 +53,7 @@
         </symbol>
         <symbol id="icon_pinterest" viewBox="0 0 14 15">
             <path
-                d="M13.5625 7.44043C13.5625 3.69434 10.5273 0.65918 6.78125 0.65918C3.03516 0.65918 0 3.69434 0 7.44043C0 10.3389 1.77734 12.7725 4.29297 13.7568C4.23828 13.2373 4.18359 12.417 4.32031 11.8154C4.45703 11.2959 5.11328 8.45215 5.11328 8.45215C5.11328 8.45215 4.92188 8.04199 4.92188 7.44043C4.92188 6.51074 5.46875 5.7998 6.15234 5.7998C6.72656 5.7998 7 6.2373 7 6.75684C7 7.33105 6.61719 8.20605 6.42578 9.02637C6.28906 9.68262 6.78125 10.2295 7.4375 10.2295C8.64062 10.2295 9.57031 8.97168 9.57031 7.13965C9.57031 5.49902 8.39453 4.37793 6.75391 4.37793C4.8125 4.37793 3.69141 5.82715 3.69141 7.30371C3.69141 7.90527 3.91016 8.53418 4.18359 8.8623C4.23828 8.91699 4.23828 8.99902 4.23828 9.05371C4.18359 9.27246 4.04688 9.7373 4.04688 9.81934C4.01953 9.95605 3.9375 9.9834 3.80078 9.92871C2.95312 9.51855 2.43359 8.28809 2.43359 7.27637C2.43359 5.14355 3.99219 3.1748 6.91797 3.1748C9.26953 3.1748 11.1016 4.87012 11.1016 7.1123C11.1016 9.43652 9.625 11.3232 7.57422 11.3232C6.89062 11.3232 6.23438 10.9678 6.01562 10.5303C6.01562 10.5303 5.6875 11.8428 5.60547 12.1436C5.44141 12.7451 5.03125 13.4834 4.75781 13.9209C5.38672 14.1396 6.07031 14.2217 6.78125 14.2217C10.5273 14.2217 13.5625 11.1865 13.5625 7.44043Z" />
+                d="M13.5625 7.44043C13.5625 3.69434 10.5273 0.65918 6.78125 0.65918C3.03516 0.65918 0 3.69434 0 7.44043C0 10.3389 1.77734 12.7725 4.29297 13.7568C4.23828 13.2373 4.18359 12.417 4.32031 11.8154C4.45703 11.2959 5.11328 8.45215 5.11328 8.45215C5.11328 8.45215 4.92188 8.04199 4.92188 7.44043C4.92188 6.51074 5.46875 5.7998 6.15234 5.7998C6.72656 5.7998 7 6.2373 7 6.75684C7 7.33105 6.61719 8.20605 6.42578 9.02637C6.28906 9.68262 6.78125 10.2295 7.4375 10.2295C8.64062 10.2295 9.57031 8.97168 9.57031 7.13965C9.57031 5.49902 8.39453 4.37793 6.75391 4.37793C4.8125 4.37793 3.69141 5.82715 3.69141 7.30371C3.69141 7.90527 3.91016 8.53418 4.18359 8.8623C4.23828 8.91699 4.23828 8.99902 4.23828 9.05371C4.18359 9.27246 4.04688 9.7373 4.04688 9.81934C4.01953 9.95605 3.9375 9.9834 3.80078 9.92871C2.95312 9.51855 2.43359 8.28809 2.43359 7.27637C2.43359 5.14355 3.99219 3.1748 6.91797 3.1748C9.26953 3.1748 11.1016 4.87012 11.1016 7.1123C11.1016 9.43652 9.625 11.3232 7.57422 11.3232C6.89062 11.3232 6.23438 10.9678 6.01562 10.5303C6.01562 10.5303 5.6875 11.8428 5.60547 12.1436C5.44141 12.7451 5.03125 13.4834 4.75781 13.9209C5.38672 14.1396 6.07031 14.2217 6.78125 14.2217C10.5273 14.2217 13.5625 11.1865 13.5625 7.44043Z"
         </symbol>
         <symbol id="icon_search" viewBox="0 0 20 20">
             <g clip-path="url(#clip0_6_7)">
@@ -306,7 +305,7 @@
 
             <div class="logo">
                 <a href="{{ route('home.index') }}">
-                    <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="logo__image d-block" />
+                   <img src="{{ asset('uploads/about/' . $about_us_data->logo_image) }}" alt="Loozy" class="logo__image d-block" />
                 </a>
             </div>
 
@@ -475,7 +474,7 @@
                     <div class="header-tools d-flex align-items-center">
                         @guest
                             <div class="header-tools__item hover-container">
-                                <a href="{{ route('home.welcome') }}"
+                                <a href="{{ route('login') }}"
                                     class="header-tools__item d-flex align-items-center">
                                     <svg class="d-block" width="20" height="20" viewBox="0 0 20 20"
                                         fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -557,10 +556,9 @@
 
     <hr class="mt-5 text-secondary" />
 
-    <footer class="footer bg-dark text-white pt-5 pb-4">
+    <footer class="footer bg-white text-dark pt-5 pb-4">
         <div class="container">
             <div class="row gy-4">
-                <!-- Logo & Kontak -->
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-logo mb-3">
                         <a href="{{ route('home.index') }}">
@@ -573,67 +571,63 @@
                     <p><strong>Telp:</strong> +62 889-0285-4021</p>
 
                     <div class="d-flex gap-3 mt-3">
-                        <a href="https://www.instagram.com/universitas_ngudiwaluyo/" class="text-white fs-5"
+                        <a href="https://www.instagram.com/universitas_ngudiwaluyo/" class="text-dark fs-5"
                             aria-label="Instagram">
                             <i class="bi bi-instagram"></i>
                         </a>
-                        <a href="#" class="text-white fs-5" aria-label="Facebook">
+                        <a href="#" class="text-dark fs-5" aria-label="Facebook">
                             <i class="bi bi-facebook"></i>
                         </a>
-                        <a href="#" class="text-white fs-5" aria-label="Twitter">
+                        <a href="#" class="text-dark fs-5" aria-label="Twitter">
                             <i class="bi bi-twitter"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Perusahaan -->
                 <div class="col-lg-2 col-md-6 col-6">
-                    <h6 class="fw-bold mb-3 text-white  ">Perusahaan</h6>
+                    <h6 class="fw-bold mb-3 text-dark">Perusahaan</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{{ route('home.about') }}" class="text-white text-decoration-none">Tentang
+                        <li><a href="{{ route('home.about') }}" class="text-dark text-decoration-none">Tentang
                                 Kami</a></li>
-                        <li><a href="{{ route('home.contact') }}" class="text-white text-decoration-none">Hubungi
+                        <li><a href="{{ route('home.contact') }}" class="text-dark text-decoration-none">Hubungi
                                 Kami</a></li>
                     </ul>
                 </div>
 
-                <!-- Belanja -->
                 <div class="col-lg-2 col-md-6 col-6">
-                    <h6 class="fw-bold mb-3 text-white">Belanja</h6>
+                    <h6 class="fw-bold mb-3 text-dark">Belanja</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url('/shop?order=' . 1) }}" class="text-white text-decoration-none">Produk
+                        <li><a href="{{ url('/shop?order=' . 1) }}" class="text-dark text-decoration-none">Produk
                                 Terbaru</a></li>
                         <li><a href="{{ url('/shop?featured=' . 1) }}"
-                                class="text-white text-decoration-none">Unggulan</a></li>
-                        <li><a href="{{ route('shop.index') }}" class="text-white text-decoration-none">Semua
+                                class="text-dark text-decoration-none">Unggulan</a></li>
+                        <li><a href="{{ route('shop.index') }}" class="text-dark text-decoration-none">Semua
                                 Produk</a></li>
                     </ul>
                 </div>
 
-                <!-- Bantuan -->
                 <div class="col-lg-2 col-md-6 col-6">
-                    <h6 class="fw-bold mb-3 text-white">Bantuan</h6>
+                    <h6 class="fw-bold mb-3 text-dark">Bantuan</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white text-decoration-none">Layanan Pelanggan</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none">Layanan Pelanggan</a></li>
                         <li><a href="{{ auth()->check() ? route('user.index') : route('login') }}"
-                                class="text-white text-decoration-none">Akun Saya</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">Hukum & Privasi</a></li>
+                                class="text-dark text-decoration-none">Akun Saya</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none">Hukum & Privasi</a></li>
                     </ul>
                 </div>
 
-                <!-- Kategori -->
                 <div class="col-lg-2 col-md-6 col-6">
-                    <h6 class="fw-bold mb-3 text-white">Kategori</h6>
+                    <h6 class="fw-bold mb-3 text-dark">Kategori</h6>
                     <ul class="list-unstyled">
                         @foreach ($footerCategories as $category)
                             <li><a href="{{ url('/shop?categories=' . $category->id) }}"
-                                    class="text-white text-decoration-none">{{ $category->name }}</a></li>
+                                    class="text-dark text-decoration-none">{{ $category->name }}</a></li>
                         @endforeach
                     </ul>
                 </div>
             </div>
 
-            <hr class="border-secondary my-4" />
+            <hr class="border-dark my-4" />
 
             <div class="text-center small">
                 ©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights Reserved.

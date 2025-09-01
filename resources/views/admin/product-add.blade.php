@@ -284,6 +284,16 @@
                     }
                 });
 
+                // --- VALIDASI TAMBAHAN ---
+                // Hanya periksa jika form masih dianggap valid sejauh ini
+                if (formIsValid) {
+                    const shortDescription = $('textarea[name="short_description"]').val();
+                    if (shortDescription.length > 100) {
+                        showErrorToast('Deskripsi Singkat tidak boleh melebihi 100 karakter.');
+                        formIsValid = false;
+                    }
+                }
+                
                 // Mencegah form untuk submit jika tidak valid
                 if (!formIsValid) {
                     e.preventDefault();

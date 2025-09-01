@@ -46,8 +46,9 @@
                 <div class="section-menu-left">
                     <div class="box-logo">
                         <a href="{{ route('home.index') }}" id="site-logo-inner">
-                            <img src="{{ asset('images/logo/logo.png') }}" alt="Loozy"
-                                class="logo__image d-block" />
+                            <img src="{{ asset('uploads/about/' . $about_us_data->logo_image) }}" 
+                                     alt="Logo Usaha"
+                                     class="logo__image d-block" />
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -166,7 +167,7 @@
                                 <li class="menu-item">
                                     <a href="{{ route('admin.about.edit') }}" class="">
                                         <div class="icon"><i class="icon-info"></i></div>
-                                        <div class="text">Edit Info Toko</div>
+                                        <div class="text">Profil Usaha</div>
                                     </a>
                                 </li>
                                 <li class="menu-item has-children">
@@ -208,11 +209,13 @@
                         <div class="wrap">
                             <div class="header-left">
                                 <a href="index-2.html">
-                                    <img class="" id="logo_header_mobile" alt=""
-                                        src="{{ asset('images/logo/logo.png') }}"
-                                        data-light="{{ asset('images/logo/logo.png') }}"
-                                        data-dark="{{ asset('images/logo/logo.png') }}" data-width="154px"
-                                        data-height="52px" data-retina="{{ asset('images/logo/logo.png') }}">
+                                      <img class="" id="logo_header_mobile" alt="Logo Mobile"
+                                             src="{{ asset('uploads/about/' . $about_us_data->logo_image) }}"
+                                             data-light="{{ asset('uploads/about/' . $about_us_data->logo_image) }}"
+                                             data-dark="{{ asset('uploads/about/' . $about_us_data->logo_image) }}" 
+                                             data-width="154px"
+                                             data-height="52px" 
+                                             data-retina="{{ asset('uploads/about/' . $about_us_data->logo_image) }}">
                                 </a>
                                 <div class="button-show-hide">
                                     <i class="icon-menu-left"></i>
