@@ -25,7 +25,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/sweetalert.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
     @stack('styles')
-   
+
 </head>
 <style>
 
@@ -163,6 +163,12 @@
                                         <div class="text">Pesan</div>
                                     </a>
                                 </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.about.edit') }}" class="">
+                                        <div class="icon"><i class="icon-info"></i></div>
+                                        <div class="text">Edit Info Toko</div>
+                                    </a>
+                                </li>
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
                                         <div class="icon"><i class="icon-user"></i></div>
@@ -264,7 +270,7 @@
                                                             <div class="text-tiny">Anda memiliki pesan yang belum
                                                                 dibaca.
                                                                 <a href="{{ route('admin.contacts') }}"
-                                                                   class="tf-color">Lihat</a>
+                                                                    class="tf-color">Lihat</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -315,8 +321,7 @@
                                             id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-user wg-user">
                                                 <span class="image">
-                                                    <img src="{{ asset('images/avatar/user.png') }}"
-                                                        alt="">
+                                                    <img src="{{ asset('images/avatar/user.png') }}" alt="">
                                                 </span>
                                                 <span class="flex flex-column">
                                                     <span class=" "
@@ -336,7 +341,8 @@
                         @yield('content')
 
                         <div class="bottom-page">
-                            <div class="body-text">©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights Reserved.</div>
+                            <div class="body-text">©2025 Teknik Informatika Universitas Ngudi Waluyo. All Rights
+                                Reserved.</div>
                         </div>
                     </div>
 

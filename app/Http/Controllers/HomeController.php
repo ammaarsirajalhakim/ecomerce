@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\About;
 use App\Models\Category;
 use App\Models\Contact;
 use App\Models\Product;
@@ -75,8 +76,13 @@ class HomeController extends Controller
 
     public function about()
     {
-        return view('about');
+        // Ambil baris pertama (dan satu-satunya) dari tabel abouts
+        $about = About::first(); 
+        
+        // Kirim data $about ke view 'about'
+        return view('about', compact('about'));
     }
+    
     public function welcome()
     {
         return view('welcome');
