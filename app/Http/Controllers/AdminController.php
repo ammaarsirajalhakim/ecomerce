@@ -35,11 +35,13 @@ class AdminController extends BaseController
     public function about_update(Request $request)
     {
         $request->validate([
+            // Tambahkan validasi untuk logo
+            'logo_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
+            'poster_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'our_story' => 'required|string',
             'our_vision' => 'required|string',
             'our_mission' => 'required|string',
             'the_company' => 'required|string',
-            'poster_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // 'nullable' karena gambar mungkin tidak diubah
         ]);
 
         $about = About::find(1);
@@ -48,22 +50,45 @@ class AdminController extends BaseController
         $about->our_mission = $request->our_mission;
         $about->the_company = $request->the_company;
 
+        // --- LOGIKA BARU UNTUK UPLOAD LOGO ---
+        if ($request->hasFile('logo_image')) {
+            // Hapus logo lama jika ada
+            if ($about->logo_image && File::exists(public_path('uploads/about') . '/' . $about->logo_image)) {
+                File::delete(public_path('uploads/about') . '/' . $about->logo_image);
+            }
+            $image = $request->file('logo_image');
+            $file_extension = $image->extension();
+            $file_name = 'logo-' . Carbon::now()->timestamp . '.' . $file_extension;
+            $this->GenerateAboutLogoImage($image, $file_name);
+            $about->logo_image = $file_name;
+        }
+        // --- AKHIR LOGIKA BARU ---
+
         if ($request->hasFile('poster_image')) {
-            // Hapus gambar lama jika ada
             if ($about->poster_image && File::exists(public_path('uploads/about') . '/' . $about->poster_image)) {
                 File::delete(public_path('uploads/about') . '/' . $about->poster_image);
             }
-
             $image = $request->file('poster_image');
             $file_extension = $image->extension();
-            $file_name = Carbon::now()->timestamp . '.' . $file_extension;
+            $file_name = 'poster-' . Carbon::now()->timestamp . '.' . $file_extension;
             $this->GenerateAboutPosterImage($image, $file_name);
             $about->poster_image = $file_name;
         }
         
         $about->save();
 
-        return redirect()->route('admin.about.edit')->with('status', 'Informasi "About Us" berhasil diperbarui!');
+        return redirect()->route('admin.about.edit')->with('status', 'Profil Usaha berhasil diperbarui!');
+    }
+
+    // --- FUNGSI BARU UNTUK PROSES LOGO ---
+    public function GenerateAboutLogoImage($image, $imageName)
+    {
+        $destinationPath = public_path('uploads/about');
+        if (!File::isDirectory($destinationPath)) {
+            File::makeDirectory($destinationPath, 0755, true, true);
+        }
+        // Untuk logo, kita hanya memindahkannya tanpa mengubah ukuran
+        $image->move($destinationPath, $imageName);
     }
 
     public function GenerateAboutPosterImage($image, $imageName)

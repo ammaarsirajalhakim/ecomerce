@@ -12,6 +12,7 @@ class About extends Model
     use HasFactory;
 
     protected $fillable = [
+        'logo_image',
         'poster_image',
         'our_story',
         'our_vision',

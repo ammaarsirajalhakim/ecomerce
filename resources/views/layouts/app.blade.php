@@ -305,7 +305,7 @@
 
             <div class="logo">
                 <a href="{{ route('home.index') }}">
-                    <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy" class="logo__image d-block" />
+                   <img src="{{ asset('uploads/about/' . $about_us_data->logo_image) }}" alt="Loozy" class="logo__image d-block" />
                 </a>
             </div>
 
