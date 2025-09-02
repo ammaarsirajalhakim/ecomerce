@@ -383,7 +383,7 @@
                             <span
                                 class="d-inline-block ms-2 text-uppercase align-middle fw-medium">{{ Auth::user()->name }}</span>
                         @else
-                            <span class="d-inline-block ms-2 text-uppercase align-middle fw-medium">Login</span>
+                            <span class="d-inline-block ms-2 text-uppercase align-middle fw-medium">Masuk / Daftar</span>
                         @endauth
                     </a>
                 </div>
