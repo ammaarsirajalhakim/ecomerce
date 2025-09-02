@@ -145,6 +145,32 @@
         font-size: 0.85rem;
     }
 
+    .google-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #ffffff;
+        color: #444;
+        border: 1px solid #ccc;
+        padding: 10px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.3s;
+        margin-top: 20px;
+    }
+
+    .google-btn:hover {
+        background-color: #f1f1f1;
+    }
+
+    .google-icon {
+        width: 20px;
+        height: 20px;
+    }
+
     /* Desain responsif untuk layar kecil */
     @media (max-width: 768px) {
         .login-card {
@@ -223,6 +249,14 @@
                     @if (Route::has('register'))
                     <a href="{{ route('register') }}" class="fw-bold">Daftar Akun Baru</a>
                     @endif
+                </div>
+                <div class="text-center">
+                    <a href="{{ route('google.login') }}"
+                        class="google-btn">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google Logo" class="google-icon">
+                        <span>Masuk Menggunakan Google</span>
+                    </a>
                 </div>
 
             </form>

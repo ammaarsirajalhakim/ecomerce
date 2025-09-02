@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
-    <main class="pt-90">
-        <div class="mb-4 pb-4"></div>
+    <main class="pt-20">
+       
         <section class="shop-checkout container">
             <h2 class="page-title">PESANAN DITERIMA</h2>
             <div class="checkout-steps">

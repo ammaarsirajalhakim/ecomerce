@@ -109,7 +109,7 @@
         </button>
     </div>
 
-    <div class="mb-5"></div> 
+    
     <section class="shop-main container d-flex">
         {{-- SIDEBAR FILTER --}}
         <div class="shop-sidebar side-sticky bg-body" id="shopFilter">
