@@ -11,12 +11,18 @@ use App\Http\Middleware\AuthAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
+use App\Http\Controllers\GoogleController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Auth::routes();
+
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
 
 Route::get('/shop/search', [ShopController::class, 'search'])->name('shop.search');
 
