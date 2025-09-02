@@ -24,6 +24,22 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends BaseController
 {
+     public function get_brands_by_category(Request $request)
+    {
+        // Ambil ID kategori dari request
+        $categoryId = $request->input('category_id');
+
+        // Cari semua merek yang memiliki category_id yang sesuai
+        // Kita hanya butuh 'id' dan 'name' untuk dropdown
+        $brands = Brand::where('category_id', $categoryId)
+                        ->select('id', 'name')
+                        ->orderBy('name', 'asc')
+                        ->get();
+
+        // Kembalikan hasilnya dalam format JSON
+        return response()->json($brands);
+    }
+
     public function about_edit()
     {
         // Menggunakan firstOrCreate agar jika data belum ada, akan dibuat baris baru yang kosong.
@@ -74,7 +90,7 @@ class AdminController extends BaseController
             $this->GenerateAboutPosterImage($image, $file_name);
             $about->poster_image = $file_name;
         }
-        
+
         $about->save();
 
         return redirect()->route('admin.about.edit')->with('status', 'Profil Usaha berhasil diperbarui!');
@@ -100,10 +116,10 @@ class AdminController extends BaseController
 
         $img = Image::read($image->path());
         // Mengatur gambar agar sesuai rasio 4:1, contoh ukuran 1200x300
-        $img->cover(1200, 300, "top"); 
+        $img->cover(1200, 300, "top");
         $img->save($destinationPath . '/' . $imageName);
     }
-    
+
     public function users()
     {
         $users = User::orderBy('created_at', 'DESC')->paginate(15); // Mengambil data user dengan pagination
@@ -170,6 +186,20 @@ class AdminController extends BaseController
         // Cari user berdasarkan nama atau email
         $users = User::where('name', 'LIKE', "%{$query}%")
             ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        // Kembalikan hasil dalam bentuk JSON
+        return response()->json($users);
+    }
+
+    public function search_category(Request $request)
+    {
+        // Ambil keyword dari request ajax
+        $query = $request->input('query');
+
+        // Cari user berdasarkan nama atau email
+        $users = Category::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('slug', 'LIKE', "%{$query}%")
             ->get();
 
         // Kembalikan hasil dalam bentuk JSON
@@ -297,64 +327,105 @@ class AdminController extends BaseController
     public function brands()
     {
         $brands = Brand::orderBy('id', 'desc')->paginate(10);
+        $brands = Brand::withCount('products')->orderBy('id', 'desc')->paginate(10);
         return view('admin.brands', compact('brands'));
+
+        
     }
 
     public function brand_add()
     {
-        return view('admin.brand-add');
+        $categories = Category::orderBy('name', 'asc')->get();
+        return view('admin.brand-add', compact('categories'));
     }
 
     public function brand_store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:brands,slug',
-            'image' => 'mimes:png,jpg,jpeg',
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ], [
+            'name.required' => 'Nama merek tidak boleh kosong.',
+            'category_id.required' => 'Anda harus memilih kategori.',
+            'image.required' => 'Gambar merek wajib diunggah.',
+            'image.image' => 'File yang diunggah harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+            'image.max' => 'Ukuran gambar maksimal adalah 2MB.',
         ]);
 
-        $brand = new Brand();
-        $brand->name = $request->name;
-        $brand->slug = Str::slug($request->name);
-        $image = $request->file('image');
-        $file_extention = $request->file('image')->extension();
-        $file_name = Carbon::now()->timestamp . '.' . $file_extention;
-        $this->GenerateBrandThumbnailsImage($image, $file_name);
-        $brand->image = $file_name;
-        $brand->save();
-        return redirect()->route('admin.brands')->with('status', 'Brand berhasil ditambahkan!');
+        $imageName = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/brands'), $imageName);
+        }
+
+        Brand::create([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name, '-'), // Membuat slug secara otomatis
+            'category_id' => $request->category_id,
+            'image' => $imageName
+        ]);
+
+        return redirect()->route('admin.brands')->with('success', 'Merek baru berhasil ditambahkan!');
     }
 
     public function brand_edit($id)
     {
-        $brand = Brand::find($id);
-        return view('admin.brand-edit', compact('brand'));
+        // Cari merek berdasarkan ID, jika tidak ketemu akan menampilkan error 404
+        $brand = Brand::findOrFail($id);
+        // Ambil semua kategori untuk dropdown
+        $categories = Category::orderBy('name', 'asc')->get();
+
+        return view('admin.brand-edit', compact('brand', 'categories'));
     }
 
     public function brand_update(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:brands,slug,' . $request->id,
-            'image' => 'mimes:png,jpg,jpeg',
+            'id' => 'required|exists:brands,id',
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Gambar bersifat opsional saat update
+        ], [
+            'name.required' => 'Nama merek tidak boleh kosong.',
+            'category_id.required' => 'Anda harus memilih kategori.',
+            'image.image' => 'File yang diunggah harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+            'image.max' => 'Ukuran gambar maksimal adalah 2MB.',
         ]);
 
-        $brand = Brand::find($request->id);
-        $brand->name = $request->name;
-        $brand->slug = Str::slug($request->name);
+        // 2. Cari merek yang akan di-update
+        $brand = Brand::findOrFail($request->id);
+
+        // 3. Cek jika ada gambar baru yang diunggah
+        $imageName = $brand->image;
         if ($request->hasFile('image')) {
-            if (File::exists(public_path('uploads/brands') . '/' . $brand->image)) {
-                File::delete(public_path('uploads/brands') . '/' . $brand->image);
+            // Hapus gambar lama jika ada
+            $oldImagePath = public_path('uploads/brands/' . $brand->image);
+            if (File::exists($oldImagePath)) {
+                File::delete($oldImagePath);
             }
+
+            // Unggah gambar baru
             $image = $request->file('image');
-            $file_extention = $request->file('image')->extension();
-            $file_name = Carbon::now()->timestamp . '.' . $file_extention;
-            $this->GenerateBrandThumbnailsImage($image, $file_name);
-            $brand->image = $file_name;
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/brands'), $imageName);
         }
-        $brand->save();
-        return redirect()->route('admin.brands')->with('status', 'Brand berhasil diupdate!');
+
+        // 4. Update data di database
+        $brand->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name, '-'),
+            'category_id' => $request->category_id,
+            'image' => $imageName
+        ]);
+
+        // 5. Redirect ke halaman daftar merek dengan pesan sukses
+        return redirect()->route('admin.brands')->with('success', 'Data merek berhasil diperbarui!');
     }
+
 
     public function GenerateBrandThumbnailsImage($image, $imageName)
     {
@@ -556,7 +627,7 @@ class AdminController extends BaseController
     {
         $product = Product::find($id);
         $categories = Category::select('id', 'name')->orderBy('name')->get();
-        $brands = Brand::select('id', 'name')->orderBy('name')->get();
+        $brands = Brand::where('category_id', $product->category_id)->select('id', 'name')->orderBy('name')->get();
         return view('admin.product-edit', compact('product', 'categories', 'brands'));
     }
 

@@ -227,6 +227,38 @@
 @push('scripts')
     <script>
         $(function() {
+            $('#productForm').on('change', 'select[name="category_id"]', function() {
+                const categoryId = $(this).val();
+                const brandSelect = $('select[name="brand_id"]');
+
+                // Kosongkan dropdown merek
+                brandSelect.empty().append('<option value="">Pilih Merek</option>');
+
+                // Jika kategori dipilih (bukan pilihan default)
+                if (categoryId) {
+                    // Lakukan AJAX request untuk mendapatkan merek
+                    $.ajax({
+                        url: "{{ route('admin.get_brands_by_category') }}",
+                        type: 'GET',
+                        data: {
+                            category_id: categoryId
+                        },
+                        success: function(brands) {
+                            if (brands.length > 0) {
+                                // Isi dropdown merek dengan data baru
+                                $.each(brands, function(key, brand) {
+                                    brandSelect.append(
+                                        `<option value="${brand.id}">${brand.name}</option>`
+                                    );
+                                });
+                            }
+                        },
+                        error: function() {
+                            console.log('Gagal mengambil data merek.');
+                        }
+                    });
+                }
+            });
             /**
              * Fungsi untuk menampilkan notifikasi eror dengan gaya kustom.
              * @param {string} message - Pesan eror yang akan ditampilkan.

@@ -28,7 +28,7 @@
             </div>
             <div class="wg-box">
                 <form class="form-new-product form-style-1" action="{{ route('admin.brand.store') }}" method="POST"
-                    enctype="multipart/form-data" id="brandForm" novalidate>
+                    enctype="multipart/form-data">
                     @csrf
                     <fieldset class="name">
                         <div class="body-title">Nama Merek <span class="tf-color-1">*</span></div>
@@ -38,17 +38,25 @@
                     @error('name')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
-                    <fieldset class="name">
-                        <div class="body-title">Link Merek <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Link Merek" name="slug" tabindex="0"
-                            value="{{ old('slug') }}" required>
+
+                    {{-- Dropdown untuk Kategori --}}
+                    <fieldset class="category">
+                        <div class="body-title">Kategori <span class="tf-color-1">*</span></div>
+                        <select name="category_id" class="flex-grow" required>
+                            <option value="">Pilih Kategori</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </fieldset>
-                    @error('slug')
+                    @error('category_id')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
+
                     <fieldset>
-                        <div class="body-title">Unggah Foto <span class="tf-color-1">*</span>
-                        </div>
+                        <div class="body-title">Unggah Foto <span class="tf-color-1">*</span></div>
                         <div class="upload-image flex-grow">
                             <div class="item" id="imgpreview" style="display:none">
                                 <img src="" class="effect8" alt="Preview Gambar Merek">
@@ -58,7 +66,7 @@
                                     <span class="icon">
                                         <i class="icon-upload-cloud"></i>
                                     </span>
-                                    <span class="body-text">Letakkan gambar di sini <span class="tf-color">cari</span></span>
+                                    <span class="body-text">Letakkan gambar di sini atau <span class="tf-color">cari</span></span>
                                     <input type="file" id="myFile" name="image" accept="image/*" required>
                                 </label>
                             </div>
@@ -81,64 +89,7 @@
 @push('scripts')
     <script>
         $(function() {
-            /**
-             * Fungsi untuk menampilkan notifikasi eror dengan gaya kustom.
-             * @param {string} message - Pesan eror yang akan ditampilkan.
-             */
-            function showErrorToast(message) {
-                Toastify({
-                    text: message,
-                    duration: 3500,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    stopOnFocus: true,
-                    style: {
-                        padding: "16px",
-                        fontSize: "15px",
-                        background: "white",
-                        color: "#3498db",
-                        border: "1px solid #3498db",
-                        borderRadius: "8px"
-                    }
-                }).showToast();
-            }
-
-            // Mencegat event submit pada form
-            $('#brandForm').on('submit', function(e) {
-                let formIsValid = true;
-                
-                // Memeriksa setiap input yang wajib diisi
-                $(this).find('input[required]').each(function() {
-                    const fieldName = $(this).closest('fieldset').find('.body-title').text().trim().replace('*', '').trim();
-                    let errorMessage = '';
-
-                    // Validasi untuk input file
-                    if ($(this).is(':file') && $(this).get(0).files.length === 0) {
-                        errorMessage = 'Anda harus mengunggah foto untuk kolom "' + fieldName + '".';
-                        formIsValid = false;
-                    }
-
-                    // Validasi untuk input teks
-                    if ($(this).is('input[type="text"]') && !$(this).val()) {
-                        errorMessage = 'Kolom "' + fieldName + '" tidak boleh kosong.';
-                        formIsValid = false;
-                    }
-
-                    // Jika ada pesan eror, tampilkan notifikasi dan hentikan loop
-                    if (errorMessage) {
-                        showErrorToast(errorMessage);
-                        return false;
-                    }
-                });
-
-                // Mencegah form untuk submit jika tidak valid
-                if (!formIsValid) {
-                    e.preventDefault();
-                }
-            });
-
-            // Logika untuk pratinjau gambar
+            // Logika untuk pratinjau gambar saat file dipilih
             $("#myFile").on("change", function(e) {
                 const [file] = this.files;
                 if (file) {
@@ -146,17 +97,6 @@
                     $("#imgpreview").show();
                 }
             });
-
-            // Logika untuk membuat slug otomatis
-            $("input[name='name']").on("change", function() {
-                $("input[name='slug']").val(StringToSlug($(this).val()));
-            });
-
-            function StringToSlug(Text) {
-                return Text.toLowerCase()
-                    .replace(/[^\w ]+/g, "")
-                    .replace(/ +/g, "-");
-            }
         });
     </script>
 @endpush
