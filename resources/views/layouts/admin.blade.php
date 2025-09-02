@@ -46,9 +46,9 @@
                 <div class="section-menu-left">
                     <div class="box-logo">
                         <a href="{{ route('home.index') }}" id="site-logo-inner">
-                            <img src="{{ asset('uploads/about/' . $about_us_data->logo_image) }}" 
-                                     alt="Logo Usaha"
-                                     class="logo__image d-block" />
+                            <img src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}" 
+                                 alt="Logo Usaha"
+                                 class="logo__image d-block" />
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -210,12 +210,10 @@
                             <div class="header-left">
                                 <a href="index-2.html">
                                       <img class="" id="logo_header_mobile" alt="Logo Mobile"
-                                             src="{{ asset('uploads/about/' . $about_us_data->logo_image) }}"
-                                             data-light="{{ asset('uploads/about/' . $about_us_data->logo_image) }}"
-                                             data-dark="{{ asset('uploads/about/' . $about_us_data->logo_image) }}" 
-                                             data-width="154px"
-                                             data-height="52px" 
-                                             data-retina="{{ asset('uploads/about/' . $about_us_data->logo_image) }}">
+                                        src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}"
+                                        data-light="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}"
+                                        data-dark="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}" data-width="154px"
+                                        data-height="52px" data-retina="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}">
                                 </a>
                                 <div class="button-show-hide">
                                     <i class="icon-menu-left"></i>
