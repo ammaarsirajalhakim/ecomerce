@@ -11,7 +11,7 @@ class About extends Model
 {
     use HasFactory;
 
-    protected $table = 'about'; // tambahkan ini
+    protected $table = 'abouts'; // tambahkan ini
 
     protected $fillable = [
         'logo_image',
