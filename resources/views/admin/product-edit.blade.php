@@ -304,6 +304,51 @@
                     .replace(/[^\w ]+/g, "")
                     .replace(/ +/g, "-");
             }
+
+            $('select[name="category_id"]').on('change', function() {
+                const categoryId = $(this).val();
+                const brandSelect = $('select[name="brand_id"]');
+                
+                // Simpan ID merek yang sedang dipilih (jika ada) untuk pembandingan
+                const currentSelectedBrandId = "{{ $product->brand_id }}";
+
+                // Kosongkan daftar merek yang lama dan tambahkan opsi default
+                brandSelect.empty().append('<option value="">Pilih Merek</option>');
+
+                // Hanya jalankan jika sebuah kategori dipilih
+                if (categoryId) {
+                    // Lakukan request ke server untuk mengambil merek yang sesuai
+                    $.ajax({
+                        url: "{{ route('admin.get_brands_by_category') }}",
+                        type: 'GET',
+                        data: { category_id: categoryId },
+                        success: function(brands) {
+                            if (brands.length > 0) {
+                                // Loop melalui data merek yang diterima dari server
+                                $.each(brands, function(key, brand) {
+                                    // Buat tag <option> baru untuk setiap merek
+                                    let option = $(`<option value="${brand.id}">${brand.name}</option>`);
+
+                                    // Jika ID merek dari server sama dengan ID merek produk,
+                                    // tandai sebagai 'selected'
+                                    if(brand.id == currentSelectedBrandId) {
+                                        option.attr('selected', 'selected');
+                                    }
+                                    
+                                    brandSelect.append(option);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            // 2. PENTING: Pemicu (trigger) saat halaman pertama kali dimuat
+            // Kode ini akan menjalankan fungsi di atas secara otomatis saat halaman edit terbuka,
+            // memastikan dropdown merek sudah terisi dengan benar sesuai kategori produk.
+            if ($('select[name="category_id"]').val()) {
+                $('select[name="category_id"]').trigger('change');
+            }
         });
     </script>
     <script>

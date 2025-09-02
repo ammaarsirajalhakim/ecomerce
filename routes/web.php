@@ -90,6 +90,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/category/{id}/edit', [AdminController::class, 'category_edit'])->name('admin.category.edit');
     Route::put('/admin/category/update', [AdminController::class, 'category_update'])->name('admin.category.update');
     Route::delete('/admin/category/{id}/delete', [AdminController::class, 'category_delete'])->name('admin.category.delete');
+    Route::get('/admin/categories/search', [AdminController::class, 'search_category'])->name('admin.category.search');
 
     Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
     Route::get('/admin/product/add', [AdminController::class, 'product_add'])->name('admin.product.add');
@@ -99,6 +100,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::delete('/admin/product/{id}/delete', [AdminController::class, 'product_delete'])->name('admin.product.delete');
     Route::delete('/admin/product/delete-image', [AdminController::class, 'deleteProductImageAjax'])->name('admin.product.deleteImage.ajax');
     Route::get('/admin/products/search', [AdminController::class, 'search_products'])->name('admin.product.search');
+    Route::get('/admin/get-brands-by-category', [AdminController::class, 'get_brands_by_category'])->name('admin.get_brands_by_category');
 
     Route::get('/admin/coupons', [AdminController::class, 'coupons'])->name('admin.coupons');
     Route::get('/admin/coupon/add', [AdminController::class, 'coupon_add'])->name('admin.coupon.add');

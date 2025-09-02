@@ -13,4 +13,10 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    // Tambahkan fungsi ini untuk relasi ke Brand
+    public function brands()
+    {
+        return $this->hasMany(Brand::class);
+    }
 }
