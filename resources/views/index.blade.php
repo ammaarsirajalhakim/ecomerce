@@ -111,8 +111,8 @@
                         },
                         "breakpoints": {
                             "320": {
-                            "slidesPerView": 2,
-                            "slidesPerGroup": 2,
+                            "slidesPerView": 3,
+                            "slidesPerGroup": 3,
                             "spaceBetween": 15
                             },
                             "768": {
@@ -138,26 +138,52 @@
                         @foreach ($categories as $category)
                             <div class="swiper-slide">
                                 <a href="{{ route('shop.index', ['categories' => $category->id]) }}">
-                                    <img loading="lazy" class="w-100 h-auto mb-3"
-                                        src="{{ asset('uploads/categories') }}/{{ $category->image }}" width="124"
-                                        height="124" alt="" />
+                                    <img loading="lazy"
+                                        src="{{ asset('uploads/categories') }}/{{ $category->image }}" width="120"
+                                        height="120" alt="{{ $category->name }}" />
                                     <div class="text-center">
                                         {{ $category->name }}
                                     </div>
                                 </a>
                             </div>
                         @endforeach
-                    </div></div><div
+                    </div>
+                </div>
+                <div
                     class="products-carousel__prev products-carousel__prev-1 position-absolute top-50 d-flex align-items-center justify-content-center">
                     <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
                         <use href="#icon_prev_md" />
                     </svg>
-                </div><div
+                </div>
+                <div
                     class="products-carousel__next products-carousel__next-1 position-absolute top-50 d-flex align-items-center justify-content-center">
                     <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
                         <use href="#icon_next_md" />
                     </svg>
-                </div></div></section>
+                </div>
+            </div>
+        </section>
+
+        {{-- 👇👇👇 UBAH UKURAN DI SINI 👇👇👇 --}}
+        <style>
+            .category-carousel .swiper-slide img {
+                max-width: 120px; /* Diubah dari 100px menjadi 120px */
+                height: 120px;    /* Diubah dari 100px menjadi 120px */
+                object-fit: cover;
+                border-radius: 10px; 
+                margin: 0 auto 10px; 
+                display: block;
+            }
+
+            .category-carousel .swiper-slide .text-center {
+                font-size: 1rem; /* Ukuran font diperbesar agar seimbang */
+                line-height: 1.3;
+                white-space: nowrap; 
+                overflow: hidden;    
+                text-overflow: ellipsis; 
+            }
+        </style>
+
 
         <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
@@ -228,24 +254,28 @@
                                                     href="{{ route('shop.product.details', ['product_slug' => $sproduct->slug]) }}">{{ $sproduct->name }}</a>
                                             </h6>
                                             <div class="product-card__price d-flex flex-column align-items-start">
-    @if ($sproduct->sale_price)
-        <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
-            Rp. {{ number_format($sproduct->sale_price, 0, ',', '.') }}
-        </span>
-        <span class="money price text-muted" style="text-decoration: line-through; font-size: 0.9rem;">
-            Rp. {{ number_format($sproduct->regular_price, 0, ',', '.') }}
-        </span>
-    @else
-        <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
-            Rp. {{ number_format($sproduct->regular_price, 0, ',', '.') }}
-        </span>
-    @endif
-</div>
+                                                @if ($sproduct->sale_price)
+                                                    <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
+                                                        Rp. {{ number_format($sproduct->sale_price, 0, ',', '.') }}
+                                                    </span>
+                                                    <span class="money price text-muted" style="text-decoration: line-through; font-size: 0.9rem;">
+                                                        Rp. {{ number_format($sproduct->regular_price, 0, ',', '.') }}
+                                                    </span>
+                                                @else
+                                                    <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
+                                                        Rp. {{ number_format($sproduct->regular_price, 0, ',', '.') }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
-                            </div></div></div></div>
-            </div></section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
@@ -328,10 +358,7 @@
         </div>
     </div>
 @endforeach
-            </div>{{-- <div class="text-center mt-2">
-                <a class="btn-link btn-link_lg default-underline text-uppercase fw-medium" href="#">Load
-                    More</a>
-            </div> --}}
+            </div>
         </section>
 
     </div> </main>

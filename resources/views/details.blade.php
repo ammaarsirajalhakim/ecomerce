@@ -5,8 +5,10 @@
             color: orange;
         }
     </style>
-    <main class="pt-90">
-        <div class="mb-md-1 pb-md-3"></div>
+    {{-- Diubah dari pt-90 menjadi pt-4 untuk mengurangi jarak atas --}}
+    <main class="pt-4"> 
+        {{-- Div ini dihapus karena menambah jarak yang tidak perlu --}}
+        {{-- <div class="mb-md-1 pb-md-3"></div> --}}
         <section class="product-single container">
             <div class="row">
                 <div class="col-lg-7">
@@ -80,12 +82,12 @@
                             @if ($prev_product)
                                 <a href="{{ route('shop.product.details', ['product_slug' => $prev_product->slug]) }}" class="text-uppercase fw-medium">
                                     <svg width="10" height="10" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg"><use href="#icon_prev_md" /></svg>
-                                    <span class="menu-link menu-link_us-s">Prev</span>
+                                    <span class="menu-link menu-link_us-s">Sebelumnya</span>
                                 </a>
                             @endif
                              @if ($next_product)
                                 <a href="{{ route('shop.product.details', ['product_slug' => $next_product->slug]) }}" class="text-uppercase fw-medium ms-4">
-                                    <span class="menu-link menu-link_us-s">Next</span>
+                                    <span class="menu-link menu-link_us-s">Selanjutnya</span>
                                     <svg width="10" height="10" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg"><use href="#icon_next_md" /></svg>
                                 </a>
                             @endif
@@ -167,8 +169,8 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab-description" role="tabpanel" aria-labelledby="tab-description-tab">
                         <div class="product-single__description">
-                           {{-- Gunakan {!! !!} untuk render HTML dari deskripsi --}}
-                           {!! $product->description !!}
+                            {{-- Gunakan {!! !!} untuk render HTML dari deskripsi --}}
+                            {!! $product->description !!}
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-reviews" role="tabpanel" aria-labelledby="tab-reviews-tab">

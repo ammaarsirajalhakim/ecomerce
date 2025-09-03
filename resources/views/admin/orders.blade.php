@@ -50,7 +50,7 @@
                                     <th class="text-center">Tanggal Pemesanan</th>
                                     <th class="text-center">Total Barang</th>
                                     <th class="text-center">Tgl Pengiriman</th>
-                                    <th class="text-center">Opsi</th>
+                                    <th class="text-center">Detail</th>
                                 </tr>
                             </thead>
                             <tbody id="orderTableBody">
