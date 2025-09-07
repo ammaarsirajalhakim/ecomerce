@@ -38,6 +38,10 @@ Route::put('/cart/decrease-quantity/{id}', [CartController::class, 'decrease_car
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove_item'])->name('cart.item.remove');
 Route::delete('/cart/clear', [CartController::class, 'empty_cart'])->name('cart.empty');
 
+// --- RUTE BARU DITAMBAHKAN DI SINI ---
+Route::post('/buy-now', [CartController::class, 'buyNow'])->name('buy.now');
+// ------------------------------------
+
 Route::post('/cart/apply-coupon', [CartController::class, 'apply_coupon_code'])->name('cart.coupon.apply');
 Route::delete('/cart/remove-coupon', [CartController::class, 'remove_coupon_code'])->name('cart.coupon.remove');
 
