@@ -13,12 +13,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator; // Penting untuk validasi
+use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
-    // Fungsi index, add_to_cart, updateQty, dll. tidak perlu diubah secara signifikan
-    // ... (Fungsi-fungsi tersebut dari file Anda sudah cukup baik)
+    // ... (Fungsi index, add_to_cart, buyNow, checkout tetap sama)
 
     public function index(Request $request)
     {
@@ -294,6 +293,35 @@ class CartController extends Controller
     
         return redirect()->route('cart.order.confirmation');
     }
+
+    /**
+     * Hapus satu item dari keranjang
+     */
+    public function remove_item(Request $request)
+    {
+        $userId = Auth::id();
+        $cartItemId = $request->id;
+
+        // Cari item di keranjang milik user yang sedang login, lalu hapus
+        CartItem::where('id', $cartItemId)->where('user_id', $userId)->delete();
+
+        // Hitung ulang diskon jika ada kupon
+        if (Session::has('coupon')) {
+            $this->calculateDiscount();
+        }
+
+        return redirect()->back()->with('success', 'Produk berhasil dihapus dari keranjang!');
+    }
+
+    /**
+     * Kosongkan semua item dari keranjang
+     */
+    public function empty_cart()
+    {
+        $userId = Auth::id();
+        CartItem::where('user_id', $userId)->delete();
+        return redirect()->back()->with('success', 'Keranjang berhasil dikosongkan!');
+    }
     
     public function setAmountForCheckout($isBuyNow = false)
     {
@@ -345,15 +373,20 @@ class CartController extends Controller
         }
     }
     
-    // Fungsi lain seperti calculateDiscount, remove_coupon_code, order_confirmation, dll.
-    // bisa tetap sama seperti yang Anda miliki.
-    
     public function calculateDiscount()
     {
         if (!Session::has('coupon')) return;
 
         $user_id = Auth::id();
         $items = CartItem::where('user_id', $user_id)->get();
+
+        // Jika keranjang kosong setelah item dihapus, hapus juga diskon
+        if($items->isEmpty()){
+            Session::forget('coupon');
+            Session::forget('discounts');
+            return;
+        }
+
         $subtotal = $items->sum(fn ($item) => $item->price * $item->quantity);
         $discount = 0;
         
@@ -384,5 +417,4 @@ class CartController extends Controller
         }
         return redirect()->route('cart.index');
     }
-
 }
