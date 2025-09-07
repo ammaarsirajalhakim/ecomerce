@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
-    // ... (Fungsi index, add_to_cart, buyNow, checkout tetap sama)
+    // ... (Method lain yang tidak berubah seperti index, add_to_cart, dll tetap di sini)
 
     public function index(Request $request)
     {
@@ -34,18 +34,14 @@ class CartController extends Controller
             $subtotal += $price * $quantity;
         }
 
-        // Cek apakah ada Voucher di session
         $discount = 0;
         if (session()->has('coupon')) {
-            $this->calculateDiscount(); // Fungsi ini akan mengisi session 'discounts'
+            $this->calculateDiscount();
         }
 
+        $total = $subtotal - $discount;
 
-        $taxRate = 0.10; // 10% pajak
-        $tax = ($subtotal - $discount) * $taxRate;
-        $total = ($subtotal - $discount) + $tax;
-
-        return view('cart', compact('productId', 'product', 'items', 'subtotal', 'discount', 'tax', 'total'));
+        return view('cart', compact('productId', 'product', 'items', 'subtotal', 'discount', 'total'));
     }
 
     public function add_to_cart(Request $request)
@@ -104,14 +100,113 @@ class CartController extends Controller
             'product_id' => $request->id,
             'quantity' => $request->quantity,
         ]);
+        
+        // Pastikan session lain bersih sebelum ke checkout
+        session()->forget('selected_checkout_items');
 
         return redirect()->route('cart.checkout');
     }
 
+    public function decrease_cart_quantity(Request $request, $id)
+{
+    $userId = Auth::id();
+    // Cari item berdasarkan ID dan pastikan milik user yang sedang login
+    $item = CartItem::where('id', $id)->where('user_id', $userId)->first();
+
+    if (!$item) {
+        return redirect()->back()->with('error', 'Item tidak ditemukan di keranjang.');
+    }
+
+    // Hanya kurangi jika kuantitas lebih dari 1
+    if ($item->quantity > 1) {
+        $item->decrement('quantity', 1);
+        
+        // Hitung ulang diskon jika ada kupon yang aktif
+        if (Session::has('coupon')) {
+            $this->calculateDiscount();
+        }
+
+        return redirect()->back()->with('success', 'Kuantitas produk berhasil diperbarui.');
+    }
+
+    // Jika kuantitas sudah 1, jangan lakukan apa-apa
+    return redirect()->back()->with('error', 'Kuantitas minimum adalah 1. Gunakan tombol hapus untuk menghilangkan produk.');
+}
+
+/**
+ * [BARU] Memperbarui kuantitas item dari input manual.
+ * Mencegah kuantitas diisi kurang dari 1.
+ */
+public function update_cart_quantity(Request $request, $id)
+{
+    // Validasi input dari pengguna
+    $request->validate([
+        'quantity' => 'required|numeric|min:1',
+    ], [
+        'quantity.min' => 'Kuantitas minimum untuk produk adalah 1.'
+    ]);
+
+    $userId = Auth::id();
+    $item = CartItem::where('id', $id)->where('user_id', $userId)->first();
+
+    if (!$item) {
+        return redirect()->back()->with('error', 'Item tidak ditemukan di keranjang.');
+    }
+
+    // Cek ketersediaan stok sebelum update
+    $product = Product::find($item->product_id);
+    if ($product->quantity < $request->quantity) {
+        return redirect()->back()->with('error', 'Stok produk tidak mencukupi!');
+    }
+
+    // Jika validasi dan stok aman, baru lakukan pembaruan
+    $item->quantity = $request->quantity;
+    $item->save();
+
+    // Hitung ulang diskon jika ada kupon yang aktif
+    if (Session::has('coupon')) {
+        $this->calculateDiscount();
+    }
+
+    return redirect()->back()->with('success', 'Kuantitas produk berhasil diperbarui.');
+}
+
+    /**
+     * [BARU] Menangani item yang dipilih dari keranjang untuk di-checkout.
+     */
+    public function checkoutSelected(Request $request)
+    {
+        $selectedProductIds = $request->input('selected_products', []);
+
+        if (empty($selectedProductIds)) {
+            return redirect()->back()->with('error', 'Silakan pilih produk yang akan di-checkout.');
+        }
+
+        $userId = Auth::id();
+        $selectedItems = CartItem::where('user_id', $userId)
+                                ->whereIn('id', $selectedProductIds)
+                                ->get();
+
+        if ($selectedItems->isEmpty()) {
+            return redirect()->back()->with('error', 'Produk yang dipilih tidak valid.');
+        }
+
+        // Simpan item yang dipilih ke sesi untuk diproses di halaman checkout
+        session()->put('selected_checkout_items', $selectedItems);
+        
+        // Pastikan session buyNow bersih
+        session()->forget('buy_now_item');
+
+        return redirect()->route('cart.checkout');
+    }
+
+    /**
+     * [MODIFIKASI] Menampilkan halaman checkout dengan 3 skenario berbeda.
+     */
     public function checkout(Request $request)
     {
         $user = Auth::user();
-        $address = Address::where('user_id', $user->id)->first(); // Ambil alamat pertama, tidak harus default
+        $address = Address::where('user_id', $user->id)->first();
 
         // Skenario 1: Checkout dari "Beli Sekarang"
         if (session()->has('buy_now_item')) {
@@ -126,65 +221,72 @@ class CartController extends Controller
 
             $price = $product->sale_price > 0 ? $product->sale_price : $product->regular_price;
             $subtotal = $price * $quantity;
-            $taxRate = 0.10;
-            $tax = $subtotal * $taxRate;
-            $total = $subtotal + $tax;
-            
-            // Buat item tunggal untuk ditampilkan di view
+            $total = $subtotal;
+
             $item = new \stdClass();
             $item->product = $product;
             $item->quantity = $quantity;
             $item->subtotal = $subtotal;
-            $items = collect([$item]); // Ubah menjadi collection agar view konsisten
+            $items = collect([$item]);
 
-            // Simpan data ke session agar bisa diambil saat place order
             $this->setAmountForCheckout(true);
 
-            return view('checkout', compact('address', 'items', 'subtotal', 'tax', 'total'));
+            return view('checkout', compact('address', 'items', 'subtotal', 'total'));
         }
-        // Skenario 2: Checkout dari Keranjang Belanja
+        // Skenario 2: Checkout dari item yang dipilih di keranjang
+        elseif (session()->has('selected_checkout_items')) {
+            $items = session('selected_checkout_items');
+
+            if ($items->isEmpty()) {
+                return redirect()->route('cart.index')->with('info', 'Tidak ada item terpilih.');
+            }
+
+            $subtotal = $items->sum(fn ($item) => $item->price * $item->quantity);
+            $total = $subtotal;
+
+            $this->setAmountForCheckout(false, $items); // Kirim item terpilih
+
+            return view('checkout', compact('address', 'items', 'subtotal', 'total'));
+        }
+        // Skenario 3: Checkout dari seluruh isi Keranjang Belanja
         else {
             $items = CartItem::where('user_id', $user->id)->get();
             if ($items->isEmpty()) {
                 return redirect()->route('cart.index')->with('info', 'Keranjang Anda kosong.');
             }
 
-            $subtotal = $items->sum(function ($item) {
-                return $item->price * $item->quantity;
-            });
+            $subtotal = $items->sum(fn ($item) => $item->price * $item->quantity);
 
-            $this->calculateDiscount(); // Hitung diskon jika ada
+            $this->calculateDiscount();
 
             if (Session::has('discounts')) {
                 $subtotal = Session::get('discounts')['subtotal'];
-                $tax = Session::get('discounts')['tax'];
-                $total = Session::get('discounts')['total'];
+                $total = Session::get('discounts')['total']; // Total sudah dihitung tanpa pajak
             } else {
-                $taxRate = 0.10;
-                $tax = $subtotal * $taxRate;
-                $total = $subtotal + $tax;
+                $total = $subtotal; // PAJAK DIHAPUS
             }
 
-            // Simpan data keranjang ke session checkout
             $this->setAmountForCheckout(false);
 
-            return view('checkout', compact('address', 'items', 'subtotal', 'tax', 'total'));
+            return view('checkout', compact('address', 'items', 'subtotal', 'total'));
         }
     }
-    
+
+    /**
+     * [MODIFIKASI] Menyimpan pesanan ke database.
+     */
     public function place_an_order(Request $request)
     {
         $user_id = Auth::id();
         $address = Address::where('user_id', $user_id)->first();
     
-        // 1. Validasi Metode Pembayaran
         $request->validate(
             ['mode' => 'required|in:cod'],
             ['mode.required' => 'Silakan pilih metode pembayaran.']
         );
     
-        // 2. Jika Alamat Belum Ada, Validasi dan Simpan Alamat Baru
         if (!$address) {
+            // ... (logika validasi dan pembuatan alamat baru tetap sama)
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'phone' => 'required|string|max:20',
@@ -202,7 +304,6 @@ class CartController extends Controller
                 return redirect()->back()->withErrors($validator)->withInput();
             }
     
-            // Buat alamat baru
             $address = new Address();
             $address->user_id = $user_id;
             $address->name = $request->name;
@@ -215,22 +316,20 @@ class CartController extends Controller
             $address->zip = $request->zip;
             $address->country = $request->country;
             $address->type = $request->type;
-            $address->isdefault = 1; // Jadikan default
+            $address->isdefault = 1;
             $address->save();
         }
     
-        // 3. Ambil data total dari session
         $checkout = Session::get('checkout');
         if (!$checkout) {
             return redirect()->route('shop.index')->with('error', 'Sesi checkout berakhir, silakan coba lagi.');
         }
     
-        // 4. Buat Order
         $order = new Order();
         $order->user_id = $user_id;
         $order->subtotal = $checkout['subtotal'];
         $order->discount = $checkout['discount'];
-        $order->tax = $checkout['tax'];
+        $order->tax = 0;
         $order->total = $checkout['total'];
         $order->name = $address->name;
         $order->phone = $address->phone;
@@ -241,10 +340,10 @@ class CartController extends Controller
         $order->state = $address->state;
         $order->zip = $address->zip;
         $order->country = $address->country;
-        $order->status = 'ordered'; // Status awal
+        $order->status = 'ordered';
         $order->save();
     
-        // 5. Simpan Order Items (berdasarkan alur)
+        // Tentukan item mana yang akan diproses berdasarkan sesi
         if ($checkout['is_buy_now']) {
             $buyNowData = session('buy_now_item');
             $product = Product::find($buyNowData['product_id']);
@@ -256,10 +355,31 @@ class CartController extends Controller
                 'quantity' => $buyNowData['quantity'],
             ]);
     
-            // Kurangi stok produk
             $product->quantity -= $buyNowData['quantity'];
             $product->save();
-        } else {
+        } 
+        elseif (isset($checkout['is_selected_checkout']) && $checkout['is_selected_checkout']) {
+            $selectedItems = session('selected_checkout_items', collect());
+            $itemIdsToDelete = [];
+            foreach ($selectedItems as $item) {
+                OrderItem::create([
+                    'product_id' => $item->product_id,
+                    'order_id' => $order->id,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                ]);
+
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->quantity -= $item->quantity;
+                    $product->save();
+                }
+                $itemIdsToDelete[] = $item->id;
+            }
+            // Hapus hanya item yang sudah di-checkout dari keranjang
+            CartItem::where('user_id', $user_id)->whereIn('id', $itemIdsToDelete)->delete();
+        }
+        else {
             $cartItems = CartItem::where('user_id', $user_id)->get();
             foreach ($cartItems as $item) {
                 OrderItem::create([
@@ -275,11 +395,10 @@ class CartController extends Controller
                     $product->save();
                 }
             }
-            // Hapus keranjang
+            // Hapus seluruh keranjang
             CartItem::where('user_id', $user_id)->delete();
         }
     
-        // 6. Buat Transaksi
         $transaction = new Transaction();
         $transaction->user_id = $user_id;
         $transaction->order_id = $order->id;
@@ -287,25 +406,93 @@ class CartController extends Controller
         $transaction->status = 'pending';
         $transaction->save();
     
-        // 7. Bersihkan Session
-        Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item']);
+        Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
         Session::put('order_id', $order->id);
     
         return redirect()->route('cart.order.confirmation');
     }
-
+    
     /**
-     * Hapus satu item dari keranjang
+     * [MODIFIKASI] Mengatur jumlah total untuk checkout.
+     * Menerima parameter $items untuk kasus checkout pilihan.
      */
+    public function setAmountForCheckout($isBuyNow = false, $items = null)
+    {
+        $user_id = Auth::id();
+    
+        if ($isBuyNow && session()->has('buy_now_item')) {
+            // ... (Logika Buy Now tidak berubah)
+            $buyNowData = session('buy_now_item');
+            $product = Product::find($buyNowData['product_id']);
+            $price = $product->sale_price > 0 ? $product->sale_price : $product->regular_price;
+            $subtotal = $price * $buyNowData['quantity'];
+            $total = $subtotal;
+    
+            Session::put('checkout', [
+                'is_buy_now' => true,
+                'is_selected_checkout' => false,
+                'discount' => 0,
+                'subtotal' => $subtotal,
+                'tax' => 0,
+                'total' => $total,
+                'price' => $price
+            ]);
+        } 
+        // Jika $items diberikan (dari checkout pilihan)
+        elseif ($items !== null) {
+            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+            $total = $subtotal;
+            Session::put('checkout', [
+                'is_buy_now' => false,
+                'is_selected_checkout' => true,
+                'discount' => 0, // Logika diskon bisa ditambahkan di sini
+                'subtotal' => $subtotal,
+                'tax' => 0,
+                'total' => $total
+            ]);
+        }
+        else {
+            // ... (Logika checkout seluruh keranjang tidak berubah)
+            $cartItems = CartItem::where('user_id', $user_id)->get();
+            if ($cartItems->isEmpty()) {
+                Session::forget('checkout');
+                return;
+            }
+    
+            $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+    
+            if (Session::has('discounts')) {
+                $discountData = Session::get('discounts');
+                Session::put('checkout', [
+                    'is_buy_now' => false,
+                    'is_selected_checkout' => false,
+                    'discount' => $discountData['discount'] ?? 0,
+                    'subtotal' => $discountData['subtotal'] ?? $subtotal,
+                    'tax' => 0,
+                    'total' => $discountData['total'] ?? ($subtotal + ($subtotal * 0.10))
+                ]);
+            } else {
+                Session::put('checkout', [
+                    'is_buy_now' => false,
+                    'is_selected_checkout' => false,
+                    'discount' => 0,
+                    'subtotal' => $subtotal,
+                    'tax' => 0,
+                    'total' => $subtotal + ($subtotal * 0.10)
+                ]);
+            }
+        }
+    }
+
+    // ... (Method lainnya seperti remove_item, empty_cart, calculateDiscount, order_confirmation tetap sama)
+    
     public function remove_item(Request $request)
     {
         $userId = Auth::id();
         $cartItemId = $request->id;
 
-        // Cari item di keranjang milik user yang sedang login, lalu hapus
         CartItem::where('id', $cartItemId)->where('user_id', $userId)->delete();
 
-        // Hitung ulang diskon jika ada kupon
         if (Session::has('coupon')) {
             $this->calculateDiscount();
         }
@@ -313,64 +500,15 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Produk berhasil dihapus dari keranjang!');
     }
 
-    /**
-     * Kosongkan semua item dari keranjang
-     */
     public function empty_cart()
     {
         $userId = Auth::id();
         CartItem::where('user_id', $userId)->delete();
+        
+        // Hapus juga session terkait checkout jika ada
+        Session::forget(['coupon', 'discounts', 'selected_checkout_items']);
+        
         return redirect()->back()->with('success', 'Keranjang berhasil dikosongkan!');
-    }
-    
-    public function setAmountForCheckout($isBuyNow = false)
-    {
-        $user_id = Auth::id();
-    
-        if ($isBuyNow && session()->has('buy_now_item')) {
-            $buyNowData = session('buy_now_item');
-            $product = Product::find($buyNowData['product_id']);
-            $price = $product->sale_price > 0 ? $product->sale_price : $product->regular_price;
-            $subtotal = $price * $buyNowData['quantity'];
-            $tax = $subtotal * 0.10;
-            $total = $subtotal + $tax;
-    
-            Session::put('checkout', [
-                'is_buy_now' => true,
-                'discount' => 0,
-                'subtotal' => $subtotal,
-                'tax' => $tax,
-                'total' => $total,
-                'price' => $price // Simpan harga per item
-            ]);
-        } else {
-            $items = CartItem::where('user_id', $user_id)->get();
-            if ($items->isEmpty()) {
-                Session::forget('checkout');
-                return;
-            }
-    
-            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
-    
-            if (Session::has('discounts')) {
-                $discountData = Session::get('discounts');
-                Session::put('checkout', [
-                    'is_buy_now' => false,
-                    'discount' => $discountData['discount'] ?? 0,
-                    'subtotal' => $discountData['subtotal'] ?? $subtotal,
-                    'tax' => $discountData['tax'] ?? ($subtotal * 0.10),
-                    'total' => $discountData['total'] ?? ($subtotal + ($subtotal * 0.10))
-                ]);
-            } else {
-                Session::put('checkout', [
-                    'is_buy_now' => false,
-                    'discount' => 0,
-                    'subtotal' => $subtotal,
-                    'tax' => $subtotal * 0.10,
-                    'total' => $subtotal + ($subtotal * 0.10)
-                ]);
-            }
-        }
     }
     
     public function calculateDiscount()
@@ -380,7 +518,6 @@ class CartController extends Controller
         $user_id = Auth::id();
         $items = CartItem::where('user_id', $user_id)->get();
 
-        // Jika keranjang kosong setelah item dihapus, hapus juga diskon
         if($items->isEmpty()){
             Session::forget('coupon');
             Session::forget('discounts');
@@ -398,17 +535,16 @@ class CartController extends Controller
         }
 
         $subtotalAfterDiscount = $subtotal - $discount;
-        $taxAfterDiscount = $subtotalAfterDiscount * 0.10; //Pajak 10 %
-        $totalAfterDiscount = $subtotalAfterDiscount + $taxAfterDiscount;
+        $totalAfterDiscount = $subtotalAfterDiscount;
 
         Session::put('discounts', [
             'discount' => $discount,
             'subtotal' => $subtotalAfterDiscount,
-            'tax' => $taxAfterDiscount,
+            'tax' => 0,
             'total' => $totalAfterDiscount
         ]);
     }
-
+    
     public function order_confirmation()
     {
         if (Session::has('order_id')) {
