@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <main class="pt-90">
-        <div class="mb-4 pb-4"></div>
+    <main >
         <section class="my-account container">
             <h2 class="page-title">Alamat</h2>
             <div class="row">

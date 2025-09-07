@@ -33,8 +33,7 @@
             color: #000;
         }
     </style>
-    <main class="pt-90" style="padding-top: 0px;">
-        <div class="mb-4 pb-4"></div>
+    <main >
         <section class="my-account container">
             <h2 class="page-title">Pesanan</h2>
             <div class="row">

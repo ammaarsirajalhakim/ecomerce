@@ -19,6 +19,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::post('cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkout.selected');
+
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
@@ -37,6 +39,10 @@ Route::put('/cart/increase-quantity/{id}', [CartController::class, 'increase_car
 Route::put('/cart/decrease-quantity/{id}', [CartController::class, 'decrease_cart_quantity'])->name('cart.qty.decrease');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove_item'])->name('cart.item.remove');
 Route::delete('/cart/clear', [CartController::class, 'empty_cart'])->name('cart.empty');
+
+// --- RUTE BARU DITAMBAHKAN DI SINI ---
+Route::post('/buy-now', [CartController::class, 'buyNow'])->name('buy.now');
+// ------------------------------------
 
 Route::post('/cart/apply-coupon', [CartController::class, 'apply_coupon_code'])->name('cart.coupon.apply');
 Route::delete('/cart/remove-coupon', [CartController::class, 'remove_coupon_code'])->name('cart.coupon.remove');
@@ -142,4 +148,18 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
 
     Route::get('/admin/about/edit', [AdminController::class, 'about_edit'])->name('admin.about.edit');
     Route::put('/admin/about/update', [AdminController::class, 'about_update'])->name('admin.about.update');
+});
+
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    // Menampilkan halaman detail akun
+    Route::get('/details', [UserController::class, 'details'])->name('details');
+
+    // Memproses pembaruan profil (nama)
+    Route::patch('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+
+    // Memproses pembaruan kata sandi
+    Route::put('/password', [UserController::class, 'updatePassword'])->name('password.update');
+
+    // Anda bisa menambahkan route lain yang berhubungan dengan user di sini
+    // seperti route untuk alamat, pesanan, dll.
 });

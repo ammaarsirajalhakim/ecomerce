@@ -213,7 +213,7 @@
                                     @php
                                         $discount = round((($product->regular_price - $product->sale_price) / $product->regular_price) * 100);
                                     @endphp
-                                    <div class="pc__badge">{{ $discount }}% OFF</div>
+                                    <div class="pc__badge">Diskon {{ $discount }}%</div>
                                 @endif
                             </div>
 
@@ -247,7 +247,6 @@
                                         @if ($inWishlist)
                                             @method('DELETE')
                                         @endif
-                                        {{-- Penambahan class js-add-wishlist agar bisa ditargetkan oleh JavaScript --}}
                                         <button type="button" class="pc__btn-wl bg-transparent border-0 js-add-wishlist {{ $inWishlist ? 'filled-heart' : '' }}"
                                             title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add To Wishlist' }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="fill: currentColor;">
@@ -287,7 +286,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- Bagian 1 & 2: Filter dan Mobile Toggle (Tidak Diubah) ---
+    // --- Bagian 1 & 2: Filter dan Mobile Toggle ---
     try {
         const frmFilter = document.getElementById('frmFilter');
         if (frmFilter) {
@@ -338,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Error pada script filter atau mobile:", e);
     }
 
-    // --- Bagian 3: Logika Wishlist (SUDAH DISESUAIKAN) ---
+    // --- Bagian 3: Logika Wishlist ---
     try {
         const handleWishlistClick = function(event) {
             event.preventDefault();
@@ -351,17 +350,13 @@ document.addEventListener("DOMContentLoaded", function() {
             const button = event.currentTarget;
             const form = button.closest('form.wishlist-form');
             if (!form) {
-                console.error("[WISHLIST DEBUG] Error: Tidak dapat menemukan form induk.");
+                console.error("Error: Tidak dapat menemukan form wishlist.");
                 return;
             }
             
             const url = form.action;
             const method = form.querySelector('input[name="_method"]')?.value || 'POST';
             const formData = new FormData(form);
-            const data = { 
-                id: formData.get('id'), 
-                _token: formData.get('_token') 
-            };
             
             button.disabled = true;
 
@@ -369,10 +364,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 method: method,
                 headers: { 
                     'Content-Type': 'application/json', 
-                    'X-CSRF-TOKEN': data._token, 
+                    'X-CSRF-TOKEN': formData.get('_token'), 
                     'Accept': 'application/json' 
                 },
-                body: (method !== 'GET') ? JSON.stringify(data) : null
+                body: (method !== 'GET') ? JSON.stringify({ id: formData.get('id'), _token: formData.get('_token') }) : null
             })
             .then(response => response.ok ? response.json() : Promise.reject(response))
             .then(data => {
@@ -396,25 +391,14 @@ document.addEventListener("DOMContentLoaded", function() {
                         const methodInput = form.querySelector('input[name="_method"]');
                         if (methodInput) methodInput.remove();
                     }
-
-                    // Logika untuk memperbarui angka di semua badge wishlist
-const badges = document.querySelectorAll('.js-wishlist-count');
-if (badges.length > 0) {
-    badges.forEach(badge => {
-        if (typeof data.count !== 'undefined') {
-            if (data.count > 0) {
-                badge.textContent = data.count;
-                badge.classList.remove('d-none');
-            } else {
-                badge.textContent = ''; // Kosongkan angka
-                badge.classList.add('d-none');
-            }
-        }
-    });
-} else {
-    console.error("[WISHLIST DEBUG] Error: Elemen dengan class='.js-wishlist-count' tidak ditemukan.");
-}
-
+                    
+                    const badges = document.querySelectorAll('.js-wishlist-count');
+                    if(badges.length > 0 && typeof data.count !== 'undefined') {
+                        badges.forEach(badge => {
+                            badge.textContent = data.count > 0 ? data.count : '';
+                            badge.classList.toggle('d-none', data.count === 0);
+                        });
+                    }
                 } else {
                     alert(data.message || 'Terjadi kesalahan.');
                 }
@@ -428,7 +412,6 @@ if (badges.length > 0) {
             });
         };
         
-        // GANTI SELEKTOR DARI .pc__btn-wl MENJADI .js-add-wishlist
         document.querySelectorAll('.js-add-wishlist').forEach(button => {
             button.addEventListener('click', handleWishlistClick);
         });
