@@ -19,6 +19,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::post('cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkout.selected');
+
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');

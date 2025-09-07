@@ -156,14 +156,6 @@
                                             </tr>
                                         @endif
                                         <tr>
-                                            <th>PENGIRIMAN</th>
-                                            <td class="text-right">Free shipping</td>
-                                        </tr>
-                                        <tr>
-                                            <th>PAJAK</th>
-                                            <td class="text-right">Rp. {{ number_format($tax, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr>
                                             <th>TOTAL</th>
                                             <td class="text-right"><strong>Rp. {{ number_format($total, 0, ',', '.') }}</strong></td>
                                         </tr>
