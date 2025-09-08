@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Midtrans\Config as MidtransConfig;
 use Midtrans\Snap as MidtransSnap;
 
+
 class CartController extends Controller
 {
     // ... (Method lain yang tidak berubah seperti index, add_to_cart, dll tetap di sini)
@@ -408,11 +409,12 @@ class CartController extends Controller
                     ],
                 ];
 
-                $snap = MidtransSnap::createTransaction($params);
+                try {
+                    // 1. Ganti createTransaction menjadi getSnapToken
+                    $snapToken = MidtransSnap::getSnapToken($params);
 
-                if ($snap->token) {
-                    $transaction->payment_token = $snap->token;
-                    $transaction->payment_url = $snap->redirect_url;
+                    // 2. Simpan token ke database Anda
+                    $transaction->payment_token = $snapToken;
                     $transaction->save();
 
                     DB::commit();
@@ -420,8 +422,12 @@ class CartController extends Controller
                     // Bersihkan session
                     Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
 
-                    // Redirect ke halaman pembayaran Midtrans
-                    return redirect($snap->redirect_url);
+                    // 3. Kembalikan token sebagai JSON, bukan redirect
+                    return response()->json(['snap_token' => $snapToken]);
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    // Kembalikan pesan error jika gagal
+                    return response()->json(['error' => $e->getMessage()], 500);
                 }
             } else { // Jika metode COD
                 $transaction->save();

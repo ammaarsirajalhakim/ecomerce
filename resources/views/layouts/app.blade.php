@@ -296,6 +296,12 @@
             max-width: 140px !important; /* Anda bisa menyesuaikan ukuran 180px ini */
             height: auto !important;
         }
+
+        .header .logo img {
+            max-width: 240px !important; /* Anda bisa menyesuaikan ukuran 180px ini */
+            height: auto !important;
+        }
+
     </style>
     <div class="header-mobile header_sticky">
         <div class="container d-flex align-items-center h-100">
