@@ -170,6 +170,13 @@
                                         <div class="text">Profil Usaha</div>
                                     </a>
                                 </li>
+                                <!-- 👇👇👇 MENU BARU DITAMBAHKAN DI SINI 👇👇👇 -->
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.whatsapp.edit') }}" class="">
+                                        <div class="icon"><i class="icon-settings"></i></div>
+                                        <div class="text">Pengaturan WA</div>
+                                    </a>
+                                </li>
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
                                         <div class="icon"><i class="icon-user"></i></div>
@@ -209,7 +216,7 @@
                         <div class="wrap">
                             <div class="header-left">
                                 <a href="index-2.html">
-                                      <img class="" id="logo_header_mobile" alt="Logo Mobile"
+                                    <img class="" id="logo_header_mobile" alt="Logo Mobile"
                                         src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}"
                                         data-light="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}"
                                         data-dark="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}" data-width="154px"

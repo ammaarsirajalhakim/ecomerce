@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View; // Fasade untuk View
-use Illuminate\Support\Facades\Auth;  // Fasade untuk Autentikasi
-use App\Models\Wishlist;              // Model untuk Wishlist
-use App\Models\About;                 // Model untuk Profil Usaha
-use App\Models\Category;              // Model untuk Kategori
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use App\Models\Wishlist;
+use App\Models\About;
+use App\Models\Category;
+use App\Models\WhatsappSetting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,30 +26,41 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Menggunakan View Composer untuk membagikan data ke layout 'layouts.app'
-        // Kode ini akan berjalan setiap kali sebuah halaman frontend dirender.
-        View::composer('layouts.app', function ($view) {
+        // Menggunakan View Composer untuk membagikan data ke semua view ('*')
+        View::composer('*', function ($view) {
             
-            // Fungsionalitas Wishlist (TETAP ADA, TIDAK DIUBAH)
-            $wishlistCount = 0;
-            if (Auth::check()) {
-                $wishlistCount = Wishlist::where('user_id', Auth::id())->count();
+            // --- DATA YANG DIBUTUHKAN SEMUA HALAMAN (FRONTEND & ADMIN) ---
+
+            // 1. Ambil Nomor WhatsApp
+            $whatsappNumber = '6281234567890'; // Nilai default untuk keamanan
+            if (Schema::hasTable('whatsapp_settings')) {
+                $setting = WhatsappSetting::where('key', 'whatsapp_number')->first();
+                if ($setting) {
+                    $whatsappNumber = $setting->value;
+                }
             }
-            $view->with('wishlistCount', $wishlistCount);
+            $view->with('whatsappNumber', $whatsappNumber);
 
-
-            // --- DATA TAMBAHAN UNTUK PROFIL USAHA & FOOTER ---
-
-            // 1. Mengambil data profil usaha (logo & banner)
+            // 2. Ambil Data Profil Usaha (untuk Logo)
             $about_us_data = About::first();
-            
-            // 2. Mengambil kategori untuk ditampilkan di footer
-            $footerCategories = Category::orderBy('name')->take(5)->get();
-
-            // 3. Membagikan variabel tambahan ke view
             $view->with('about_us_data', $about_us_data);
-            $view->with('footerCategories', $footerCategories);
 
+
+            // --- DATA KHUSUS HALAMAN DEPAN (TIDAK JALAN DI ADMIN) ---
+            if (!request()->is('admin*')) 
+            {
+                // Data Wishlist
+                $wishlistCount = 0;
+                if (Auth::check()) {
+                    $wishlistCount = Wishlist::where('user_id', Auth::id())->count();
+                }
+                $view->with('wishlistCount', $wishlistCount);
+
+                // Data Kategori untuk Footer
+                $footerCategories = Category::orderBy('name')->take(5)->get();
+                $view->with('footerCategories', $footerCategories);
+            }
         });
     }
 }
+

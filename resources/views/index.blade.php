@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('content')
 <style>
     /* CSS untuk Tombol WhatsApp */
@@ -11,7 +12,7 @@
         background-color: #fff;
         border-radius: 50px;
         text-align: center;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         z-index: 1000;
         display: flex;
         align-items: center;
@@ -33,7 +34,8 @@
         .whatsapp-float {
             width: 55px;
             height: 55px;
-            bottom: 80px; /* Disesuaikan agar di atas footer mobile */
+            bottom: 80px;
+            /* Disesuaikan agar di atas footer mobile */
             right: 20px;
         }
 
@@ -42,12 +44,56 @@
             height: 30px;
         }
     }
+
+    /* Default desktop */
+    .slideshow .slideshow-character__img {
+        max-height: 90vh;
+        object-fit: contain;
+    }
+
+    /* Mobile khusus */
+    @media (max-width: 768px) {
+        .slideshow .slideshow-text h2 {
+            font-size: 1.2rem;
+            /* kecilkan judul */
+            line-height: 1.3;
+        }
+
+        .slideshow .slideshow-text h6 {
+            font-size: 0.8rem;
+        }
+
+        .slideshow .slideshow-text a {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+        }
+
+        .slideshow .slideshow-character__img {
+            max-height: 50vh;
+        }
+    }
+
+    .category-carousel .swiper-slide img {
+        max-width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin: 0 auto 10px;
+        display: block;
+    }
+
+    .category-carousel .swiper-slide .text-center {
+        font-size: 1rem;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 </style>
 <main>
 
     @if (isset($slides) && !$slides->isEmpty())
-        <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow"
-            data-settings='{
+        <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow" data-settings='{
                 "autoplay": {
                 "delay": 5000
                 },
@@ -102,45 +148,13 @@
         </section>
     @endif
 
-    <style>
-        /* Default desktop */
-        .slideshow .slideshow-character__img {
-            max-height: 90vh;
-            object-fit: contain;
-        }
-
-        /* Mobile khusus */
-        @media (max-width: 768px) {
-            .slideshow .slideshow-text h2 {
-                font-size: 1.2rem;
-                /* kecilkan judul */
-                line-height: 1.3;
-            }
-
-            .slideshow .slideshow-text h6 {
-                font-size: 0.8rem;
-            }
-
-            .slideshow .slideshow-text a {
-                font-size: 0.8rem;
-                padding: 6px 12px;
-            }
-
-            .slideshow .slideshow-character__img {
-                max-height: 50vh;
-            }
-        }
-    </style>
-
-
     <div class="container mw-1620 bg-white border-radius-10">
         <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
         <section class="category-carousel container">
             <h2 class="section-title text-center mb-3 pb-xl-2 mb-xl-4">Mungkin Kamu Suka</h2>
 
             <div class="position-relative">
-                <div class="swiper-container js-swiper-slider"
-                    data-settings='{
+                <div class="swiper-container js-swiper-slider" data-settings='{
                         "autoplay": {
                             "delay": 5000
                         },
@@ -207,27 +221,6 @@
             </div>
         </section>
 
-        {{-- 👇👇👇 UBAH UKURAN DI SINI 👇👇👇 --}}
-        <style>
-            .category-carousel .swiper-slide img {
-                max-width: 120px; /* Diubah dari 100px menjadi 120px */
-                height: 120px;    /* Diubah dari 100px menjadi 120px */
-                object-fit: cover;
-                border-radius: 10px; 
-                margin: 0 auto 10px; 
-                display: block;
-            }
-
-            .category-carousel .swiper-slide .text-center {
-                font-size: 1rem; /* Ukuran font diperbesar agar seimbang */
-                line-height: 1.3;
-                white-space: nowrap; 
-                overflow: hidden;    
-                text-overflow: ellipsis; 
-            }
-        </style>
-
-
         <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
         <section class="hot-deals container">
@@ -266,8 +259,7 @@
                 </div>
                 <div class="col-md-6 col-lg-8 col-xl-80per">
                     <div class="position-relative">
-                        <div class="swiper-container js-swiper-slider"
-                            data-settings='{
+                        <div class="swiper-container js-swiper-slider" data-settings='{
                                 "autoplay": { "delay": 5000 },
                                 "slidesPerView": 4,
                                 "slidesPerGroup": 4,
@@ -318,95 +310,100 @@
                     </div>
                 </div>
             </div>
-        </section>
+    </div>
+    </section>
 
-        <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
+    <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
-        <section class="category-banner container">
-            <div class="row">
-                @foreach ($bannerRandomCategories as $category)
-                    @php
-                        $lowestSaleProduct = $category->products
-                            ->whereNotNull('sale_price')
-                            ->sortBy('sale_price')
-                            ->first();
-                        $productImage = $category->products->first()?->image;
-                    @endphp
-                    <div class="col-md-6">
-                        <div class="category-banner__item border-radius-10 mb-5">
-                            @php
-                                $imagePath = $productImage
-                                    ? public_path('uploads/products/' . $productImage)
-                                    : null;
-                                $isPng =
-                                    $productImage &&
-                                    strtolower(pathinfo($productImage, PATHINFO_EXTENSION)) === 'png';
-                            @endphp
+    <section class="category-banner container">
+        <div class="row">
+            @foreach ($bannerRandomCategories as $category)
+                @php
+                    $lowestSaleProduct = $category->products
+                        ->whereNotNull('sale_price')
+                        ->sortBy('sale_price')
+                        ->first();
+                    $productImage = $category->products->first()?->image;
+                @endphp
+                <div class="col-md-6">
+                    <div class="category-banner__item border-radius-10 mb-5">
+                        @php
+                            $imagePath = $productImage
+                                ? public_path('uploads/products/' . $productImage)
+                                : null;
+                            $isPng =
+                                $productImage &&
+                                strtolower(pathinfo($productImage, PATHINFO_EXTENSION)) === 'png';
+                        @endphp
 
-                            <img loading="lazy" class="h-auto"
-                                src="{{ $productImage ? asset('uploads/products/' . $productImage) : asset('assets/images/placeholder.jpg') }}"
-                                width="690" height="665" alt="{{ $category->name }}"
-                                @style(['background-color: #f2f2f2'=> $isPng]) />
+                        <img loading="lazy" class="h-auto"
+                            src="{{ $productImage ? asset('uploads/products/' . $productImage) : asset('assets/images/placeholder.jpg') }}"
+                            width="690" height="665" alt="{{ $category->name }}"
+                            @style(['background-color: #f2f2f2'=> $isPng]) />
 
-                            <div class="category-banner__item-mark">
-                                @if ($lowestSaleProduct)
-                                    Mulai Dari Rp. {{ number_format($lowestSaleProduct->sale_price, 2) }}
+                        <div class="category-banner__item-mark">
+                            @if ($lowestSaleProduct)
+                                Mulai Dari Rp. {{ number_format($lowestSaleProduct->sale_price, 2) }}
+                            @else
+                                Check the deals
+                            @endif
+                        </div>
+
+                        <div class="category-banner__item-content">
+                            <h3 class="mb-0">{{ $category->name }}</h3>
+                            <a href="{{ url('/shop?categories=' . $category->id) }}"
+                                class="btn-link default-underline text-uppercase fw-medium">Belanja Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+    <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
+
+    <section class="products-grid container">
+        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Produk Unggulan</h2>
+        <div class="row">
+            @foreach ($fproducts as $fproduct)
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
+                        <div class="pc__img-wrapper">
+                            <a href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">
+                                <img loading="lazy" src="{{ asset('uploads/products') }}/{{ $fproduct->image }}"
+                                    width="330" height="400" alt="{{ $fproduct->name }}" class="pc__img">
+                            </a>
+                        </div>
+                        <div class="pc__info position-relative">
+                            <h6 class="pc__title"><a
+                                    href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">{{ $fproduct->name }}</a>
+                            </h6>
+                            <div class="product-card__price d-flex flex-column align-items-start">
+                                @if ($fproduct->sale_price)
+                                    <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
+                                        Rp. {{ number_format($fproduct->sale_price, 0, ',', '.') }}
+                                    </span>
+                                    <span class="money price text-muted" style="text-decoration: line-through; font-size: 0.9rem;">
+                                        Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
+                                    </span>
                                 @else
-                                    Check the deals
+                                    <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
+                                        Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
+                                    </span>
                                 @endif
-                            </div>
-
-                            <div class="category-banner__item-content">
-                                <h3 class="mb-0">{{ $category->name }}</h3>
-                                <a href="{{ url('/shop?categories=' . $category->id) }}"
-                                    class="btn-link default-underline text-uppercase fw-medium">Belanja Sekarang</a>
                             </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
-        </section>
-
-        <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
-        <section class="products-grid container">
-            <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Produk Unggulan</h2>
-            <div class="row">
-                @foreach ($fproducts as $fproduct)
-    <div class="col-6 col-md-4 col-lg-3">
-        <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
-            <div class="pc__img-wrapper">
-                <a href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">
-                    <img loading="lazy" src="{{ asset('uploads/products') }}/{{ $fproduct->image }}"
-                        width="330" height="400" alt="{{ $fproduct->name }}" class="pc__img">
-                </a>
-            </div>
-            <div class="pc__info position-relative">
-                <h6 class="pc__title"><a href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">{{ $fproduct->name }}</a></h6>
-                <div class="product-card__price d-flex flex-column align-items-start">
-                    @if ($fproduct->sale_price)
-                        <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
-                            Rp. {{ number_format($fproduct->sale_price, 0, ',', '.') }}
-                        </span>
-                        <span class="money price text-muted" style="text-decoration: line-through; font-size: 0.9rem;">
-                            Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
-                        </span>
-                    @else
-                        <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
-                            Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
-                        </span>
-                    @endif
                 </div>
-            </div>
+            @endforeach
         </div>
-    </div>
-@endforeach
-            </div>
-        </section>
+    </section>
 
-    </div> </main>
-    <!-- Tombol WhatsApp Mengambang -->
-    <a href="https://wa.me/62895623110888?text=Halo,%20saya%20tertarik%20dengan%20layanan%20Anda." class="whatsapp-float" target="_blank" rel="noopener noreferrer">
-        <img src="{{ asset('images/whatsapp-icon.svg') }}" alt="Chat di WhatsApp" class="whatsapp-icon">
-    </a>
+    </div>
+</main>
+<!-- Tombol WhatsApp Mengambang -->
+<a href="https://wa.me/{{ $whatsappNumber }}?text=Halo,%20saya%20tertarik%20dengan%20layanan%20Anda."
+    class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+    <img src="{{ asset('images/whatsapp-icon.svg') }}" alt="Chat di WhatsApp" class="whatsapp-icon">
+</a>
 @endsection
