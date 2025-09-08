@@ -151,3 +151,17 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/about/edit', [AdminController::class, 'about_edit'])->name('admin.about.edit');
     Route::put('/admin/about/update', [AdminController::class, 'about_update'])->name('admin.about.update');
 });
+
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    // Menampilkan halaman detail akun
+    Route::get('/details', [UserController::class, 'details'])->name('details');
+
+    // Memproses pembaruan profil (nama)
+    Route::patch('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+
+    // Memproses pembaruan kata sandi
+    Route::put('/password', [UserController::class, 'updatePassword'])->name('password.update');
+
+    // Anda bisa menambahkan route lain yang berhubungan dengan user di sini
+    // seperti route untuk alamat, pesanan, dll.
+});
