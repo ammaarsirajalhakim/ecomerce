@@ -228,7 +228,7 @@
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <button type="button" id="pay-button" class="btn btn-primary btn-checkout">BUAT
+                            <button type="submit" id="pay-button" class="btn btn-primary btn-checkout">BUAT
                                 PESANAN</button>
                         </div>
                     </div>
@@ -243,56 +243,82 @@
             data-client-key="{{ config('midtrans.client_key') }}"></script>
 
         <script type="text/javascript">
-            // Pastikan jQuery sudah dimuat sebelum blok ini
             $(document).ready(function() {
-                var payButton = document.getElementById('pay-button');
+                // [MODIFIKASI] Gunakan event 'submit' pada form, bukan 'click' pada tombol
+                $('#checkout-form').on('submit', function(event) {
+                    // Ambil tombol submit
+                    var payButton = $('#pay-button');
 
-                payButton.addEventListener('click', function() {
-                    payButton.disabled = true;
-                    payButton.innerHTML = 'Memproses...';
+                    // Cek metode pembayaran yang dipilih
+                    var selectedPaymentMethod = $('input[name="mode"]:checked').val();
 
-                    $.ajax({
-                        url: "{{ route('cart.place.an.order') }}",
-                        method: 'POST',
-                        data: $('#checkout-form').serialize(),
-                        cache: false,
-                        success: function(data) {
-                            if (data.snap_token) {
-                                snap.pay(data.snap_token, {
-                                    onSuccess: function(result) {
-                                        sendPaymentResult(result);
-                                    },
-                                    onPending: function(result) {
-                                        sendPaymentResult(result);
-                                    },
-                                    onError: function(result) {
-                                        alert("Pembayaran Gagal!");
-                                        payButton.disabled = false;
-                                        payButton.innerHTML = 'BUAT PESANAN';
-                                    },
-                                    onClose: function() {
-                                        alert('Anda menutup popup pembayaran.');
-                                        payButton.disabled = false;
-                                        payButton.innerHTML = 'BUAT PESANAN';
-                                    }
-                                });
-                            } else {
-                                alert(data.error || 'Gagal mendapatkan token pembayaran.');
-                                payButton.disabled = false;
-                                payButton.innerHTML = 'BUAT PESANAN';
+                    // [LOGIKA BARU] Jika metode pembayaran adalah 'transfer', jalankan AJAX
+                    if (selectedPaymentMethod === 'transfer') {
+                        // Hentikan pengiriman form standar agar AJAX bisa berjalan
+                        event.preventDefault();
+
+                        // Nonaktifkan tombol untuk mencegah klik ganda
+                        payButton.prop('disabled', true);
+                        payButton.html('Memproses...');
+
+                        $.ajax({
+                            url: $(this).attr('action'), // Ambil URL dari atribut action form
+                            method: 'POST',
+                            data: $(this).serialize(),
+                            cache: false,
+                            success: function(data) {
+                                if (data.snap_token) {
+                                    // Jika token diterima, buka popup Midtrans
+                                    snap.pay(data.snap_token, {
+                                        onSuccess: function(result) {
+                                            sendPaymentResult(result);
+                                        },
+                                        onPending: function(result) {
+                                            sendPaymentResult(result);
+                                        },
+                                        onError: function(result) {
+                                            alert("Pembayaran Gagal!");
+                                            payButton.prop('disabled', false);
+                                            payButton.html('BUAT PESANAN');
+                                        },
+                                        onClose: function() {
+                                            // Jangan tampilkan alert jika pembayaran berhasil/pending
+                                            if (window.paymentSuccess !== true) {
+                                                alert('Anda menutup popup pembayaran.');
+                                            }
+                                            payButton.prop('disabled', false);
+                                            payButton.html('BUAT PESANAN');
+                                        }
+                                    });
+                                } else {
+                                    // Jika tidak ada token, tampilkan error
+                                    alert(data.error || 'Gagal mendapatkan token pembayaran.');
+                                    payButton.prop('disabled', false);
+                                    payButton.html('BUAT PESANAN');
+                                }
+                            },
+                            error: function(xhr) {
+                                console.error(xhr.responseText);
+                                alert("Terjadi kesalahan. Silakan coba lagi.");
+                                payButton.prop('disabled', false);
+                                payButton.html('BUAT PESANAN');
                             }
-                        },
-                        error: function(xhr) {
-                            console.error(xhr.responseText);
-                            alert("Terjadi kesalahan. Silakan coba lagi.");
-                            payButton.disabled = false;
-                            payButton.innerHTML = 'BUAT PESANAN';
-                        }
-                    });
+                        });
+
+                    } else {
+                        // [LOGIKA BARU] Jika metode adalah 'cod' atau lainnya,
+                        // biarkan form melakukan submit secara normal.
+                        // Cukup nonaktifkan tombol untuk memberikan feedback ke user.
+                        payButton.prop('disabled', true);
+                        payButton.html('Memproses...');
+                        // Tidak ada event.preventDefault(), jadi form akan dikirim ke server.
+                    }
                 });
 
-                // PASTIKAN FUNGSI INI ADA DI DALAM SCRIPT TAG YANG SAMA
+                // Fungsi untuk mengirim hasil pembayaran ke server (tetap sama)
                 function sendPaymentResult(result) {
+                    // Tandai bahwa pembayaran berhasil/pending untuk mencegah alert 'onClose'
+                    window.paymentSuccess = true;
                     $.ajax({
                         url: "{{ route('payment.success') }}",
                         method: 'POST',
@@ -301,6 +327,7 @@
                             result: result
                         },
                         success: function() {
+                            // Arahkan ke halaman konfirmasi setelah hasil terkirim
                             window.location.href = "{{ route('cart.order.confirmation') }}";
                         },
                         error: function(xhr) {

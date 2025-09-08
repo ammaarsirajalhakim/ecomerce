@@ -279,6 +279,9 @@ class CartController extends Controller
     /**
      * [MODIFIKASI] Menyimpan pesanan ke database.
      */
+    /**
+     * [MODIFIKASI] Menyimpan pesanan ke database.
+     */
     public function place_an_order(Request $request)
     {
         // Validasi dan logika pembuatan alamat tetap sama
@@ -327,8 +330,6 @@ class CartController extends Controller
         if (!$checkout) {
             return redirect()->route('shop.index')->with('error', 'Sesi checkout berakhir, silakan coba lagi.');
         }
-
-        // --- MULAI PERUBAHAN LOGIKA DI SINI ---
 
         DB::beginTransaction();
         try {
@@ -390,8 +391,10 @@ class CartController extends Controller
             $transaction->mode = $request->mode;
             $transaction->status = 'pending'; // Status awal untuk semua transaksi
 
+            // Simpan order_id ke session untuk digunakan di halaman konfirmasi
             Session::put('order_id', $order->id);
 
+            // [MODIFIKASI DIMULAI] - Memisahkan logika Transfer dan COD
             if ($request->mode == 'transfer') {
                 // Konfigurasi Midtrans
                 MidtransConfig::$serverKey = config('midtrans.server_key');
@@ -412,36 +415,46 @@ class CartController extends Controller
                 ];
 
                 try {
-                    // 1. Ganti createTransaction menjadi getSnapToken
+                    // 1. Dapatkan Snap Token dari Midtrans
                     $snapToken = MidtransSnap::getSnapToken($params);
 
-                    // 2. Simpan token ke database Anda
+                    // 2. Simpan token ke database transaksi
                     $transaction->payment_token = $snapToken;
                     $transaction->save();
 
                     DB::commit();
 
-                    // Bersihkan session
+                    // Bersihkan session setelah transaksi berhasil dibuat
                     Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
 
-                    // 3. Kembalikan token sebagai JSON, bukan redirect
+                    // 3. Kembalikan token sebagai JSON untuk diproses oleh frontend
                     return response()->json(['snap_token' => $snapToken]);
+
                 } catch (\Exception $e) {
                     DB::rollBack();
-                    // Kembalikan pesan error jika gagal
+                    // Kembalikan pesan error jika gagal membuat token
                     return response()->json(['error' => $e->getMessage()], 500);
                 }
-            } else { // Jika metode COD
+
+            } else { // Jika metode yang dipilih adalah COD
+                
+                // 1. Langsung simpan transaksi tanpa token pembayaran
                 $transaction->save();
+                
+                // 2. Commit perubahan ke database
                 DB::commit();
 
+                // 3. Bersihkan session yang sudah tidak diperlukan
                 Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
-                Session::put('order_id', $order->id);
+                
+                // 4. Arahkan pengguna langsung ke halaman konfirmasi pesanan
                 return redirect()->route('cart.order.confirmation');
             }
+            // [MODIFIKASI SELESAI]
+
         } catch (\Exception $e) {
             DB::rollBack();
-            // Log error atau tampilkan pesan error
+            // Log error atau tampilkan pesan error jika terjadi kesalahan umum
             return redirect()->route('cart.checkout')->with('error', 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage());
         }
     }
