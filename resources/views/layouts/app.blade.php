@@ -292,6 +292,10 @@
         #box-content-search .product-item {
             margin-bottom: 10px;
         }
+        .header-mobile .logo img {
+            max-width: 140px !important; /* Anda bisa menyesuaikan ukuran 180px ini */
+            height: auto !important;
+        }
     </style>
     <div class="header-mobile header_sticky">
         <div class="container d-flex align-items-center h-100">
@@ -305,7 +309,7 @@
 
             <div class="logo">
                 <a href="{{ route('home.index') }}">
-                   <img src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('images/logo/logo.png') }}" />
+                   <img src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}" />
                 </a>
             </div>
 
@@ -443,8 +447,7 @@
                 <div class="header-top d-flex align-items-center justify-content-between w-100 mb-2">
                     <div class="logo">
                         <a href="{{ route('home.index') }}">
-                            <img src="{{ asset('assets/images/logo.png') }}" alt="Loozy"
-                                class="logo__image d-block" />
+                            <img src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}" />
                         </a>
                     </div>
 

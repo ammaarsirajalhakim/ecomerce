@@ -170,6 +170,12 @@
                                         Cash On Delivery (COD)
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input form-check-input_fill" type="radio" name="mode" id="mode4" value="transfer">
+                                    <label class="form-check-label" for="mode4">
+                                        Transfer Bank
+                                    </label>
+                                </div>
                                 <div class="policy-text">
                                     Data pribadi Anda akan digunakan untuk memproses pesanan Anda...
                                 </div>
