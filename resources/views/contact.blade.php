@@ -59,7 +59,7 @@
             color: #000;
         }
         .category-item:hover .category-icon {
-             transform: scale(1.1);
+            transform: scale(1.1);
         }
         .category-icon {
             width: 80px;
@@ -142,6 +142,48 @@
             border-top: 1px solid #e0e0e0; /* Membuat garis horizontal sebagai pembatas */
         }
         /* PERUBAHAN SELESAI DI SINI */
+
+        /* CSS untuk Tombol WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #fff;
+            border-radius: 50px;
+            text-align: center;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+
+        .whatsapp-icon {
+            width: 35px;
+            height: 35px;
+        }
+
+        /* Penyesuaian Tombol WhatsApp untuk Mobile */
+        @media (max-width: 767px) {
+            .whatsapp-float {
+                width: 55px;
+                height: 55px;
+                bottom: 80px; /* Disesuaikan agar di atas footer mobile */
+                right: 20px;
+            }
+
+            .whatsapp-icon {
+                width: 30px;
+                height: 30px;
+            }
+        }
     </style>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -217,7 +259,7 @@
                             </div>
                         </div>
                          <div class="faq-item">
-                             <div class="faq-question">
+                            <div class="faq-question">
                                 <span>Apakah saya bisa membatalkan atau mengubah pesanan?</span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
@@ -315,4 +357,9 @@
             });
         </script>
         </main>
+
+        <!-- Tombol WhatsApp Mengambang -->
+        <a href="https://wa.me/62895623110888?text=Halo,%20saya%20tertarik%20dengan%20layanan%20Anda." class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+            <img src="{{ asset('images/whatsapp-icon.svg') }}" alt="Chat di WhatsApp" class="whatsapp-icon">
+        </a>
 @endsection

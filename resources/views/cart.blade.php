@@ -23,6 +23,48 @@
         border-top: 1px solid #eee;
         margin-top: 15px;
     }
+
+    /* CSS untuk Tombol WhatsApp */
+    .whatsapp-float {
+        position: fixed;
+        width: 60px;
+        height: 60px;
+        bottom: 40px;
+        right: 40px;
+        background-color: #fff;
+        border-radius: 50px;
+        text-align: center;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .whatsapp-float:hover {
+        transform: scale(1.1);
+    }
+
+    .whatsapp-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Penyesuaian Tombol WhatsApp untuk Mobile */
+    @media (max-width: 767px) {
+        .whatsapp-float {
+            width: 55px;
+            height: 55px;
+            bottom: 80px; /* Disesuaikan agar di atas footer mobile */
+            right: 20px;
+        }
+
+        .whatsapp-icon {
+            width: 30px;
+            height: 30px;
+        }
+    }
 </style>
 <main class="pt-20">
 
@@ -103,9 +145,9 @@
     <div class="qty-control position-relative">
         {{-- Form di sini sudah dihapus --}}
         <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" 
-               class="qty-control__number text-center action-input" 
-               data-action="{{ route('cart.qty.update', ['id' => $item->id]) }}" 
-               data-method="PUT">
+                class="qty-control__number text-center action-input" 
+                data-action="{{ route('cart.qty.update', ['id' => $item->id]) }}" 
+                data-method="PUT">
         
         <div class="qty-control__reduce action-btn" data-action="{{ route('cart.qty.decrease', ['id' => $item->id]) }}" data-method="PUT">-</div>
         <div class="qty-control__increase action-btn" data-action="{{ route('cart.qty.increase', ['id' => $item->id]) }}" data-method="PUT">+</div>
@@ -211,6 +253,10 @@
         </div>
     </section>
 </main>
+<!-- Tombol WhatsApp Mengambang -->
+<a href="https://wa.me/62895623110888?text=Halo,%20saya%20tertarik%20dengan%20layanan%20Anda." class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+    <img src="{{ asset('images/whatsapp-icon.svg') }}" alt="Chat di WhatsApp" class="whatsapp-icon">
+</a>
 @endsection
 
 @push('scripts')
