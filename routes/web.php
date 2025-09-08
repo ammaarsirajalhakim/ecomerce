@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\WhatsappSettingController; 
 
 Route::get('/', function () {
     return view('welcome');
@@ -151,6 +152,10 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
 
     Route::get('/admin/about/edit', [AdminController::class, 'about_edit'])->name('admin.about.edit');
     Route::put('/admin/about/update', [AdminController::class, 'about_update'])->name('admin.about.update');
+    
+    // --- RUTE PENGATURAN WHATSAPP ---
+    Route::get('/admin/whatsapp-settings', [WhatsappSettingController::class, 'edit'])->name('admin.whatsapp.edit');
+    Route::put('/admin/whatsapp-settings', [WhatsappSettingController::class, 'update'])->name('admin.whatsapp.update');
 });
 
 Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
@@ -166,3 +171,4 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     // Anda bisa menambahkan route lain yang berhubungan dengan user di sini
     // seperti route untuk alamat, pesanan, dll.
 });
+
