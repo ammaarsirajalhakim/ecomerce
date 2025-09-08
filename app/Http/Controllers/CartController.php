@@ -390,6 +390,8 @@ class CartController extends Controller
             $transaction->mode = $request->mode;
             $transaction->status = 'pending'; // Status awal untuk semua transaksi
 
+            Session::put('order_id', $order->id);
+
             if ($request->mode == 'transfer') {
                 // Konfigurasi Midtrans
                 MidtransConfig::$serverKey = config('midtrans.server_key');
@@ -576,12 +578,38 @@ class CartController extends Controller
         ]);
     }
 
+    public function paymentSuccess(Request $request)
+    {
+        $result = $request->input('result');
+
+        // Simpan informasi yang Anda butuhkan ke dalam session
+        Session::flash('transaction_details', [
+            'transaction_id' => $result['transaction_id'],
+            'payment_type'   => str_replace('_', ' ', $result['payment_type']),
+            'status_message' => $result['status_message'],
+            'gross_amount'   => number_format($result['gross_amount'], 0, ',', '.'),
+        ]);
+
+        return response()->json(['status' => 'success']);
+    }
+
     public function order_confirmation()
     {
-        if (Session::has('order_id')) {
-            $order = Order::find(Session::get('order_id'));
-            return view('order-confirmation', compact('order'));
+        // Pastikan ada order_id di session, ini wajib untuk COD dan Transfer
+        if (!Session::has('order_id')) {
+            return redirect()->route('cart.index');
         }
-        return redirect()->route('cart.index');
+
+        // Ambil order berdasarkan session
+        $order = Order::find(Session::get('order_id'));
+
+        // Ambil detail transaksi (ini hanya akan ada untuk pembayaran transfer)
+        $transactionDetails = Session::get('transaction_details');
+
+        // Hapus session order_id agar tidak bisa diakses lagi jika halaman di-refresh
+        Session::forget('order_id');
+
+        // Kirim kedua variabel ke view
+        return view('order-confirmation', compact('order', 'transactionDetails'));
     }
 }
