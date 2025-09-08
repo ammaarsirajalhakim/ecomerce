@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\MidtransController;
 use App\Http\Middleware\AuthAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,7 @@ Route::post('/wishlist/move-to-cart/{id}', [WishlistController::class, 'move_to_
 Route::get('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 Route::post('/place-an-order', [CartController::class, 'place_an_order'])->name('cart.place.an.order');
 Route::get('/order-confirmation', [CartController::class, 'order_confirmation'])->name('cart.order.confirmation');
+Route::post('/midtrans/notification', [MidtransController::class, 'notificationHandler']);
 
 // Rute untuk halaman Bantuan
 Route::get('/help', [HomeController::class, 'help'])->name('home.help');
