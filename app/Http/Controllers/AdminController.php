@@ -53,7 +53,7 @@ class AdminController extends BaseController
         $request->validate([
             // Tambahkan validasi untuk logo
             'logo_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
-            'poster_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'poster_image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'our_story' => 'required|string',
             'our_vision' => 'required|string',
             'our_mission' => 'required|string',
@@ -344,7 +344,7 @@ class AdminController extends BaseController
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif'
         ], [
             'name.required' => 'Nama merek tidak boleh kosong.',
             'category_id.required' => 'Anda harus memilih kategori.',
@@ -387,7 +387,7 @@ class AdminController extends BaseController
             'id' => 'required|exists:brands,id',
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Gambar bersifat opsional saat update
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif' // Gambar bersifat opsional saat update
         ], [
             'name.required' => 'Nama merek tidak boleh kosong.',
             'category_id.required' => 'Anda harus memilih kategori.',
@@ -556,7 +556,7 @@ class AdminController extends BaseController
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
-            'image' => 'required|mimes:png,jpg,jpeg|max:2048',
+            'image' => 'required|mimes:png,jpg,jpeg',
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
@@ -644,7 +644,7 @@ class AdminController extends BaseController
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
-            'image' => 'mimes:png,jpg,jpeg|max:2048',
+            'image' => 'mimes:png,jpg,jpeg',
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
@@ -870,7 +870,7 @@ class AdminController extends BaseController
             'subtitle' => 'required',
             'link' => 'required',
             'status' => 'required',
-            'image' => 'required|mimes:png,jpg,jpeg|max:2048'
+            'image' => 'required|mimes:png,jpg,jpeg'
         ]);
 
         $slide = new Slide();
@@ -913,7 +913,7 @@ class AdminController extends BaseController
             'subtitle' => 'required',
             'link' => 'required',
             'status' => 'required',
-            'image' => 'required|mimes:png,jpg,jpeg|max:2048'
+            'image' => 'required|mimes:png,jpg,jpeg'
         ]);
 
         $slide = Slide::find($request->id);
