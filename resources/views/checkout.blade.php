@@ -20,7 +20,7 @@
                                 <div class="col-6 text-right">
                                     <a href="{{ route('user.address.index') }}" class="btn btn-link fw-semi-bold mt-4"
                                         style="text-decoration: underline; background: none; border: none;">Ubah Alamat</a>
-                                    
+
                                 </div>
                             @endif
                         </div>
@@ -243,67 +243,72 @@
             data-client-key="{{ config('midtrans.client_key') }}"></script>
 
         <script type="text/javascript">
-            // 2. Tambahkan event listener untuk tombol bayar
-            var payButton = document.getElementById('pay-button');
-            payButton.addEventListener('click', function() {
-                // Nonaktifkan tombol untuk mencegah klik ganda
-                payButton.disabled = true;
-                payButton.innerHTML = 'Memproses...';
+            // Pastikan jQuery sudah dimuat sebelum blok ini
+            $(document).ready(function() {
+                var payButton = document.getElementById('pay-button');
 
-                // Menggunakan jQuery untuk AJAX (pastikan jQuery sudah ada di proyek Anda)
-                $.ajax({
-                    url: "{{ route('cart.place.an.order') }}", // Rute ke controller Anda
-                    method: 'POST',
-                    data: $('#checkout-form').serialize(), // Ambil semua data form
-                    cache: false,
-                    success: function(data) {
-                        // Jika berhasil dapat token, panggil snap.pay
-                        if (data.snap_token) {
-                            snap.pay(data.snap_token, {
-                                onSuccess: function(result) {
-                                    /* Logika jika pembayaran sukses, arahkan ke halaman konfirmasi */
-                                    console.log(result);
-                                    window.location.href =
-                                        "{{ route('cart.order.confirmation') }}";
-                                },
-                                onPending: function(result) {
-                                    /* Logika jika pembayaran pending */
-                                    console.log(result);
-                                    alert("Pembayaran Anda sedang diproses.");
-                                    window.location.href =
-                                        "{{ route('cart.order.confirmation') }}";
-                                },
-                                onError: function(result) {
-                                    /* Logika jika pembayaran error */
-                                    console.log(result);
-                                    alert("Pembayaran Gagal!");
-                                    // Aktifkan kembali tombol
-                                    payButton.disabled = false;
-                                    payButton.innerHTML = 'BUAT PESANAN';
-                                },
-                                onClose: function() {
-                                    /* Logika jika pelanggan menutup popup */
-                                    alert('Anda menutup popup pembayaran.');
-                                    // Aktifkan kembali tombol
-                                    payButton.disabled = false;
-                                    payButton.innerHTML = 'BUAT PESANAN';
-                                }
-                            });
-                        } else if (data.error) {
-                            alert(data.error);
-                            // Aktifkan kembali tombol
+                payButton.addEventListener('click', function() {
+                    payButton.disabled = true;
+                    payButton.innerHTML = 'Memproses...';
+
+                    $.ajax({
+                        url: "{{ route('cart.place.an.order') }}",
+                        method: 'POST',
+                        data: $('#checkout-form').serialize(),
+                        cache: false,
+                        success: function(data) {
+                            if (data.snap_token) {
+                                snap.pay(data.snap_token, {
+                                    onSuccess: function(result) {
+                                        sendPaymentResult(result);
+                                    },
+                                    onPending: function(result) {
+                                        sendPaymentResult(result);
+                                    },
+                                    onError: function(result) {
+                                        alert("Pembayaran Gagal!");
+                                        payButton.disabled = false;
+                                        payButton.innerHTML = 'BUAT PESANAN';
+                                    },
+                                    onClose: function() {
+                                        alert('Anda menutup popup pembayaran.');
+                                        payButton.disabled = false;
+                                        payButton.innerHTML = 'BUAT PESANAN';
+                                    }
+                                });
+                            } else {
+                                alert(data.error || 'Gagal mendapatkan token pembayaran.');
+                                payButton.disabled = false;
+                                payButton.innerHTML = 'BUAT PESANAN';
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            alert("Terjadi kesalahan. Silakan coba lagi.");
                             payButton.disabled = false;
                             payButton.innerHTML = 'BUAT PESANAN';
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        alert("Terjadi kesalahan. Silakan coba lagi.");
-                        // Aktifkan kembali tombol
-                        payButton.disabled = false;
-                        payButton.innerHTML = 'BUAT PESANAN';
-                    }
+                    });
                 });
+
+                // PASTIKAN FUNGSI INI ADA DI DALAM SCRIPT TAG YANG SAMA
+                function sendPaymentResult(result) {
+                    $.ajax({
+                        url: "{{ route('payment.success') }}",
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            result: result
+                        },
+                        success: function() {
+                            window.location.href = "{{ route('cart.order.confirmation') }}";
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            alert('Gagal memproses hasil pembayaran di server.');
+                        }
+                    });
+                }
             });
         </script>
     @endpush
