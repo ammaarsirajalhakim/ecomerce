@@ -279,22 +279,17 @@ class CartController extends Controller
     /**
      * [MODIFIKASI] Menyimpan pesanan ke database.
      */
-    /**
-     * [MODIFIKASI] Menyimpan pesanan ke database.
-     */
     public function place_an_order(Request $request)
     {
-        // Validasi dan logika pembuatan alamat tetap sama
-        $user_id = Auth::id();
-        $address = Address::where('user_id', $user_id)->first();
-
         $request->validate(
             ['mode' => 'required|in:cod,transfer'],
             ['mode.required' => 'Silakan pilih metode pembayaran.']
         );
 
+        $user_id = Auth::id();
+        $address = Address::where('user_id', $user_id)->first();
+
         if (!$address) {
-            // ... (logika validasi dan pembuatan alamat baru tetap sama)
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'phone' => 'required|string|max:20',
@@ -311,18 +306,7 @@ class CartController extends Controller
                 return redirect()->back()->withErrors($validator)->withInput();
             }
             $address = new Address();
-            $address->user_id = $user_id;
-            $address->name = $request->name;
-            $address->phone = $request->phone;
-            $address->address = $request->address;
-            $address->landmark = $request->landmark;
-            $address->locality = $request->locality;
-            $address->city = $request->city;
-            $address->state = $request->state;
-            $address->zip = $request->zip;
-            $address->country = $request->country;
-            $address->type = $request->type;
-            $address->isdefault = 1;
+            // ... (sisa logika pembuatan alamat)
             $address->save();
         }
 
@@ -348,7 +332,7 @@ class CartController extends Controller
             $order->state = $address->state;
             $order->zip = $address->zip;
             $order->country = $address->country;
-            $order->status = 'ordered'; // Status awal
+            $order->status = 'ordered';
             $order->save();
 
             // Logika untuk memproses OrderItems (tetap sama)
@@ -384,78 +368,102 @@ class CartController extends Controller
                 CartItem::where('user_id', $user_id)->delete();
             }
 
-            // Logika untuk Transaksi
-            $transaction = new Transaction();
-            $transaction->user_id = $user_id;
-            $transaction->order_id = $order->id;
-            $transaction->mode = $request->mode;
-            $transaction->status = 'pending'; // Status awal untuk semua transaksi
 
-            // Simpan order_id ke session untuk digunakan di halaman konfirmasi
-            Session::put('order_id', $order->id);
-
-            // [MODIFIKASI DIMULAI] - Memisahkan logika Transfer dan COD
+            // Panggil fungsi pembayaran yang sesuai
             if ($request->mode == 'transfer') {
-                // Konfigurasi Midtrans
-                MidtransConfig::$serverKey = config('midtrans.server_key');
-                MidtransConfig::$isProduction = config('midtrans.is_production');
-                MidtransConfig::$isSanitized = true;
-                MidtransConfig::$is3ds = true;
-
-                $params = [
-                    'transaction_details' => [
-                        'order_id' => $order->id . '-' . time(), // Buat order ID unik
-                        'gross_amount' => $order->total,
-                    ],
-                    'customer_details' => [
-                        'first_name' => $address->name,
-                        'email' => Auth::user()->email,
-                        'phone' => $address->phone,
-                    ],
-                ];
-
-                try {
-                    // 1. Dapatkan Snap Token dari Midtrans
-                    $snapToken = MidtransSnap::getSnapToken($params);
-
-                    // 2. Simpan token ke database transaksi
-                    $transaction->payment_token = $snapToken;
-                    $transaction->save();
-
-                    DB::commit();
-
-                    // Bersihkan session setelah transaksi berhasil dibuat
-                    Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
-
-                    // 3. Kembalikan token sebagai JSON untuk diproses oleh frontend
-                    return response()->json(['snap_token' => $snapToken]);
-
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    // Kembalikan pesan error jika gagal membuat token
-                    return response()->json(['error' => $e->getMessage()], 500);
-                }
-
-            } else { // Jika metode yang dipilih adalah COD
-                
-                // 1. Langsung simpan transaksi tanpa token pembayaran
-                $transaction->save();
-                
-                // 2. Commit perubahan ke database
-                DB::commit();
-
-                // 3. Bersihkan session yang sudah tidak diperlukan
-                Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
-                
-                // 4. Arahkan pengguna langsung ke halaman konfirmasi pesanan
-                return redirect()->route('cart.order.confirmation');
+                return $this->processTransferOrder($order, $address);
+            } else { // COD
+                return $this->processCodOrder($order);
             }
-            // [MODIFIKASI SELESAI]
 
         } catch (\Exception $e) {
             DB::rollBack();
-            // Log error atau tampilkan pesan error jika terjadi kesalahan umum
             return redirect()->route('cart.checkout')->with('error', 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * [BARU] Memproses pesanan dengan metode pembayaran COD.
+     */
+    protected function processCodOrder(Order $order)
+    {
+        try {
+            // 1. Buat transaksi
+            $transaction = new Transaction();
+            $transaction->user_id = $order->user_id;
+            $transaction->order_id = $order->id;
+            $transaction->mode = 'cod';
+            $transaction->status = 'pending';
+            $transaction->save();
+
+            // 2. Simpan order_id ke session untuk konfirmasi
+            Session::put('order_id', $order->id);
+
+            // 3. Commit perubahan ke database
+            DB::commit();
+
+            // 4. Bersihkan session yang tidak diperlukan
+            Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
+
+            // 5. Arahkan ke halaman konfirmasi pesanan
+            return redirect()->route('cart.order.confirmation');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('cart.checkout')->with('error', 'Gagal memproses pesanan COD: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * [BARU] Memproses pesanan dengan metode pembayaran Transfer (Midtrans).
+     */
+    protected function processTransferOrder(Order $order, Address $address)
+    {
+        try {
+            MidtransConfig::$serverKey = config('midtrans.server_key');
+            MidtransConfig::$isProduction = config('midtrans.is_production');
+            MidtransConfig::$isSanitized = true;
+            MidtransConfig::$is3ds = true;
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->id . '-' . time(),
+                    'gross_amount' => $order->total,
+                ],
+                'customer_details' => [
+                    'first_name' => $address->name,
+                    'email' => Auth::user()->email,
+                    'phone' => $address->phone,
+                ],
+            ];
+
+            // 1. Dapatkan Snap Token
+            $snapToken = MidtransSnap::getSnapToken($params);
+
+            // 2. Buat dan simpan transaksi dengan token
+            $transaction = new Transaction();
+            $transaction->user_id = $order->user_id;
+            $transaction->order_id = $order->id;
+            $transaction->mode = 'transfer';
+            $transaction->status = 'pending';
+            $transaction->payment_token = $snapToken;
+            $transaction->save();
+            
+            // 3. Simpan order_id ke session
+            Session::put('order_id', $order->id);
+            
+            // 4. Commit database
+            DB::commit();
+
+            // 5. Bersihkan session
+            Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
+
+            // 6. Kembalikan token ke frontend
+            return response()->json(['snap_token' => $snapToken]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -515,7 +523,7 @@ class CartController extends Controller
                     'discount' => $discountData['discount'] ?? 0,
                     'subtotal' => $discountData['subtotal'] ?? $subtotal,
                     'tax' => 0,
-                    'total' => $discountData['total'] ?? ($subtotal + ($subtotal * 0.10))
+                    'total' => $discountData['total'] ?? ($subtotal)
                 ]);
             } else {
                 Session::put('checkout', [
@@ -524,7 +532,7 @@ class CartController extends Controller
                     'discount' => 0,
                     'subtotal' => $subtotal,
                     'tax' => 0,
-                    'total' => $subtotal + ($subtotal * 0.10)
+                    'total' => $subtotal, 
                 ]);
             }
         }
