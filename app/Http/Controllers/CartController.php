@@ -306,7 +306,18 @@ class CartController extends Controller
                 return redirect()->back()->withErrors($validator)->withInput();
             }
             $address = new Address();
-            // ... (sisa logika pembuatan alamat)
+            $address->user_id = $user_id;
+            $address->name = $request->name;
+            $address->phone = $request->phone;
+            $address->address = $request->address;
+            $address->landmark = $request->landmark;
+            $address->locality = $request->locality;
+            $address->city = $request->city;
+            $address->state = $request->state;
+            $address->zip = $request->zip;
+            $address->country = $request->country;
+            $address->type = $request->type;
+            $address->isdefault = 1;
             $address->save();
         }
 
@@ -417,7 +428,7 @@ class CartController extends Controller
     /**
      * [BARU] Memproses pesanan dengan metode pembayaran Transfer (Midtrans).
      */
-    protected function processTransferOrder(Order $order, Address $address)
+     protected function processTransferOrder(Order $order, Address $address)
     {
         try {
             MidtransConfig::$serverKey = config('midtrans.server_key');
@@ -455,10 +466,7 @@ class CartController extends Controller
             // 4. Commit database
             DB::commit();
 
-            // 5. Bersihkan session
-            Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
-
-            // 6. Kembalikan token ke frontend
+            // 5. Kembalikan token ke frontend
             return response()->json(['snap_token' => $snapToken]);
 
         } catch (\Exception $e) {
@@ -610,6 +618,9 @@ class CartController extends Controller
             'status_message' => $result['status_message'],
             'gross_amount'   => number_format($result['gross_amount'], 0, ',', '.'),
         ]);
+
+        // [BARU] Bersihkan session setelah pembayaran berhasil dikonfirmasi dari sisi client
+        Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
 
         return response()->json(['status' => 'success']);
     }
