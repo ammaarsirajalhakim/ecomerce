@@ -61,6 +61,8 @@ Route::get('/order-confirmation', [CartController::class, 'order_confirmation'])
 Route::post('/midtrans/notification', [MidtransController::class, 'notificationHandler']);
 Route::post('/payment/success', [App\Http\Controllers\CartController::class, 'paymentSuccess'])->name('payment.success');
 
+Route::post('/checkout/cancel-order', [App\Http\Controllers\CartController::class, 'cancelPendingOrder'])->name('cart.order.cancel')->middleware('auth');
+
 // Rute untuk halaman Bantuan
 Route::get('/help', [HomeController::class, 'help'])->name('home.help');
 Route::get('/help/{category}', [App\Http\Controllers\HomeController::class, 'showHelpCategory'])->name('help.category');

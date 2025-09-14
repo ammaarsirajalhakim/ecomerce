@@ -355,7 +355,6 @@ class CartController extends Controller
                 $product->save();
             } elseif (isset($checkout['is_selected_checkout']) && $checkout['is_selected_checkout']) {
                 $selectedItems = session('selected_checkout_items', collect());
-                $itemIdsToDelete = [];
                 foreach ($selectedItems as $item) {
                     OrderItem::create(['product_id' => $item->product_id, 'order_id' => $order->id, 'price' => $item->price, 'quantity' => $item->quantity]);
                     $product = Product::find($item->product_id);
@@ -363,9 +362,7 @@ class CartController extends Controller
                         $product->quantity -= $item->quantity;
                         $product->save();
                     }
-                    $itemIdsToDelete[] = $item->id;
                 }
-                CartItem::where('user_id', $user_id)->whereIn('id', $itemIdsToDelete)->delete();
             } else {
                 $cartItems = CartItem::where('user_id', $user_id)->get();
                 foreach ($cartItems as $item) {
@@ -376,7 +373,6 @@ class CartController extends Controller
                         $product->save();
                     }
                 }
-                CartItem::where('user_id', $user_id)->delete();
             }
 
 
@@ -384,9 +380,10 @@ class CartController extends Controller
             if ($request->mode == 'transfer') {
                 return $this->processTransferOrder($order, $address);
             } else { // COD
+                // Untuk COD, hapus keranjang sekarang karena tidak ada callback pembayaran
+                CartItem::where('user_id', $user_id)->delete();
                 return $this->processCodOrder($order);
             }
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('cart.checkout')->with('error', 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage());
@@ -418,7 +415,6 @@ class CartController extends Controller
 
             // 5. Arahkan ke halaman konfirmasi pesanan
             return redirect()->route('cart.order.confirmation');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('cart.checkout')->with('error', 'Gagal memproses pesanan COD: ' . $e->getMessage());
@@ -428,7 +424,7 @@ class CartController extends Controller
     /**
      * [BARU] Memproses pesanan dengan metode pembayaran Transfer (Midtrans).
      */
-     protected function processTransferOrder(Order $order, Address $address)
+    protected function processTransferOrder(Order $order, Address $address)
     {
         try {
             MidtransConfig::$serverKey = config('midtrans.server_key');
@@ -448,10 +444,8 @@ class CartController extends Controller
                 ],
             ];
 
-            // 1. Dapatkan Snap Token
             $snapToken = MidtransSnap::getSnapToken($params);
 
-            // 2. Buat dan simpan transaksi dengan token
             $transaction = new Transaction();
             $transaction->user_id = $order->user_id;
             $transaction->order_id = $order->id;
@@ -459,20 +453,67 @@ class CartController extends Controller
             $transaction->status = 'pending';
             $transaction->payment_token = $snapToken;
             $transaction->save();
-            
-            // 3. Simpan order_id ke session
+
             Session::put('order_id', $order->id);
-            
-            // 4. Commit database
+
             DB::commit();
 
-            // 5. Kembalikan token ke frontend
-            return response()->json(['snap_token' => $snapToken]);
-
+            // [MODIFIKASI] Tambahkan order_id ke dalam response
+            return response()->json([
+                'snap_token' => $snapToken,
+                'order_id' => $order->id // <-- Tambahkan baris ini
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function cancelPendingOrder(Request $request)
+    {
+        $orderId = $request->input('order_id');
+        if (!$orderId) {
+            return response()->json(['status' => 'error', 'message' => 'Order ID tidak ada.'], 400);
+        }
+
+        $userId = Auth::id();
+        $order = Order::where('id', $orderId)
+            ->where('user_id', $userId)
+            ->where('status', 'ordered') // Pastikan statusnya masih awal
+            ->first();
+
+        if ($order) {
+            // Cek status transaksi, hanya batalkan jika masih 'pending'
+            $transaction = $order->transaction;
+            if ($transaction && $transaction->status === 'pending') {
+                DB::beginTransaction();
+                try {
+                    // 1. Kembalikan stok produk
+                    foreach ($order->orderItems as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            $product->quantity += $item->quantity;
+                            $product->save();
+                        }
+                    }
+
+                    // 2. Hapus order (order items dan transaction akan terhapus otomatis jika ada cascade delete)
+                    // Jika tidak ada cascade, hapus manual:
+                    $order->orderItems()->delete();
+                    $order->transaction()->delete();
+                    $order->delete();
+
+                    DB::commit();
+
+                    return response()->json(['status' => 'success', 'message' => 'Pesanan berhasil dibatalkan.']);
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return response()->json(['status' => 'error', 'message' => 'Gagal membatalkan pesanan: ' . $e->getMessage()], 500);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Pesanan tidak ditemukan atau sudah diproses.'], 404);
     }
 
     /**
@@ -540,7 +581,7 @@ class CartController extends Controller
                     'discount' => 0,
                     'subtotal' => $subtotal,
                     'tax' => 0,
-                    'total' => $subtotal, 
+                    'total' => $subtotal,
                 ]);
             }
         }
@@ -619,7 +660,22 @@ class CartController extends Controller
             'gross_amount'   => number_format($result['gross_amount'], 0, ',', '.'),
         ]);
 
-        // [BARU] Bersihkan session setelah pembayaran berhasil dikonfirmasi dari sisi client
+        // [BARU] Hapus item keranjang setelah pembayaran berhasil dari sisi client
+        $user_id = Auth::id();
+        $checkout = Session::get('checkout');
+
+        if ($checkout) {
+            if (isset($checkout['is_selected_checkout']) && $checkout['is_selected_checkout']) {
+                $selectedItems = session('selected_checkout_items', collect());
+                $itemIdsToDelete = $selectedItems->pluck('id')->toArray();
+                CartItem::where('user_id', $user_id)->whereIn('id', $itemIdsToDelete)->delete();
+            } else if (!$checkout['is_buy_now']) {
+                // Ini akan menghapus semua item jika bukan "Beli Sekarang" dan bukan "Item terpilih"
+                CartItem::where('user_id', $user_id)->delete();
+            }
+        }
+
+        // Bersihkan session setelah pembayaran berhasil
         Session::forget(['checkout', 'coupon', 'discounts', 'buy_now_item', 'selected_checkout_items']);
 
         return response()->json(['status' => 'success']);

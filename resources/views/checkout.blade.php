@@ -244,82 +244,85 @@
 
         <script type="text/javascript">
             $(document).ready(function() {
-                // [MODIFIKASI] Gunakan event 'submit' pada form, bukan 'click' pada tombol
-                $('#checkout-form').on('submit', function(event) {
-                    // Ambil tombol submit
-                    var payButton = $('#pay-button');
+                // [BARU] Variabel global untuk menyimpan ID pesanan yang sedang diproses
+                let pendingOrderId = null;
 
-                    // Cek metode pembayaran yang dipilih
+                $('#checkout-form').on('submit', function(event) {
+                    var payButton = $('#pay-button');
                     var selectedPaymentMethod = $('input[name="mode"]:checked').val();
 
-                    // [LOGIKA BARU] Jika metode pembayaran adalah 'transfer', jalankan AJAX
                     if (selectedPaymentMethod === 'transfer') {
-                        // Hentikan pengiriman form standar agar AJAX bisa berjalan
-                        event.preventDefault();
+                        event.preventDefault(); // Hentikan form submission untuk AJAX
 
-                        // Nonaktifkan tombol untuk mencegah klik ganda
                         payButton.prop('disabled', true);
                         payButton.html('Memproses...');
 
                         $.ajax({
-                            url: $(this).attr('action'), // Ambil URL dari atribut action form
+                            url: $(this).attr('action'),
                             method: 'POST',
                             data: $(this).serialize(),
                             cache: false,
                             success: function(data) {
-                                if (data.snap_token) {
-                                    // Jika token diterima, buka popup Midtrans
-                                    snap.pay(data.snap_token, {
-                                        onSuccess: function(result) {
-                                            sendPaymentResult(result);
-                                        },
-                                        onPending: function(result) {
-                                            sendPaymentResult(result);
-                                        },
-                                        onError: function(result) {
-                                            alert("Pembayaran Gagal!");
-                                            payButton.prop('disabled', false);
-                                            payButton.html('BUAT PESANAN');
-                                        },
-                                        onClose: function() {
-                                            // Jangan tampilkan alert jika pembayaran berhasil/pending
-                                            if (window.paymentSuccess !== true) {
-                                                alert('Anda menutup popup pembayaran.');
-                                            }
-                                            payButton.prop('disabled', false);
-                                            payButton.html('BUAT PESANAN');
-                                        }
-                                    });
-                                } else {
-                                    // Jika tidak ada token, tampilkan error
+                                // Aktifkan kembali tombol jika ada error dari server
+                                if (data.error || !data.snap_token) {
                                     alert(data.error || 'Gagal mendapatkan token pembayaran.');
                                     payButton.prop('disabled', false);
                                     payButton.html('BUAT PESANAN');
+                                    return;
                                 }
+
+                                // [MODIFIKASI] Simpan Order ID yang diterima dari server
+                                pendingOrderId = data.order_id;
+
+                                snap.pay(data.snap_token, {
+                                    onSuccess: function(result) {
+                                        pendingOrderId =
+                                        null; // Reset ID karena berhasil
+                                        sendPaymentResult(result);
+                                    },
+                                    onPending: function(result) {
+                                        pendingOrderId =
+                                        null; // Reset ID karena pending
+                                        sendPaymentResult(result);
+                                    },
+                                    onError: function(result) {
+                                        alert("Pembayaran Gagal!");
+                                        // [MODIFIKASI] Panggil fungsi pembatalan
+                                        cancelOrder(pendingOrderId);
+                                        payButton.prop('disabled', false);
+                                        payButton.html('BUAT PESANAN');
+                                    },
+                                    onClose: function() {
+                                        // [MODIFIKASI] Panggil fungsi pembatalan jika popup ditutup
+                                        // Hanya panggil jika pembayaran tidak sukses/pending
+                                        if (pendingOrderId) {
+                                            console.log(
+                                                'Popup ditutup, membatalkan pesanan...'
+                                                );
+                                            cancelOrder(pendingOrderId);
+                                        }
+                                        payButton.prop('disabled', false);
+                                        payButton.html('BUAT PESANAN');
+                                    }
+                                });
                             },
                             error: function(xhr) {
                                 console.error(xhr.responseText);
-                                alert("Terjadi kesalahan. Silakan coba lagi.");
+                                alert("Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.");
                                 payButton.prop('disabled', false);
                                 payButton.html('BUAT PESANAN');
                             }
                         });
-
-                    } else {
-                        // [LOGIKA BARU] Jika metode adalah 'cod' atau lainnya,
-                        // biarkan form melakukan submit secara normal.
-                        // Cukup nonaktifkan tombol untuk memberikan feedback ke user.
+                    } else { // Jika metode 'cod' atau lainnya
                         payButton.prop('disabled', true);
                         payButton.html('Memproses...');
-                        // Tidak ada event.preventDefault(), jadi form akan dikirim ke server.
+                        // Form akan submit secara normal
                     }
                 });
 
-                // Fungsi untuk mengirim hasil pembayaran ke server (tetap sama)
                 function sendPaymentResult(result) {
-                    // Tandai bahwa pembayaran berhasil/pending untuk mencegah alert 'onClose'
-                    window.paymentSuccess = true;
                     $.ajax({
+                        // Pastikan route ini benar, sesuaikan jika perlu
                         url: "{{ route('payment.success') }}",
                         method: 'POST',
                         data: {
@@ -327,12 +330,37 @@
                             result: result
                         },
                         success: function() {
-                            // Arahkan ke halaman konfirmasi setelah hasil terkirim
                             window.location.href = "{{ route('cart.order.confirmation') }}";
                         },
                         error: function(xhr) {
                             console.error(xhr.responseText);
                             alert('Gagal memproses hasil pembayaran di server.');
+                        }
+                    });
+                }
+
+                // [BARU] Fungsi untuk mengirim request pembatalan order ke server
+                function cancelOrder(orderId) {
+                    if (!orderId) {
+                        return; // Jangan lakukan apa-apa jika tidak ada order ID
+                    }
+
+                    console.log('Mencoba membatalkan pesanan ID: ' + orderId);
+
+                    $.ajax({
+                        url: "{{ route('cart.order.cancel') }}", // Pastikan route ini ada di web.php
+                        method: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            order_id: orderId
+                        },
+                        success: function(response) {
+                            console.log('Respons pembatalan:', response.message);
+                            pendingOrderId = null; // Reset ID setelah diproses
+                        },
+                        error: function(xhr) {
+                            console.error('Gagal mengirim permintaan pembatalan:', xhr.responseText);
+                            pendingOrderId = null; // Reset ID
                         }
                     });
                 }
