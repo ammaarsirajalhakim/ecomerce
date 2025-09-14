@@ -6,10 +6,12 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Wishlist;
 use App\Models\About;
 use App\Models\Category;
 use App\Models\WhatsappSetting;
+use ReCaptcha\ReCaptcha;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +28,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Menggunakan View Composer untuk membagikan data ke semua view ('*')
+        // ### BLOK VALIDASI RECAPTCHA ###
+        // Mendaftarkan aturan validasi 'captcha' kustom.
+        Validator::extend('captcha', function ($attribute, $value, $parameters, $validator) {
+            // Membuat instance ReCaptcha dengan secret key dari file .env
+            $recaptcha = new ReCaptcha(env('RECAPTCHA_SECRET_KEY'));
+            // Memverifikasi token captcha yang dikirim dari form dengan IP pengguna
+            $response = $recaptcha->verify($value, request()->ip());
+            // Mengembalikan status sukses dari verifikasi
+            return $response->isSuccess();
+        });
+
+        // ### BLOK VIEW COMPOSER ANDA YANG SUDAH ADA ###
+        // Kode ini tetap sama dan tidak terganggu.
         View::composer('*', function ($view) {
             
             // --- DATA YANG DIBUTUHKAN SEMUA HALAMAN (FRONTEND & ADMIN) ---
