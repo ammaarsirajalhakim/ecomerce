@@ -404,11 +404,12 @@ class CartController extends Controller
         DB::beginTransaction();
         try {
             $order = new Order();
+            $shippingCost = (int) $request->input('shipping_cost', 0);
             $order->user_id = $user_id;
             $order->subtotal = $checkout['subtotal'];
             $order->discount = $checkout['discount'];
             $order->tax = 0;
-            $order->total = $checkout['total'];
+            $order->total = $checkout['total'] + $shippingCost;
             $order->name = $address->name;
             $order->phone = $address->phone;
             $order->address = $address->address;
