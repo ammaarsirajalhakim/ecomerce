@@ -112,13 +112,10 @@
                                 <td class="text-right">- Rp. {{ number_format($order->discount, 0, ',', '.') }}</td>
                             </tr>
                             <tr>
-                                <th>PAJAK</th>
-                                <td class="text-right">Rp. {{ number_format($order->tax, 0, ',', '.') }}</td>
+                                <td>Pengiriman</td>
+                                <td class="text-right">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</td>
                             </tr>
-                            <tr>
-                                <th>PENGIRIMAN</th>
-                                <td class="text-right">Gratis</td>
-                            </tr>
+
                             <tr>
                                 <th>TOTAL</th>
                                 <td class="text-right"><strong>Rp. {{ number_format($order->total, 0, ',', '.') }}</strong></td>

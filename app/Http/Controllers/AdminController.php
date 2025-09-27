@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends BaseController
 {
-     public function get_brands_by_category(Request $request)
+    public function get_brands_by_category(Request $request)
     {
         // Ambil ID kategori dari request
         $categoryId = $request->input('category_id');
@@ -32,9 +32,9 @@ class AdminController extends BaseController
         // Cari semua merek yang memiliki category_id yang sesuai
         // Kita hanya butuh 'id' dan 'name' untuk dropdown
         $brands = Brand::where('category_id', $categoryId)
-                        ->select('id', 'name')
-                        ->orderBy('name', 'asc')
-                        ->get();
+            ->select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
 
         // Kembalikan hasilnya dalam format JSON
         return response()->json($brands);
@@ -329,8 +329,6 @@ class AdminController extends BaseController
         $brands = Brand::orderBy('id', 'desc')->paginate(10);
         $brands = Brand::withCount('products')->orderBy('id', 'desc')->paginate(10);
         return view('admin.brands', compact('brands'));
-
-        
     }
 
     public function brand_add()
@@ -559,6 +557,7 @@ class AdminController extends BaseController
             'image' => 'required|mimes:png,jpg,jpeg',
             'category_id' => 'required',
             'brand_id' => 'required',
+            'weight_gram' => ['required', 'integer', 'min:0'],
         ]);
 
         $product = new Product();
@@ -604,6 +603,8 @@ class AdminController extends BaseController
             $gallery_images = implode(',', $gallery_arr);
         }
         $product->images = $gallery_images;
+        $product->brand_id     = $request->brand_id;
+        $product->weight_gram  = (int) $request->weight_gram;
         $product->save();
         return redirect()->route('admin.products')->with('status', 'Produk berhasil ditambahkan!');
     }
@@ -647,6 +648,7 @@ class AdminController extends BaseController
             'image' => 'mimes:png,jpg,jpeg',
             'category_id' => 'required',
             'brand_id' => 'required',
+            'weight_gram' => ['required', 'integer', 'min:0'],
         ]);
 
         $product = Product::find($request->id);
@@ -706,6 +708,8 @@ class AdminController extends BaseController
             $gallery_images = implode(',', $gallery_arr);
             $product->images = $gallery_images;
         }
+        $product->brand_id     = $request->brand_id;
+        $product->weight_gram  = (int) $request->weight_gram;
         $product->save();
         return redirect()->route('admin.products')->with('status', 'Produk berhasil diupdate!');
     }

@@ -14,6 +14,21 @@ use Illuminate\Support\Facades\Route;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\WhatsappSettingController; 
+use App\Http\Controllers\RajaOngkirController;
+
+// routes/web.php
+Route::post('/shipping/cost', [\App\Http\Controllers\CartController::class, 'calculateShipping'])
+    ->name('shipping.cost');
+
+Route::prefix('ro')->name('ro.')->group(function () {
+    Route::get('/provinces', [RajaOngkirController::class, 'getProvinces'])->name('provinces');
+    Route::get('/cities/{provinceId}', [RajaOngkirController::class, 'getCities'])->name('cities');
+    Route::get('/districts/{cityId}', [RajaOngkirController::class, 'getDistricts'])->name('districts');
+    Route::post('/check-ongkir', [RajaOngkirController::class, 'checkOngkir'])->name('check');
+    Route::post('/ro/check-ongkir', [\App\Http\Controllers\RajaOngkirController::class, 'checkOngkir'])->name('ro.check');
+
+});
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -84,7 +99,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/account-orders/cancel-order', [UserController::class, 'order_cancel'])->name('user.order.cancel');
     Route::get('/admin/orders/search', [AdminController::class, 'search_orders'])->name('admin.order.search');
 
-    Route::get('/addresses', [AddressController::class, 'index'])->name('user.address.index');
+    Route::get('/address', [AddressController::class, 'index'])->name('user.address.index');
     Route::get('/address/add', [AddressController::class, 'address_add'])->name('user.address.add');
     Route::post('/address/store', [AddressController::class, 'address_store'])->name('user.address.store');
     Route::get('/address/{id}/edit', [AddressController::class, 'address_edit'])->name('user.address.edit');

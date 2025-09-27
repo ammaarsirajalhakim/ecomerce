@@ -8,117 +8,157 @@ use Illuminate\Support\Facades\Auth;
 
 class AddressController extends Controller
 {
-    /**
-     * Menampilkan semua alamat milik pengguna.
-     */
-    public function index()
+    public function __construct()
     {
-        $userId = Auth::id();
-        $addresses = Address::where('user_id', $userId)->orderByDesc('isdefault')->get();
-        return view('user.address', compact('addresses'));
+        $this->middleware('auth'); // pastikan user login
     }
 
-    /**
-     * Menampilkan form untuk menambah alamat baru.
-     */
+    /** LIST alamat (halaman index) */
+    public function index()
+    {
+        $addresses = Address::where('user_id', Auth::id())
+            ->orderByDesc('isdefault')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('user.address', compact('addresses')); // file yg sudah kamu punya
+    }
+
+    /** FORM tambah alamat */
     public function address_add()
     {
         return view('user.address-add');
     }
 
-    /**
-     * Menyimpan alamat baru ke database.
-     */
+    /** SIMPAN alamat baru */
     public function address_store(Request $request)
     {
-        $user = Auth::user();
+        $request->validate([
+    'name'          => 'required|string|max:255',
+    'phone'         => 'required|string|max:20',
+    'province_id'   => 'required|integer',
+    'state'         => 'required|string|max:255',  // nama provinsi
+    'city_id'       => 'required|integer',
+    'city'          => 'required|string|max:255',  // nama kota
+    'district_id'   => 'required|integer',
+    'district_name' => 'required|string|max:255',
+    'zip'           => 'required|string|max:10',   // ← WAJIB
+    'address'       => 'required|string',
+    'locality'      => 'nullable|string|max:255',
+    'landmark'      => 'nullable|string|max:255',
+    'type'          => 'required|string|in:Rumah,Kantor,Lainnya',
+    'isdefault'     => 'nullable|in:1',
+]);
 
-        // Validasi input
-        $validated = $request->validate([
-            'name'      => 'required|max:100',
-            'phone'     => 'required|numeric|digits_between:10,13',
-            'locality'  => 'required|string|max:255',
-            'address'   => 'required|string',
-            'city'      => 'required|string|max:100',
-            'state'     => 'required|string|max:100',
-            'landmark'  => 'required|max:255', // WAJIB
-            'zip'       => 'required|numeric|digits:5',
-            'type'      => 'required|in:Rumah,Kantor,Lainnya', // WAJIB
-            'isdefault' => 'nullable|boolean',
-        ]);
 
-        $validated['country'] = $request->input('country', 'Indonesia');
+       $addr = new Address();
+$addr->user_id = Auth::id();
 
-        // Cek apakah checkbox isdefault dicentang
-        $validated['isdefault'] = $request->has('isdefault') ? 1 : 0;
+$addr->name     = $request->name;
+$addr->phone    = $request->phone;
+$addr->address  = $request->address;
+$addr->locality = $request->locality;
+$addr->landmark = $request->landmark;
+$addr->type     = $request->type;
+$addr->isdefault = $request->boolean('isdefault') ? 1 : 0;
 
-        // Jika alamat ini default, nonaktifkan alamat default lama
-        if ($validated['isdefault']) {
-            Address::where('user_id', $user->id)->update(['isdefault' => false]);
-        }
+// --- sinkron RajaOngkir + kolom lama ---
+$addr->province_id   = (int) $request->province_id;
+$addr->province_name = $request->state;   // simpan nama provinsi
+$addr->state         = $request->state;   // ← PENTING: isi kolom lama
 
-        // Simpan alamat baru
-        $address = new Address($validated);
-        $address->user_id = $user->id;
-        $address->save();
+$addr->city_id   = (int) $request->city_id;
+$addr->city_name = $request->city;        // simpan nama kota
+$addr->city      = $request->city;        // ← PENTING: isi kolom lama
 
-        return redirect()->route('user.address.index')->with('success', 'Alamat berhasil ditambahkan!');
+$zip = $request->zip;                     // form kirim 'zip'
+$addr->postal_code = $zip;                // sinkron ke kolom tambahan
+$addr->zip         = $zip;                // ← PENTING: isi kolom lama
+
+$addr->district_id   = (int) $request->district_id;
+$addr->district_name = $request->district_name;
+
+$addr->country = 'Indonesia';
+
+$addr->save();
+
+
+        return redirect()->route('user.address.index')->with('success', 'Alamat berhasil ditambahkan.');
     }
 
-    /**
-     * Menampilkan form untuk mengedit alamat.
-     */
+    /** EDIT alamat */
     public function address_edit($id)
     {
-        // Gunakan findOrFail untuk keamanan dan otomatisasi error 404 jika ID tidak ditemukan
-        $address = Address::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $address = Address::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
         return view('user.address-edit', compact('address'));
     }
 
-    /**
-     * Memperbarui alamat yang ada di database.
-     */
+    /** UPDATE alamat */
     public function address_update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'name'      => 'required|string|max:255',
-            'phone'     => 'required|string|max:20',
-            'zip'       => 'required|string|max:10',
-            'state'     => 'required|string|max:100',
-            'city'      => 'required|string|max:100',
-            'address'   => 'required|string|max:255',
-            'locality'  => 'required|string|max:255',
-            'landmark'  => 'required|string|max:255', // WAJIB
-            'type'      => 'required|in:Rumah,Kantor,Lainnya', // WAJIB
-            'isdefault' => 'nullable|boolean',
-        ]);
+        $request->validate([
+    'name'          => 'required|string|max:255',
+    'phone'         => 'required|string|max:20',
+    'province_id'   => 'required|integer',
+    'state'         => 'required|string|max:255',   // nama provinsi
+    'city_id'       => 'required|integer',
+    'city'          => 'required|string|max:255',   // nama kota
+    'district_id'   => 'required|integer',
+    'district_name' => 'required|string|max:255',
+    'zip'           => 'required|string|max:10',    // ← WAJIB (bukan postal_code)
+    'address'       => 'required|string',
+    'locality'      => 'nullable|string|max:255',
+    'landmark'      => 'nullable|string|max:255',
+    'type'          => 'required|string|in:Rumah,Kantor,Lainnya',
+    'isdefault'     => 'nullable|in:1',
+]);
 
-        $address = Address::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        // Jika centang isdefault, nonaktifkan semua isdefault lain milik user
-        if ($request->has('isdefault')) {
-            Address::where('user_id', Auth::id())->where('id', '!=', $id)->update(['isdefault' => false]);
-            $validated['isdefault'] = true;
-        } else {
-            $validated['isdefault'] = false;
-        }
+       $addr = Address::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        $address->update($validated);
+$addr->name     = $request->name;
+$addr->phone    = $request->phone;
+$addr->address  = $request->address;
+$addr->locality = $request->locality;
+$addr->landmark = $request->landmark;
+$addr->type     = $request->type;
+$addr->isdefault = $request->boolean('isdefault') ? 1 : 0;
 
-        return redirect()->route('user.address.index')->with('success', 'Alamat berhasil diupdate!');
+// --- sinkron RajaOngkir + kolom lama ---
+$addr->province_id   = (int) $request->province_id;
+$addr->province_name = $request->state;
+$addr->state         = $request->state;          // ← penting
+
+$addr->city_id   = (int) $request->city_id;
+$addr->city_name = $request->city;
+$addr->city      = $request->city;               // ← penting
+
+$zip = $request->zip;
+$addr->postal_code = $zip;                       // simpan juga ke postal_code
+$addr->zip         = $zip;                       // ← penting
+
+$addr->district_id   = (int) $request->district_id;
+$addr->district_name = $request->district_name;
+
+$addr->country = 'Indonesia';
+
+$addr->save();
+
+        return redirect()->route('user.address.index')->with('success', 'Alamat berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus alamat dari database.
-     */
+    /** HAPUS alamat */
     public function address_delete($id)
     {
-        // Cari alamat milik user yang sedang login untuk keamanan
-        $address = Address::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-        
-        // Hapus object yang sudah ditemukan
-        $address->delete(); 
-        
-        return redirect()->route('user.address.index')->with('success', 'Alamat berhasil dihapus!');
+        $addr = Address::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $addr->delete();
+
+        return redirect()->route('user.address.index')->with('success', 'Alamat berhasil dihapus.');
     }
 }

@@ -17,6 +17,13 @@ class Address extends Model
         'landmark',
         'zip',
         'type',
-        'isdefault'
+        'isdefault',
+        'province_id',
+        'city_id',
+        'district_id',
+        'province_name',
+        'city_name',
+        'district_name',
+        'postal_code',
     ];
 }

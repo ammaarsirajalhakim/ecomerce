@@ -181,6 +181,12 @@
                     @error('images')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
+<div class="form-group">
+  <label for="weight_gram">Berat (gram)</label>
+  <input type="number" min="0" step="1"
+         class="form-control" id="weight_gram" name="weight_gram"
+         value="{{ old('weight_gram', $product->weight_gram ?? 0) }}">
+</div>
 
                     <div class="cols gap22">
                         <fieldset class="name">
