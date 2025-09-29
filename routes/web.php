@@ -93,6 +93,8 @@ Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/welcome', [HomeController::class, 'welcome'])->name('home.welcome');
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('/cart/coupon', [CartController::class, 'apply_coupon_code'])->name('cart.coupon.apply');
+    Route::delete('/cart/coupon/remove', [CartController::class, 'remove_coupon_code'])->name('cart.coupon.remove');
     Route::get('/account-dashboard', [UserController::class, 'index'])->name('user.index');
     Route::get('/account-orders', [UserController::class, 'orders'])->name('user.orders');
     Route::get('/account-orders/{order_id}/details', [UserController::class, 'order_details'])->name('user.order.details');

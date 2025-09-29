@@ -171,15 +171,18 @@
                                             </td>
                                             <td>
                                                 <a href="javascript:void(0)" class="remove-cart action-btn"
-   data-action="{{ route('cart.item.remove', ['id' => $item->id]) }}"
-   data-method="DELETE">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-trash" viewBox="0 0 16 16">
-        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-    </svg>
-    
-</a>
+                                                    data-action="{{ route('cart.item.remove', ['id' => $item->id]) }}"
+                                                    data-method="DELETE">
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="red" class="bi bi-trash" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                                        <path
+                                                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                                    </svg>
+
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -226,9 +229,43 @@
                         <div class="sticky-content">
                             <div class="shopping-cart__totals">
                                 <h3>Total Keranjang</h3>
-                                @if (Session::has('discounts'))
-                                    {{-- ... blok kode diskon Anda ... --}}
+                                {{-- GANTI KODE LAMA ANDA DENGAN INI --}}
+                                @if (Session::has('discounts') && Session::has('coupon'))
+                                    <table class="cart-totals">
+                                        <tbody>
+                                            <tr>
+                                                <th>Subtotal Awal</th>
+                                                {{-- $subtotal dari controller adalah subtotal sebelum diskon --}}
+                                                <td>Rp. {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-success">Diskon ({{ Session::get('coupon')['code'] }})
+                                                </th>
+                                                <td class="text-success">- Rp.
+                                                    {{ number_format(Session::get('discounts')['discount'], 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Subtotal Setelah Diskon</th>
+                                                <td>Rp.
+                                                    {{ number_format(Session::get('discounts')['subtotal'], 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Pajak (10%)</th>
+                                                <td>Rp. {{ number_format(Session::get('discounts')['tax'], 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Total Akhir</th>
+                                                <td><strong>Rp.
+                                                        {{ number_format(Session::get('discounts')['total'], 0, ',', '.') }}</strong>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 @else
+                                    {{-- Bagian ini tetap sama seperti kode Anda sebelumnya --}}
                                     <table class="cart-totals">
                                         <tbody>
                                             <tr>

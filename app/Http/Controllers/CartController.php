@@ -668,6 +668,92 @@ class CartController extends Controller
     }
 
     // ... (Method lainnya seperti remove_item, empty_cart, calculateDiscount, order_confirmation tetap sama)
+    public function updateQty(Request $request, $id)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $item = CartItem::findOrFail($id);
+        $item->quantity = $request->quantity;
+        $item->save();
+
+        return redirect()->back();
+    }
+
+    public function increase_cart_quantity($id)
+    {
+        $product = CartItem::find($id);
+        $product->quantity += 1;
+        $product->save();
+        return redirect()->back();
+    }
+
+   public function apply_coupon_code(Request $request)
+{
+    $coupon_code = $request->coupon_code;
+
+    // Cari kupon yang valid
+    $coupon = Coupon::where('code', $coupon_code)
+                    ->where('expiry_date', '>=', Carbon::today())
+                    // ->where('cart_value', '<=', $subtotal) // <-- BARIS INI DIHAPUS
+                    ->where('cart_value', '>', 0) // Cek apakah kuantitas kupon masih ada
+                    ->first();
+
+    if (!$coupon) {
+        return redirect()->back()->with('error', 'Voucher tidak valid atau sudah habis digunakan!');
+    }
+
+    // Gunakan transaction untuk memastikan data aman
+    try {
+        DB::transaction(function () use ($coupon) {
+            // [FOKUS UTAMA] Kurangi jumlah kupon (cart_value) setelah berhasil digunakan
+            $coupon->decrement('cart_value', 1);
+
+            // Simpan data kupon ke session
+            Session::put('coupon', [
+                'code' => $coupon->code,
+                'type' => $coupon->type,
+                'value' => $coupon->value,
+            ]);
+        });
+
+        // $this->calculateDiscount(); // Panggil fungsi kalkulasi diskon Anda jika ada
+        return redirect()->back()->with('success', 'Voucher Berhasil digunakan!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses voucher.');
+    }
+}
+   public function remove_coupon_code()
+{
+    if (!Session::has('coupon')) {
+        return back();
+    }
+
+    $couponCode = Session::get('coupon')['code'];
+
+    // Gunakan transaction untuk memastikan data aman
+    try {
+        DB::transaction(function () use ($couponCode) {
+            $coupon = Coupon::where('code', $couponCode)->first();
+
+            if ($coupon) {
+                // [FOKUS UTAMA] Tambah kembali jumlah kupon (cart_value)
+                $coupon->increment('cart_value', 1);
+            }
+
+            // Hapus kupon dari session
+            Session::forget('coupon');
+            Session::forget('discounts');
+        });
+
+        return back()->with('success', 'Voucher berhasil dihapus!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus voucher.');
+    }
+}
 
     public function remove_item(Request $request)
     {
