@@ -94,10 +94,10 @@
                 e.preventDefault();
                 var form = $(this).closest('form');
                 swal({
-                        title: "Are you sure?",
-                        text: "You want to delete this record?",
+                        title: "Hapus Alamat?",
+                        text: "Yakin Ingin Menghapus Alamat ini?",
                         type: "warning",
-                        buttons: ["No", "Yes"],
+                        buttons: ["Tidak", "Iya"],
                         dangermode: true
                     })
                     .then(function(result) {

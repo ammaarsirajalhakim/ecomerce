@@ -195,9 +195,9 @@
                                     class="position-relative bg-body">
                                     @csrf
                                     <input class="form-control" type="text" name="coupon_code" id="coupon_code"
-                                        placeholder="Kode Voucher" value="">
+                                        placeholder="Kode Kupon" value="">
                                     <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4"
-                                        type="submit" id="apply-voucher-btn" value="APPLY VOUCHER" disabled>
+                                        type="submit" id="apply-voucher-btn" value="GUNAKAN KUPON" disabled>
                                 </form>
                             @else
                                 <form action="{{ route('cart.coupon.remove') }}" method="POST"
@@ -205,10 +205,10 @@
                                     @csrf
                                     @method('DELETE')
                                     <input class="form-control" type="text" name="coupon_code" placeholder="Coupon Code"
-                                        value="@if (Session::has('coupon')) {{ Session::get('coupon')['code'] }} Applied! @endif"
+                                        value="@if (Session::has('coupon')) {{ Session::get('coupon')['code'] }} Digunakan! @endif"
                                         readonly>
                                     <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4"
-                                        type="submit" value="HAPUS VOUCHER">
+                                        type="submit" value="HAPUS KUPON">
                                 </form>
                             @endif
                             <form action="{{ route('cart.empty') }}" method="POST">
