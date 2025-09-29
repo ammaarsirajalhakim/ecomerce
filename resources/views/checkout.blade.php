@@ -3,141 +3,69 @@
 @section('content')
 <main class="pt-20">
   <section class="shop-checkout container">
-    {{-- ===== PAGE HEADER ===== --}}
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-      <div>
-        <h2 class="page-title mb-1">Pengiriman & Checkout</h2>
-        <div class="text-muted small">Periksa alamat, ongkos kirim, lalu pilih metode pembayaran.</div>
-      </div>
-      <div class="checkout-steps d-flex align-items-center gap-2">
-        {{-- ... Step Indicator (tetap) ... --}}
-      </div>
-    </div>
 
-    <form id="checkout-form" name="checkout-form" action="{{ route('cart.place.an.order') }}" method="POST">
+    {{-- ===== PAGE HEADER ===== --}}
+    <header class="ck-header d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 class="ck-title mb-1">Pengiriman & Checkout</h2>
+        <p class="ck-subtitle mb-0">Periksa alamat, ongkos kirim, lalu pilih metode pembayaran.</p>
+      </div>
+    </header>
+
+    <form id="checkout-form" name="checkout-form" action="{{ route('cart.place.an.order') }}" method="POST" class="ck-form">
       @csrf
 
       <div class="row g-4">
         {{-- ===================== LEFT: DETAIL PENGIRIMAN ===================== --}}
         <div class="col-lg-7">
-          <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white border-0 d-flex align-items-center justify-content-between py-3">
-              <h5 class="mb-0">Detail Pengiriman</h5>
-              @if ($address)
-                <a href="{{ route('user.address.index') }}" class="btn btn-link fw-semi-bold p-0">
-                  Ubah Alamat
-                </a>
-              @endif
+          {{-- DETAIL PENGIRIMAN --}}
+          <div class="card ck-card mb-4">
+            <div class="card-header ck-card__header">
+              <div class="d-flex align-items-center justify-content-between w-100 gap-2">
+                <h5 class="mb-0 d-flex align-items-center gap-2">
+                  <span class="ck-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" fill="currentColor"/></svg>
+                  </span>
+                  Detail Pengiriman
+                </h5>
+                @if ($address)
+                  <a href="{{ route('user.address.index') }}" class="btn btn-link p-0 fw-semibold">Ubah Alamat</a>
+                @endif
+              </div>
             </div>
 
             <div class="card-body">
               {{-- Jika alamat sudah ada, tampilkan --}}
               @if ($address)
-                <div class="rounded-3 p-3 mb-3 bg-light border address-box">
-                  <div class="d-flex align-items-start gap-3">
-                    <div class="badge bg-primary-subtle text-dark px-3 py-2 rounded-pill">Alamat Utama</div>
-                    <div class="small text-muted">Pastikan detailnya sudah benar sebelum lanjut pembayaran.</div>
+                <div class="ck-address">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <span class="badge ck-badge">Alamat Utama</span>
+                    <small class="text-muted">Pastikan detailnya benar sebelum lanjut pembayaran.</small>
                   </div>
-                  <hr class="my-3">
-                  <div class="my-account__address-item__detail">
-                    <p class="mb-1 fw-semibold">{{ $address->name }}</p>
-                    <p class="mb-1">{{ $address->phone }}</p>
-                    <p class="mb-1">{{ $address->address }}</p>
-                    <p class="mb-1">{{ $address->landmark }}</p>
-                    <p class="mb-1">{{ $address->locality }}, {{ $address->city }}, {{ $address->state }}</p>
-                    <p class="mb-0">{{ $address->zip }}, {{ $address->country }}</p>
+                  <div class="ck-address__content">
+                    <div class="ck-address__left">
+                      <p class="mb-1 fw-semibold">{{ $address->name }}</p>
+                      <p class="mb-0 text-muted">{{ $address->phone }}</p>
+                    </div>
+                    <div class="ck-address__right">
+                      <p class="mb-1">{{ $address->address }}</p>
+                      <p class="mb-1">{{ $address->landmark }}</p>
+                      <p class="mb-1">{{ $address->locality }}, {{ $address->city }}, {{ $address->state }}</p>
+                      <p class="mb-0">{{ $address->zip }}, {{ $address->country }}</p>
+                    </div>
                   </div>
                 </div>
               @else
-                {{-- Jika alamat belum ada, form input (tetap) --}}
-                <div id="address-form-fields" class="mt-1">
-                  <div class="alert alert-info mb-4">
-                    <div class="fw-semibold mb-1">Belum ada alamat tersimpan</div>
-                    <div>Isi detail berikut. Kolom bertanda <span class="text-danger">*</span> wajib diisi.</div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label for="name" class="form-label">Nama Penerima <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('name') is-invalid @enderror"
-                        id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required>
-                      @error('name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                {{-- Jika alamat belum ada, CTA tambah alamat --}}
+                <div class="ck-address ck-address--empty">
+                  <div class="d-flex align-items-start gap-3">
+                    <div class="ck-address__icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm1 10H11V9H8V7h3V4h2v3h3v2h-3v3z" fill="currentColor"/></svg>
                     </div>
-                    <div class="col-md-6 mb-3">
-                      <label for="phone" class="form-label">No. Telepon <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('phone') is-invalid @enderror"
-                        id="phone" name="phone" value="{{ old('phone') }}" required>
-                      @error('phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-12 mb-3">
-                      <label for="address" class="form-label">Alamat Lengkap <span class="text-danger">*</span></label>
-                      <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3" required>{{ old('address') }}</textarea>
-                      @error('address')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <label for="landmark" class="form-label">Patokan <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('landmark') is-invalid @enderror"
-                        id="landmark" name="landmark" value="{{ old('landmark') }}" required>
-                      @error('landmark')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <label for="locality" class="form-label">Kelurahan/Desa <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('locality') is-invalid @enderror"
-                        id="locality" name="locality" value="{{ old('locality') }}" required>
-                      @error('locality')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-12 mb-3">
-                      <label class="form-label d-block">Tipe Alamat <span class="text-danger">*</span></label>
-                      <div class="d-flex flex-wrap gap-3 mt-1">
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="type" id="type_rumah"
-                            value="Rumah" {{ old('type', 'Rumah') == 'Rumah' ? 'checked' : '' }} required>
-                          <label class="form-check-label" for="type_rumah">Rumah</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="type" id="type_kantor"
-                            value="Kantor" {{ old('type') == 'Kantor' ? 'checked' : '' }}>
-                          <label class="form-check-label" for="type_kantor">Kantor</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="type" id="type_lainnya"
-                            value="Lainnya" {{ old('type') == 'Lainnya' ? 'checked' : '' }}>
-                          <label class="form-check-label" for="type_lainnya">Lainnya</label>
-                        </div>
-                      </div>
-                      @error('type')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <label for="city" class="form-label">Kota/Kabupaten <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('city') is-invalid @enderror"
-                        id="city" name="city" value="{{ old('city') }}" required>
-                      @error('city')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <label for="state" class="form-label">Provinsi <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('state') is-invalid @enderror"
-                        id="state" name="state" value="{{ old('state') }}" required>
-                      @error('state')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <label for="zip" class="form-label">Kode Pos <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('zip') is-invalid @enderror"
-                        id="zip" name="zip" value="{{ old('zip') }}" required>
-                      @error('zip')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <label for="country" class="form-label">Negara <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('country') is-invalid @enderror"
-                        id="country" name="country" value="{{ old('country', 'Indonesia') }}" required>
-                      @error('country')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    <div class="flex-grow-1">
+                      <div class="fw-semibold mb-1">Belum ada alamat tersimpan</div>
+                      <div class="small text-muted mb-2">Silakan daftarkan alamat pengiriman terlebih dahulu.</div>
+                      <a href="{{ route('user.address.add') }}" class="btn btn-sm btn-info">Tambah Baru</a>
                     </div>
                   </div>
                 </div>
@@ -145,11 +73,17 @@
             </div>
           </div>
 
-          {{-- ===================== SHIPPING / ONGKIR ===================== --}}
-          <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white border-0 py-3">
-              <h5 class="mb-0">Ekspedisi & Ongkos Kirim</h5>
+          {{-- EKSPEDISI & ONGKIR --}}
+          <div class="card ck-card mb-4">
+            <div class="card-header ck-card__header">
+              <h5 class="mb-0 d-flex align-items-center gap-2">
+                <span class="ck-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 8h-3V4H3v13h2a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h2v-5l-3-4zM7 19a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 .001-2.001A1 1 0 0 1 17 19zm3-4h-1.17a3.001 3.001 0 0 0-5.66 0H11a3.001 3.001 0 0 0-5.66 0H5V6h10v4h4l1 1.333V15z" fill="currentColor"/></svg>
+                </span>
+                Ekspedisi & Ongkos Kirim
+              </h5>
             </div>
+
             <div class="card-body">
               {{-- Hidden hasil pilihan ongkir (untuk dikirim ke server) --}}
               <input type="hidden" name="shipping_courier" id="shipping_courier">
@@ -162,30 +96,30 @@
                 value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
 
               <div class="mb-3">
-                <div class="d-flex flex-wrap gap-3">
-                  <div class="custom-control custom-radio">
-                    <input type="radio" id="courier_jne" name="courier" value="jne" class="custom-control-input" checked>
-                    <label class="custom-control-label" for="courier_jne">JNE</label>
-                  </div>
-                  <div class="custom-control custom-radio">
-                    <input type="radio" id="courier_pos" name="courier" value="pos" class="custom-control-input">
-                    <label class="custom-control-label" for="courier_pos">POS Indonesia</label>
-                  </div>
-                  <div class="custom-control custom-radio">
-                    <input type="radio" id="courier_jnt" name="courier" value="jnt" class="custom-control-input">
-                    <label class="custom-control-label" for="courier_jnt">J&amp;T</label>
-                  </div>
+                <div class="ck-courier d-flex flex-wrap gap-2">
+                  <label class="ck-pill">
+                    <input type="radio" id="courier_jne" name="courier" value="jne" class="d-none" checked>
+                    <span>JNE</span>
+                  </label>
+                  <label class="ck-pill">
+                    <input type="radio" id="courier_pos" name="courier" value="pos" class="d-none">
+                    <span>POS Indonesia</span>
+                  </label>
+                  <label class="ck-pill">
+                    <input type="radio" id="courier_jnt" name="courier" value="jnt" class="d-none">
+                    <span>J&amp;T</span>
+                  </label>
                 </div>
               </div>
 
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button type="button" class="btn btn-primary" id="btnCheckOngkir">
                   Cek Ongkos Kirim
                 </button>
                 <div id="shippingNote" class="text-muted small"></div>
               </div>
 
-              <div id="shippingOptions" class="mt-3"></div>
+              <div id="shippingOptions" class="mt-3 ck-ship-options"></div>
 
               {{-- elemen lama (biarkan ada) --}}
               <ul id="ongkirResult" class="list-group d-none"></ul>
@@ -197,20 +131,20 @@
         {{-- ===================== RIGHT: RINGKASAN & PEMBAYARAN ===================== --}}
         <div class="col-lg-5">
           <div class="position-lg-sticky top-lg-20">
-            {{-- RINGKASAN PESANAN --}}
-            <div class="card shadow-sm border-0 mb-4">
-              <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0">Ringkasan Pesanan</h5>
+
+            {{-- RINGKASAN --}}
+            <div class="card ck-card mb-4">
+              <div class="card-header ck-card__header">
+                <h5 class="mb-0 d-flex align-items-center gap-2">
+                  <span class="ck-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 4h-2l-1 2H1v2h2l3.6 7.59-1.35 2.45A1.996 1.996 0 0 0 6 20h12v-2H6.42a.25.25 0 0 1-.22-.37L7.1 16h7.45a2 2 0 0 0 1.79-1.11L21 6H7.42L7 4zM7 22a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm10 0a2 2 0 1 0 .001-3.999A2 2 0 0 0 17 22z" fill="currentColor"/></svg>
+                  </span>
+                  Ringkasan Pesanan
+                </h5>
               </div>
               <div class="card-body">
                 <div class="table-responsive">
-                  <table class="table align-middle checkout-cart-items mb-3">
-                    <thead class="small text-muted">
-                      <tr>
-                        <th class="border-0">Produk</th>
-                        <th class="border-0 bg-transparent text-end">Subtotal</th>
-                      </tr>
-                    </thead>
+                  <table class="table align-middle ck-table-items mb-3">
                     <tbody>
                       @foreach ($items as $item)
                         <tr>
@@ -227,15 +161,17 @@
                   </table>
                 </div>
 
-                <hr>
+                <hr class="ck-sep">
 
                 <div class="table-responsive">
-                  <table class="table checkout-totals mb-0">
+                  <table class="table ck-table-totals mb-0">
                     <tbody>
                       @if (Session::has('discounts'))
                         <tr>
                           <th class="border-0">Subtotal</th>
-                          <td class="border-0 text-end" id="subtotal_products_text">Rp. {{ number_format(Session::get('discounts')['subtotal'], 0, ',', '.') }}</td>
+                          <td class="border-0 text-end" id="subtotal_products_text">
+                            Rp. {{ number_format(Session::get('discounts')['subtotal'], 0, ',', '.') }}
+                          </td>
                         </tr>
                         <tr>
                           <th class="border-0">Diskon ({{ Session::get('coupon')['code'] }})</th>
@@ -254,16 +190,15 @@
                         </tr>
                       @endif
 
-                      {{-- Tambahan: Ongkos Kirim (dinamis) --}}
+                      {{-- Ongkos Kirim (dinamis) --}}
                       <tr>
                         <th class="border-0">Ongkos Kirim</th>
                         <td class="border-0 text-end" id="shipping_cost_text">Rp. 0</td>
                       </tr>
 
-                      <tr class="fw-semibold">
+                      <tr class="fw-semibold ck-total-row">
                         <th class="border-0">Total Bayar</th>
                         <td class="border-0 text-end" id="grand_total_text">
-                          {{-- default = total barang (tanpa ongkir) --}}
                           @if (Session::has('discounts'))
                             Rp. {{ number_format(Session::get('discounts')['subtotal'] - Session::get('discounts')['discount'], 0, ',', '.') }}
                           @else
@@ -275,42 +210,50 @@
                   </table>
                 </div>
 
-                {{-- Hidden agar server bisa terima nilai ini juga bila perlu --}}
-                <input type="hidden" name="products_total_without_shipping"
-                  id="products_total_without_shipping_hidden"
+                {{-- Hidden untuk server --}}
+                <input type="hidden" name="products_total_without_shipping" id="products_total_without_shipping_hidden"
                   value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
-                <input type="hidden" name="grand_total_client" id="grand_total_client_hidden" value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
-
+                <input type="hidden" name="grand_total_client" id="grand_total_client_hidden"
+                  value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
               </div>
             </div>
 
             {{-- METODE PEMBAYARAN --}}
-            <div class="card shadow-sm border-0 mb-4">
-              <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0">Metode Pembayaran</h5>
+            <div class="card ck-card mb-4">
+              <div class="card-header ck-card__header">
+                <h5 class="mb-0 d-flex align-items-center gap-2">
+                  <span class="ck-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 6H3a2 2 0 0 0-2 2v1h22V8a2 2 0 0 0-2-2zM1 18a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V11H1v7zm5-3h4v2H6v-2z" fill="currentColor"/></svg>
+                  </span>
+                  Metode Pembayaran
+                </h5>
               </div>
               <div class="card-body">
-                <div class="vstack gap-3">
-                  <div class="form-check">
+                <div class="ck-payment vstack gap-3">
+                  <label class="ck-radio">
                     <input class="form-check-input form-check-input_fill" type="radio" name="mode" id="mode3" value="cod" checked>
-                    <label class="form-check-label" for="mode3">Cash On Delivery (COD)</label>
-                  </div>
-                  <div class="form-check">
+                    <span class="ck-radio__box"></span>
+                    <span class="ck-radio__label">Cash On Delivery (COD)</span>
+                  </label>
+                  <label class="ck-radio">
                     <input class="form-check-input form-check-input_fill" type="radio" name="mode" id="mode4" value="transfer">
-                    <label class="form-check-label" for="mode4">Transfer Bank</label>
-                  </div>
+                    <span class="ck-radio__box"></span>
+                    <span class="ck-radio__label">Transfer Bank</span>
+                  </label>
                 </div>
 
-                <div class="policy-text small text-muted mt-3">
+                <div class="ck-policy small text-muted mt-3">
                   Data pribadi Anda akan digunakan untuk memproses pesanan Anda...
                 </div>
                 @error('mode')<div class="text-danger mt-2">{{ $message }}</div>@enderror
 
-                <button type="submit" id="place-order-btn" class="btn btn-primary" disabled>
-        Buat Pesanan
-    </button>
+                {{-- NOTE: tetap gunakan id asli "place-order-btn" agar fungsionalitas tidak berubah --}}
+                <button type="submit" id="place-order-btn" class="btn btn-primary w-100 mt-3" disabled>
+                  Buat Pesanan
+                </button>
               </div>
             </div>
+
           </div>
         </div>
       </div> {{-- /row --}}
@@ -318,348 +261,430 @@
   </section>
 </main>
 
-{{-- ========== STYLE KHUSUS TAMPILAN (tidak mengubah fungsionalitas) ========== --}}
+{{-- ========== STYLE KHUSUS TAMPILAN (UI ONLY) ========== --}}
 @push('styles')
 <style>
-  .top-lg-20{ top:20px; }
-  @media (min-width: 992px){
-    .position-lg-sticky{ position: sticky; }
+  :root{
+    --ck-border: rgba(0,0,0,.08);
+    --ck-border-strong: rgba(0,0,0,.12);
+    --ck-bg-soft: #f7f8fa;
+    --ck-primary: #0d6efd;
+    --ck-radius: 14px;
   }
-  .page-title{ font-weight:700; }
-  .checkout-cart-items th, .checkout-cart-items td{ background:transparent !important; }
-  .checkout-totals th{ width:50%; }
-  .custom-control.custom-radio{ padding-left: 1.8rem; }
-  .custom-control-input:checked~.custom-control-label{ font-weight:600; }
+
+  .top-lg-20 { top: 20px; }
+  @media (min-width: 992px) { .position-lg-sticky { position: sticky; } }
+
+  /* Header */
+  .ck-title{ font-weight:800; letter-spacing:.2px; }
+  .ck-subtitle{ color:#666; }
+  .ck-steps{ list-style:none; display:flex; gap:.5rem; padding:0; }
+  .ck-step{
+    font-size:.85rem; padding:.35rem .65rem; border-radius:20px; border:1px solid var(--ck-border);
+    color:#666; background:#fff;
+  }
+  .ck-step.is-active{ border-color:var(--ck-primary); color:var(--ck-primary); font-weight:600; }
+  .ck-step.is-done{ background:var(--ck-bg-soft); color:#444; }
+
+  /* Cards */
+  .ck-card{ border:1px solid var(--ck-border); border-radius:var(--ck-radius); overflow:hidden; }
+  .ck-card__header{
+    background:#fff; border-bottom:1px solid var(--ck-border); padding:1rem 1.25rem;
+  }
+  .ck-card .card-body{ padding:1.25rem; }
+  .ck-icon{ display:inline-flex; align-items:center; justify-content:center; color:var(--ck-primary); }
+
+  /* Address */
+  .ck-badge{
+    background:rgba(13,110,253,.08); color:#0b5ed7; border:1px solid rgba(13,110,253,.2);
+    padding:.3rem .55rem; border-radius:999px;
+  }
+  .ck-address{
+    border:1px dashed var(--ck-border-strong);
+    background:linear-gradient(180deg,#fff, #fff), radial-gradient(1200px 1200px at 0% 0%, rgba(13,110,253,.05), transparent);
+    border-radius:12px; padding:1rem;
+  }
+  .ck-address--empty{ background:#f9fbff; }
+  .ck-address__content{ display:grid; grid-template-columns: 1fr 2fr; gap:1rem; }
+  .ck-address__icon{ color:var(--ck-primary); }
+  @media (max-width: 576px){ .ck-address__content{ grid-template-columns:1fr; } }
+
+  /* Courier selector as pills */
+  .ck-pill{
+    display:inline-flex; align-items:center; gap:.5rem; padding:.5rem .85rem; border-radius:999px;
+    border:1px solid var(--ck-border); cursor:pointer; user-select:none; background:#fff;
+    transition: all .15s ease;
+  }
+  .ck-pill:hover{ border-color:var(--ck-border-strong); background:#fafafa; }
+  .ck-pill input:checked + span,
+  .ck-pill input:checked ~ span{
+    font-weight:600;
+  }
+  .ck-pill input:checked ~ span::after{
+    content:""; display:inline-block; width:.5rem; height:.5rem; margin-left:.4rem; border-radius:50%;
+    background:var(--ck-primary);
+  }
+
+  /* Shipping options */
   #shippingOptions .custom-control{
-    border:1px solid rgba(0,0,0,.08);
-    border-radius:.5rem;
-    padding:.75rem .75rem .75rem 2.25rem;
-    transition:all .15s ease;
+    border:1px solid var(--ck-border); border-radius:12px;
+    padding:.85rem .85rem .85rem 2.25rem; transition:.15s ease; background:#fff;
   }
-  #shippingOptions .custom-control:hover{
-    background: rgba(0,0,0,.02);
-    border-color: rgba(0,0,0,.15);
+  #shippingOptions .custom-control:hover{ background:#fafafa; border-color:var(--ck-border-strong); }
+  .ck-ship-options{ display:grid; gap:.6rem; }
+
+  /* Items table */
+  .ck-table-items th, .ck-table-items td{ background:transparent !important; }
+  .ck-sep{ border-color:var(--ck-border); opacity:1; }
+
+  /* Totals */
+  .ck-table-totals th{ width:55%; }
+  .ck-total-row td, .ck-total-row th{
+    border-top:1px dashed var(--ck-border-strong) !important;
+    font-size:1.05rem;
   }
-  .btn-primary{ border-radius:.75rem; }
-  .card{ border-radius:1rem; }
-  .card-header{ border-bottom:1px solid rgba(0,0,0,.06)!important; }
+
+  /* Payment radios */
+  .ck-radio{ position:relative; display:flex; align-items:center; gap:.75rem; cursor:pointer; }
+  .ck-radio input{ position:absolute; opacity:0; }
+  .ck-radio__box{
+    width:22px; height:22px; border:2px solid var(--ck-border-strong); border-radius:50%; display:inline-block;
+    transition:.15s ease; background:#fff;
+  }
+  .ck-radio input:checked + .ck-radio__box{
+    border-color:var(--ck-primary); box-shadow:inset 0 0 0 6px var(--ck-primary);
+  }
+  .ck-radio__label{ font-weight:600; }
+
+  /* Buttons */
+  .btn-primary{ border-radius:12px; padding:.7rem 1rem; font-weight:600; }
+
+  /* Minor utilities */
+  .ck-policy{ line-height:1.6; }
 </style>
 @endpush
 
 {{-- ====== SCRIPT YANG SUDAH ADA (TETAP) ====== --}}
 @push('scripts')
-  {{-- Midtrans Snap --}}
-  <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-    data-client-key="{{ config('midtrans.client_key') }}"></script>
+{{-- Midtrans Snap --}}
+<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+  data-client-key="{{ config('midtrans.client_key') }}"></script>
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-      let pendingOrderId = null;
+<script type="text/javascript">
+  $(document).ready(function() {
+    let pendingOrderId = null;
 
-      $('#checkout-form').on('submit', function(event) {
-        var payButton = $('#pay-button');
-        var selectedPaymentMethod = $('input[name="mode"]:checked').val();
+    $('#checkout-form').on('submit', function(event) {
+      var payButton = $('#pay-button'); // (tetap sesuai kode asal)
+      var selectedPaymentMethod = $('input[name="mode"]:checked').val();
 
-        if (selectedPaymentMethod === 'transfer') {
-          event.preventDefault();
+      if (selectedPaymentMethod === 'transfer') {
+        event.preventDefault();
 
-          payButton.prop('disabled', true).text('Memproses...');
+        payButton.prop('disabled', true).text('Memproses...');
 
-          $.ajax({
-            url: $(this).attr('action'),
-            method: 'POST',
-            data: $(this).serialize(),
-            cache: false,
-            success: function(data) {
-              if (data.error || !data.snap_token) {
-                alert(data.error || 'Gagal mendapatkan token pembayaran.');
-                payButton.prop('disabled', false).text('Buat Pesanan');
-                return;
-              }
-
-              pendingOrderId = data.order_id;
-
-              snap.pay(data.snap_token, {
-                onSuccess: function(result) {
-                  pendingOrderId = null;
-                  sendPaymentResult(result);
-                },
-                onPending: function(result) {
-                  pendingOrderId = null;
-                  sendPaymentResult(result);
-                },
-                onError: function() {
-                  alert("Pembayaran Gagal!");
-                  cancelOrder(pendingOrderId);
-                  payButton.prop('disabled', false).text('Buat Pesanan');
-                },
-                onClose: function() {
-                  if (pendingOrderId) {
-                    cancelOrder(pendingOrderId);
-                  }
-                  payButton.prop('disabled', false).text('Buat Pesanan');
-                }
-              });
-            },
-            error: function(xhr) {
-              console.error(xhr.responseText);
-              alert("Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.");
-              payButton.prop('disabled', false).text('Buat Pesanan');
-            }
-          });
-        } else {
-          payButton.prop('disabled', true).text('Memproses...');
-        }
-      });
-
-      function sendPaymentResult(result) {
         $.ajax({
-          url: "{{ route('payment.success') }}",
+          url: $(this).attr('action'),
           method: 'POST',
-          data: {
-            _token: '{{ csrf_token() }}',
-            result: result
-          },
-          success: function() {
-            window.location.href = "{{ route('cart.order.confirmation') }}";
+          data: $(this).serialize(),
+          cache: false,
+          success: function(data) {
+            if (data.error || !data.snap_token) {
+              alert(data.error || 'Gagal mendapatkan token pembayaran.');
+              payButton.prop('disabled', false).text('Buat Pesanan');
+              return;
+            }
+
+            pendingOrderId = data.order_id;
+
+            snap.pay(data.snap_token, {
+              onSuccess: function(result) {
+                pendingOrderId = null;
+                sendPaymentResult(result);
+              },
+              onPending: function(result) {
+                pendingOrderId = null;
+                sendPaymentResult(result);
+              },
+              onError: function() {
+                alert("Pembayaran Gagal!");
+                cancelOrder(pendingOrderId);
+                payButton.prop('disabled', false).text('Buat Pesanan');
+              },
+              onClose: function() {
+                if (pendingOrderId) {
+                  cancelOrder(pendingOrderId);
+                }
+                payButton.prop('disabled', false).text('Buat Pesanan');
+              }
+            });
           },
           error: function(xhr) {
             console.error(xhr.responseText);
-            alert('Gagal memproses hasil pembayaran di server.');
+            alert("Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.");
+            payButton.prop('disabled', false).text('Buat Pesanan');
           }
         });
-      }
-
-      function cancelOrder(orderId) {
-        if (!orderId) return;
-        $.ajax({
-          url: "{{ route('cart.order.cancel') }}",
-          method: 'POST',
-          data: { _token: "{{ csrf_token() }}", order_id: orderId },
-          success: function() { /* no-op UI */ },
-          error: function(xhr) { console.error(xhr.responseText); }
-        });
+      } else {
+        payButton.prop('disabled', true).text('Memproses...');
       }
     });
-  </script>
 
-  {{-- Variabel RO dari server --}}
-  <script>
-    window.RO_CHECK_URL = "{{ route('ro.check') }}";        // endpoint cek ongkir anda
-    window.RO_DEST      = @json($address->district_id ?? ''); // id kecamatan tujuan
-    window.RO_WEIGHT_G  = @json((int)($totalWeightG ?? 1));   // total berat gram
-  </script>
-
-  {{-- Ongkir checker + KALKULASI RINGKASAN (dinamis) --}}
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const btn  = document.getElementById('btnCheckOngkir');
-      const box  = document.getElementById('shippingOptions');
-      const note = document.getElementById('shippingNote');
-
-      const hidCourier = document.getElementById('shipping_courier');
-      const hidService = document.getElementById('shipping_service');
-      const hidCost    = document.getElementById('shipping_cost');
-      const hidEtd     = document.getElementById('shipping_etd');
-
-      // label ringkasan
-      const lblShip = document.getElementById('shipping_cost_text');
-      const lblGrand= document.getElementById('grand_total_text');
-
-      const baseWithoutShipInput = document.getElementById('base_total_without_shipping');
-      const hiddenProductsTotal  = document.getElementById('products_total_without_shipping_hidden');
-      const hiddenGrandClient    = document.getElementById('grand_total_client_hidden');
-      const placeBtn = document.getElementById('place-order-btn');
-
-      // helper rupiah
-      function rupiah(n){
-        return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n||0));
-      }
-
-      function getBaseTotal(){
-        // pakai hidden base (total barang sudah diskon)
-        const v = Number(baseWithoutShipInput?.value || hiddenProductsTotal?.value || 0);
-        return isNaN(v) ? 0 : v;
-      }
-
-      function recalcGrand(){
-        const base = getBaseTotal();
-        const ship = Number(hidCost?.value || 0);
-        const grand = base + ship;
-
-        if (lblShip)  lblShip.textContent  = rupiah(ship);
-        if (lblGrand) lblGrand.textContent = rupiah(grand);
-        if (hiddenGrandClient) hiddenGrandClient.value = grand;
-      }
-
-      function applySelection(radio){
-        if (!radio) return;
-        if (hidCourier) hidCourier.value = radio.dataset.courier || '';
-        if (hidService) hidService.value = radio.dataset.service || '';
-        if (hidCost)    hidCost.value    = radio.dataset.price || '0';
-        if (hidEtd)     hidEtd.value     = radio.dataset.etd || '';
-        recalcGrand();
-      }
-
-      const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
-      const destinationDistrictId = window.RO_DEST || '';
-      const totalWeightGram       = Number(window.RO_WEIGHT_G || 1) || 1;
-      const getCourier = () => document.querySelector('input[name="courier"]:checked')?.value || 'jne';
-
-      async function checkOngkir(){
-        box.innerHTML = '';
-        note.textContent = '';
-
-        if (!destinationDistrictId) {
-          note.textContent = 'Alamat tujuan belum lengkap (kecamatan belum dipilih).';
-          return;
+    function sendPaymentResult(result) {
+      $.ajax({
+        url: "{{ route('payment.success') }}",
+        method: 'POST',
+        data: {
+          _token: '{{ csrf_token() }}',
+          result: result
+        },
+        success: function() {
+          window.location.href = "{{ route('cart.order.confirmation') }}";
+        },
+        error: function(xhr) {
+          console.error(xhr.responseText);
+          alert('Gagal memproses hasil pembayaran di server.');
         }
+      });
+    }
 
-        const payload = new URLSearchParams({
-          district_id: String(destinationDistrictId),
-          weight: String(Math.max(1, +totalWeightGram || 1)),
-          courier: String(getCourier())
+    function cancelOrder(orderId) {
+      if (!orderId) return;
+      $.ajax({
+        url: "{{ route('cart.order.cancel') }}",
+        method: 'POST',
+        data: {
+          _token: "{{ csrf_token() }}",
+          order_id: orderId
+        },
+        success: function() { /* no-op UI */ },
+        error: function(xhr) {
+          console.error(xhr.responseText);
+        }
+      });
+    }
+  });
+</script>
+
+{{-- Variabel RO dari server --}}
+<script>
+  window.RO_CHECK_URL = "{{ route('ro.check') }}"; // endpoint cek ongkir anda
+  window.RO_DEST = @json($address -> district_id ?? ''); // id kecamatan tujuan (UI-only)
+  window.RO_WEIGHT_G = @json((int)($totalWeightG ?? 1)); // total berat gram
+</script>
+
+{{-- Ongkir checker + KALKULASI RINGKASAN (dinamis) --}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('btnCheckOngkir');
+    const box = document.getElementById('shippingOptions');
+    const note = document.getElementById('shippingNote');
+
+    const hidCourier = document.getElementById('shipping_courier');
+    const hidService = document.getElementById('shipping_service');
+    const hidCost = document.getElementById('shipping_cost');
+    const hidEtd = document.getElementById('shipping_etd');
+
+    // label ringkasan
+    const lblShip = document.getElementById('shipping_cost_text');
+    const lblGrand = document.getElementById('grand_total_text');
+
+    const baseWithoutShipInput = document.getElementById('base_total_without_shipping');
+    const hiddenProductsTotal = document.getElementById('products_total_without_shipping_hidden');
+    const hiddenGrandClient = document.getElementById('grand_total_client_hidden');
+    const placeBtn = document.getElementById('place-order-btn');
+
+    // helper rupiah
+    function rupiah(n) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(Number(n || 0));
+    }
+
+    function getBaseTotal() {
+      const v = Number(baseWithoutShipInput?.value || hiddenProductsTotal?.value || 0);
+      return isNaN(v) ? 0 : v;
+    }
+
+    function recalcGrand() {
+      const base = getBaseTotal();
+      const ship = Number(hidCost?.value || 0);
+      const grand = base + ship;
+
+      if (lblShip) lblShip.textContent = rupiah(ship);
+      if (lblGrand) lblGrand.textContent = rupiah(grand);
+      if (hiddenGrandClient) hiddenGrandClient.value = grand;
+    }
+
+    function applySelection(radio) {
+      if (!radio) return;
+      if (hidCourier) hidCourier.value = radio.dataset.courier || '';
+      if (hidService) hidService.value = radio.dataset.service || '';
+      if (hidCost) hidCost.value = radio.dataset.price || '0';
+      if (hidEtd) hidEtd.value = radio.dataset.etd || '';
+      recalcGrand();
+    }
+
+    const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const destinationDistrictId = window.RO_DEST || '';
+    const totalWeightGram = Number(window.RO_WEIGHT_G || 1) || 1;
+    const getCourier = () => document.querySelector('input[name="courier"]:checked')?.value || 'jne';
+
+    async function checkOngkir() {
+      box.innerHTML = '';
+      note.textContent = '';
+
+      if (!destinationDistrictId) {
+        note.textContent = 'Alamat tujuan belum lengkap (kecamatan belum dipilih).';
+        return;
+      }
+
+      const payload = new URLSearchParams({
+        district_id: String(destinationDistrictId),
+        weight: String(Math.max(1, +totalWeightGram || 1)),
+        courier: String(getCourier())
+      });
+
+      let res;
+      try {
+        res = await fetch(window.RO_CHECK_URL, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: payload.toString()
         });
-
-        let res;
-        try {
-          res = await fetch(window.RO_CHECK_URL, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'X-CSRF-TOKEN': token,
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: payload.toString()
-          });
-        } catch(e) {
-          note.textContent = 'Tidak bisa menghubungi server ongkir.';
-          if (placeBtn) placeBtn.disabled = true;      // << matikan saat error jaringan
-          return;
-        }
-
-        let data;
-        try { data = await res.json(); } catch(e) { data = {}; }
-
-        const results = Array.isArray(data?.results) ? data.results : (Array.isArray(data) ? data : []);
-        renderServices(results, data?.message);
+      } catch (e) {
+        note.textContent = 'Tidak bisa menghubungi server ongkir.';
+        if (placeBtn) placeBtn.disabled = true;
+        return;
       }
 
-      function renderServices(results, apiMessage){
-        box.innerHTML = '';
-        if (!Array.isArray(results) || results.length === 0){
-          box.innerHTML = '<div class="alert alert-warning mb-0">Tarif tidak tersedia.</div>';
-          if (apiMessage) note.textContent = apiMessage;
-          // reset ongkir jadi 0 jika gagal
-          if (hidCost) hidCost.value = 0;
-          recalcGrand();
-          if (placeBtn) placeBtn.disabled = true; // << matikan saat gagal
-          return;
-        }
+      let data;
+      try { data = await res.json(); } catch (e) { data = {}; }
 
-        // Format flat {service, description, cost, etd}
-        if ('cost' in (results[0] || {})) {
-          const frag = document.createDocumentFragment();
-          const courierCode = getCourier();
+      const results = Array.isArray(data?.results) ? data.results : (Array.isArray(data) ? data : []);
+      renderServices(results, data?.message);
+    }
 
-          results.forEach((r, idx) => {
-            const svc   = r.service || '';
-            const desc  = r.description || '';
-            const price = Number(r.cost) || 0;
-            const etd   = r.etd || '';
-            const id    = `ship_${svc}_${idx}`;
+    function renderServices(results, apiMessage) {
+      box.innerHTML = '';
+      if (!Array.isArray(results) || results.length === 0) {
+        box.innerHTML = '<div class="alert alert-warning mb-0">Tarif tidak tersedia.</div>';
+        if (apiMessage) note.textContent = apiMessage;
+        if (hidCost) hidCost.value = 0;
+        recalcGrand();
+        if (placeBtn) placeBtn.disabled = true;
+        return;
+      }
 
-            const wrap = document.createElement('div');
-            wrap.className = 'custom-control custom-radio mb-2';
-            wrap.innerHTML =
-              '<input type="radio" id="'+id+'" name="shipping_pick" class="custom-control-input"'+
-              ' data-courier="'+courierCode+'" data-service="'+svc+'" data-price="'+price+'" data-etd="'+etd+'">'+
-              '<label class="custom-control-label" for="'+id+'">'+
-                '<strong>'+svc+'</strong> — '+desc+' · '+rupiah(price)+(etd ? ' · ETD '+etd : '')+
-              '</label>';
-            frag.appendChild(wrap);
-          });
-
-          box.appendChild(frag);
-
-          const radios = box.querySelectorAll('input[name="shipping_pick"]');
-          if (radios.length) {
-            let pick = radios[0];
-            radios.forEach(r => { if (+r.dataset.price < +pick.dataset.price) pick = r; });
-            pick.checked = true;
-            applySelection(pick);
-            if (placeBtn) placeBtn.disabled = false;  // << hidupkan setelah sukses pilih
-          }
-
-          box.addEventListener('change', (e) => {
-            if (e.target && e.target.name === 'shipping_pick') applySelection(e.target);
-            if (placeBtn) placeBtn.disabled = false; // << hidupkan saat user ganti opsi
-          });
-
-          return;
-        }
-
-        // Format klasik RajaOngkir: [{code, costs:[{service, description, cost:[{value,etd}]}]}]
-        const first = results[0] || {};
-        const courierCode = first.code || getCourier();
-        const costs = Array.isArray(first.costs) ? first.costs : [];
-
-        if (!costs.length){
-          box.innerHTML = '<div class="alert alert-warning mb-0">Layanan tidak ditemukan untuk kurir terpilih. Coba kurir lain.</div>';
-          if (hidCost) hidCost.value = 0;
-          recalcGrand();
-          return;
-        }
-
+      // Format flat {service, description, cost, etd}
+      if ('cost' in (results[0] || {})) {
         const frag = document.createDocumentFragment();
-        costs.forEach((c, idx) => {
-          const svc   = c?.service || '';
-          const desc  = c?.description || '';
-          const price = (c?.cost?.[0]?.value) ?? 0;
-          const etd   = (c?.cost?.[0]?.etd) ?? '';
-          const id    = `ship_${svc}_${idx}`;
+        const courierCode = getCourier();
+
+        results.forEach((r, idx) => {
+          const svc = r.service || '';
+          const desc = r.description || '';
+          const price = Number(r.cost) || 0;
+          const etd = r.etd || '';
+          const id = `ship_${svc}_${idx}`;
 
           const wrap = document.createElement('div');
           wrap.className = 'custom-control custom-radio mb-2';
           wrap.innerHTML =
-            '<input type="radio" id="'+id+'" name="shipping_pick" class="custom-control-input"'+
-            ' data-courier="'+courierCode+'" data-service="'+svc+'" data-price="'+price+'" data-etd="'+etd+'">'+
-            '<label class="custom-control-label" for="'+id+'">'+
-              '<strong>'+svc+'</strong> — '+desc+' · '+rupiah(price)+(etd ? ' · ETD '+etd+' hari' : '')+
+            '<input type="radio" id="' + id + '" name="shipping_pick" class="custom-control-input"' +
+            ' data-courier="' + courierCode + '" data-service="' + svc + '" data-price="' + price + '" data-etd="' + etd + '">' +
+            '<label class="custom-control-label" for="' + id + '">' +
+            '<strong>' + svc + '</strong> — ' + desc + ' · ' + rupiah(price) + (etd ? ' · ETD ' + etd : '') +
             '</label>';
           frag.appendChild(wrap);
         });
+
         box.appendChild(frag);
 
-        const radios2 = box.querySelectorAll('input[name="shipping_pick"]');
-        if (radios2.length) {
-          let pick = radios2[0];
-          radios2.forEach(r => { if (+r.dataset.price < +pick.dataset.price) pick = r; });
+        const radios = box.querySelectorAll('input[name="shipping_pick"]');
+        if (radios.length) {
+          let pick = radios[0];
+          radios.forEach(r => { if (+r.dataset.price < +pick.dataset.price) pick = r; });
           pick.checked = true;
           applySelection(pick);
-          if (placeBtn) placeBtn.disabled = false;    // << hidupkan setelah sukses pilih
+          if (placeBtn) placeBtn.disabled = false;
         }
 
         box.addEventListener('change', (e) => {
           if (e.target && e.target.name === 'shipping_pick') applySelection(e.target);
-          if (placeBtn) placeBtn.disabled = false;  // << hidupkan saat user ganti opsi
+          if (placeBtn) placeBtn.disabled = false;
         });
+
+        return;
       }
 
-      // tombol cek ongkir
-      document.getElementById('btnCheckOngkir')?.addEventListener('click', checkOngkir);
+      // Format RajaOngkir klasik
+      const first = results[0] || {};
+      const courierCode = first.code || getCourier();
+      const costs = Array.isArray(first.costs) ? first.costs : [];
 
-      // inisialisasi tampilan default
-      recalcGrand();
-      document.querySelector('form#checkout-form')?.addEventListener('submit', (e) => {
-  if (!hidCost || Number(hidCost.value || 0) <= 0) {
-    e.preventDefault();
-    note.textContent = 'Silakan cek dan pilih ongkos kirim terlebih dahulu.';
-    if (placeBtn) placeBtn.disabled = true;
-  }
-});
+      if (!costs.length) {
+        box.innerHTML = '<div class="alert alert-warning mb-0">Layanan tidak ditemukan untuk kurir terpilih. Coba kurir lain.</div>';
+        if (hidCost) hidCost.value = 0;
+        recalcGrand();
+        return;
+      }
 
+      const frag = document.createDocumentFragment();
+      costs.forEach((c, idx) => {
+        const svc = c?.service || '';
+        const desc = c?.description || '';
+        const price = (c?.cost?.[0]?.value) ?? 0;
+        const etd = (c?.cost?.[0]?.etd) ?? '';
+        const id = `ship_${svc}_${idx}`;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'custom-control custom-radio mb-2';
+        wrap.innerHTML =
+          '<input type="radio" id="' + id + '" name="shipping_pick" class="custom-control-input"' +
+          ' data-courier="' + courierCode + '" data-service="' + svc + '" data-price="' + price + '" data-etd="' + etd + '">' +
+          '<label class="custom-control-label" for="' + id + '">' +
+          '<strong>' + svc + '</strong> — ' + desc + ' · ' + rupiah(price) + (etd ? ' · ETD ' + etd + ' hari' : '') +
+          '</label>';
+        frag.appendChild(wrap);
+      });
+      box.appendChild(frag);
+
+      const radios2 = box.querySelectorAll('input[name="shipping_pick"]');
+      if (radios2.length) {
+        let pick = radios2[0];
+        radios2.forEach(r => { if (+r.dataset.price < +pick.dataset.price) pick = r; });
+        pick.checked = true;
+        applySelection(pick);
+        if (placeBtn) placeBtn.disabled = false;
+      }
+
+      box.addEventListener('change', (e) => {
+        if (e.target && e.target.name === 'shipping_pick') applySelection(e.target);
+        if (placeBtn) placeBtn.disabled = false;
+      });
+    }
+
+    // tombol cek ongkir
+    document.getElementById('btnCheckOngkir')?.addEventListener('click', checkOngkir);
+
+    // inisialisasi tampilan default
+    recalcGrand();
+    document.querySelector('form#checkout-form')?.addEventListener('submit', (e) => {
+      if (!hidCost || Number(hidCost.value || 0) <= 0) {
+        e.preventDefault();
+        note.textContent = 'Silakan cek dan pilih ongkos kirim terlebih dahulu.';
+        if (placeBtn) placeBtn.disabled = true;
+      }
     });
-  </script>
+
+  });
+</script>
 @endpush
 @endsection
