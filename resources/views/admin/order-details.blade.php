@@ -52,6 +52,15 @@
                             <th>Tanggal Ditolak</th>
                             <td>{{ $order->canceled_date }}</td>
                         </tr>
+
+                        <tr>
+                            <th>Ongkos Kirim</th>
+                            <td>{{ $order->ongkir }}</td>
+                            <th>Jenis Pengiriman</th>
+                            <td>{{ $order->mode_pengiriman }}</td>
+                            <th>Tipe Pengiriman</th>
+                            <td>{{ $order->jenis_pengiriman }}</td>
+                        </tr>
                         <tr>
                             <th>Status Pesanan</th>
                             <td colspan="5">
@@ -124,12 +133,12 @@
                 <h5>Alamat Pemesan</h5>
                 <div class="my-account__address-item col-md-6">
                     <div class="my-account__address-item__detail">
-                        <p>{{ $order->name }}</p>
-                        <p>{{ $order->address }}</p>
-                        <p>{{ $order->locality }}</p>
-                        <p>{{ $order->city }}, {{ $order->country }}</p>
-                        <p>{{ $order->landmark }}</p>
-                        <p>{{ $order->zip }}</p>
+                        <p>Nama Penerima : {{ $order->name }}</p>
+                        <p>Alamat : {{ $order->address }}</p>
+                        <p>Nama Jalan : {{ $order->locality }}</p>
+                        <p>Kota : {{ $order->city }}, {{ $order->country }}</p>
+                        <p>Petunjuk : {{ $order->landmark }}</p>
+                        <p>Kode Pos : {{ $order->zip }}</p>
                         <br>
                         <p>No Telepon : {{ $order->phone }}</p>
                     </div>

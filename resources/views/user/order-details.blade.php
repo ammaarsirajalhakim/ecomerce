@@ -161,6 +161,14 @@
                                     <td>{{ $order->canceled_date }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Ongkos Kirim</th>
+                                    <td>{{ $order->ongkir }}</td>
+                                    <th>Jenis Pengiriman</th>
+                                    <td>{{ $order->mode_pengiriman }}</td>
+                                    <th>Tipe Pengiriman</th>
+                                    <td>{{ $order->jenis_pengiriman }}</td>
+                                </tr>
+                                <tr>
                                     <th>Status Penanan</th>
                                     <td colspan="5">
                                         @if ($order->status == 'delivered')

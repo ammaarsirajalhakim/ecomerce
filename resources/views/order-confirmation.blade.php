@@ -113,7 +113,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Pengiriman</td>
+                                        <td>ONGKOS KIRIM</td>
                                         <td class="text-right">Rp {{ number_format($order->ongkir, 0, ',', '.') }}
                                         </td>
                                     </tr>
