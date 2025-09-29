@@ -72,8 +72,9 @@ class CartController extends Controller
         ]);
     }
 
-    private function safeGram(int $g): int { 
-        return max(1, $g); 
+    private function safeGram(int $g): int
+    {
+        return max(1, $g);
     }
 
     public function index(Request $request)
@@ -261,92 +262,92 @@ class CartController extends Controller
      * [MODIFIKASI] Menampilkan halaman checkout dengan 3 skenario berbeda.
      */
     public function checkout(Request $request)
-{
-    $user = Auth::user();
-    $address = Address::where('user_id', $user->id)->first();
+    {
+        $user = Auth::user();
+        $address = Address::where('user_id', $user->id)->first();
 
-    // Skenario 1: Beli Sekarang
-    if (session()->has('buy_now_item')) {
-        $buyNowData = session('buy_now_item');
-        $product = Product::find($buyNowData['product_id']);
-        $quantity = $buyNowData['quantity'];
+        // Skenario 1: Beli Sekarang
+        if (session()->has('buy_now_item')) {
+            $buyNowData = session('buy_now_item');
+            $product = Product::find($buyNowData['product_id']);
+            $quantity = $buyNowData['quantity'];
 
-        if (!$product) {
-            session()->forget('buy_now_item');
-            return redirect()->route('shop.index')->with('error', 'Produk tidak ditemukan.');
-        }
+            if (!$product) {
+                session()->forget('buy_now_item');
+                return redirect()->route('shop.index')->with('error', 'Produk tidak ditemukan.');
+            }
 
-        $price = $product->sale_price > 0 ? $product->sale_price : $product->regular_price;
-        $subtotal = $price * $quantity;
-        $total = $subtotal;
-
-        $item = new \stdClass();
-        $item->product = $product;
-        $item->quantity = $quantity;
-        $item->subtotal = $subtotal;
-        $items = collect([$item]);
-
-        $this->setAmountForCheckout(true);
-
-        // ⬅️ total berat untuk Buy Now
-        $totalWeightG = $this->safeGram(((int)($product->weight_gram ?? 0)) * (int)$quantity);
-
-        return view('checkout', compact('address', 'items', 'subtotal', 'total', 'totalWeightG')); // ⬅️
-    }
-    // Skenario 2: Selected Items
-    elseif (session()->has('selected_checkout_items')) {
-        $items = session('selected_checkout_items');
-
-        if ($items->isEmpty()) {
-            return redirect()->route('cart.index')->with('info', 'Tidak ada item terpilih.');
-        }
-
-        $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
-        $total = $subtotal;
-
-        $this->setAmountForCheckout(false, $items); // Kirim item terpilih
-
-        // ⬅️ total berat untuk selected items
-        $totalWeightG = 0;
-        foreach ($items as $it) {
-            $p = Product::find($it->product_id);
-            $totalWeightG += ((int)($p->weight_gram ?? 0)) * (int)$it->quantity;
-        }
-        $totalWeightG = $this->safeGram($totalWeightG);
-
-        return view('checkout', compact('address', 'items', 'subtotal', 'total', 'totalWeightG')); // ⬅️
-    }
-    // Skenario 3: Semua isi keranjang
-    else {
-        $items = CartItem::where('user_id', $user->id)->get();
-        if ($items->isEmpty()) {
-            return redirect()->route('cart.index')->with('info', 'Keranjang Anda kosong.');
-        }
-
-        $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
-
-        $this->calculateDiscount();
-
-        if (Session::has('discounts')) {
-            $subtotal = Session::get('discounts')['subtotal'];
-            $total = Session::get('discounts')['total']; // tanpa pajak
-        } else {
+            $price = $product->sale_price > 0 ? $product->sale_price : $product->regular_price;
+            $subtotal = $price * $quantity;
             $total = $subtotal;
+
+            $item = new \stdClass();
+            $item->product = $product;
+            $item->quantity = $quantity;
+            $item->subtotal = $subtotal;
+            $items = collect([$item]);
+
+            $this->setAmountForCheckout(true);
+
+            // ⬅️ total berat untuk Buy Now
+            $totalWeightG = $this->safeGram(((int)($product->weight_gram ?? 0)) * (int)$quantity);
+
+            return view('checkout', compact('address', 'items', 'subtotal', 'total', 'totalWeightG')); // ⬅️
         }
+        // Skenario 2: Selected Items
+        elseif (session()->has('selected_checkout_items')) {
+            $items = session('selected_checkout_items');
 
-        $this->setAmountForCheckout(false);
+            if ($items->isEmpty()) {
+                return redirect()->route('cart.index')->with('info', 'Tidak ada item terpilih.');
+            }
 
-        // ⬅️ total berat untuk semua item cart
-        $totalWeightG = 0;
-        foreach ($items as $it) {
-            $p = Product::find($it->product_id);
-            $totalWeightG += ((int)($p->weight_gram ?? 0)) * (int)$it->quantity;
+            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+            $total = $subtotal;
+
+            $this->setAmountForCheckout(false, $items); // Kirim item terpilih
+
+            // ⬅️ total berat untuk selected items
+            $totalWeightG = 0;
+            foreach ($items as $it) {
+                $p = Product::find($it->product_id);
+                $totalWeightG += ((int)($p->weight_gram ?? 0)) * (int)$it->quantity;
+            }
+            $totalWeightG = $this->safeGram($totalWeightG);
+
+            return view('checkout', compact('address', 'items', 'subtotal', 'total', 'totalWeightG')); // ⬅️
         }
-        $totalWeightG = $this->safeGram($totalWeightG);
+        // Skenario 3: Semua isi keranjang
+        else {
+            $items = CartItem::where('user_id', $user->id)->get();
+            if ($items->isEmpty()) {
+                return redirect()->route('cart.index')->with('info', 'Keranjang Anda kosong.');
+            }
 
-        return view('checkout', compact('address', 'items', 'subtotal', 'total', 'totalWeightG')); // ⬅️
+            $subtotal = $items->sum(fn($item) => $item->price * $item->quantity);
+
+            $this->calculateDiscount();
+
+            if (Session::has('discounts')) {
+                $subtotal = Session::get('discounts')['subtotal'];
+                $total = Session::get('discounts')['total']; // tanpa pajak
+            } else {
+                $total = $subtotal;
+            }
+
+            $this->setAmountForCheckout(false);
+
+            // ⬅️ total berat untuk semua item cart
+            $totalWeightG = 0;
+            foreach ($items as $it) {
+                $p = Product::find($it->product_id);
+                $totalWeightG += ((int)($p->weight_gram ?? 0)) * (int)$it->quantity;
+            }
+            $totalWeightG = $this->safeGram($totalWeightG);
+
+            return view('checkout', compact('address', 'items', 'subtotal', 'total', 'totalWeightG')); // ⬅️
+        }
     }
-}
 
     /**
      * [MODIFIKASI] Menyimpan pesanan ke database.
@@ -391,7 +392,7 @@ class CartController extends Controller
             $address->type = $request->type;
             $address->isdefault = 1;
             $shippingCost = (int) $request->input('shipping_cost', 0);
-            $productsSubtotal = (int) $request->input('products_subtotal', 0); 
+            $productsSubtotal = (int) $request->input('products_subtotal', 0);
             $grandTotal = $productsSubtotal + $shippingCost;
             $address->save();
         }
@@ -420,6 +421,9 @@ class CartController extends Controller
             $order->zip = $address->zip;
             $order->country = $address->country;
             $order->status = 'ordered';
+            $order->mode_pengiriman = $request->input('shipping_courier');  // Ambil data kurir (jne, jnt, dll)
+            $order->jenis_pengiriman = $request->input('shipping_service'); // Ambil data layanan (REG, OKE, dll)
+            $order->ongkir = $shippingCost;
             $order->save();
 
             // Logika untuk memproses OrderItems (tetap sama)

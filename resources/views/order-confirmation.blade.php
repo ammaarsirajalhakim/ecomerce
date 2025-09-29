@@ -76,7 +76,6 @@
                                 <span
                                     style="color: green; font-weight: bold;">{{ $transactionDetails['status_message'] }}</span>
                             </div>
-                        </div>
                     @endif
 
                     <div class="checkout__totals-wrapper">
@@ -115,7 +114,7 @@
                                     </tr>
                                     <tr>
                                         <td>Pengiriman</td>
-                                        <td class="text-right">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}
+                                        <td class="text-right">Rp {{ number_format($order->ongkir, 0, ',', '.') }}
                                         </td>
                                     </tr>
 
