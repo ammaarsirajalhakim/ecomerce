@@ -71,6 +71,15 @@
         .slideshow .slideshow-character__img {
             max-height: 50vh;
         }
+        .slideshow .container {
+        padding: 0 15px;
+    }
+    .slideshow .row {
+        margin: 0;
+    }
+    .slideshow .col-12 {
+        padding: 0;
+    }
     }
 
     .category-carousel .swiper-slide img {
@@ -106,35 +115,36 @@
                     <div class="swiper-slide">
                         <div class="container">
                             <div class="row align-items-center">
-                                <div class="col-6 col-md-6 text-center">
-                                    <img loading="lazy" src="{{ asset('uploads/slides') }}/{{ $slide->image }}"
-                                        alt="{{ $slide->image }}"
-                                        class="img-fluid slideshow-character__img animate animate_fade animate_btt animate_delay-9" />
-                                    <div class="character_markup type2 mt-2 d-none d-md-block">
-                                        <p
-                                            class="text-uppercase font-sofia mark-grey-color animate animate_fade animate_btt animate_delay-10 mb-0">
-                                            {{ $slide->tagline }}
-                                        </p>
-                                    </div>
-                                </div>
+    <div class="col-12 col-md-6 text-center mb-4 mb-md-0">
+        <img loading="lazy" src="{{ asset('uploads/slides') }}/{{ $slide->image }}"
+            alt="{{ $slide->image }}"
+            class="img-fluid slideshow-character__img animate animate_fade animate_btt animate_delay-9" />
+        <div class="character_markup type2 mt-2 d-none d-md-block">
+            <p
+                class="text-uppercase font-sofia mark-grey-color animate animate_fade animate_btt animate_delay-10 mb-0">
+                {{ $slide->tagline }}
+            </p>
+        </div>
+    </div>
 
-                                <div class="col-6 col-md-6 slideshow-text text-start">
-                                    <h6
-                                        class="text_dash text-uppercase fw-medium animate animate_fade animate_btt animate_delay-3 mb-2">
-                                        Produk Unggulan
-                                    </h6>
-                                    <h2 class="fw-normal animate animate_fade animate_btt animate_delay-5 mb-1">
-                                        {{ $slide->title }}
-                                    </h2>
-                                    <h2 class="fw-bold animate animate_fade animate_btt animate_delay-5 mb-3">
-                                        {{ $slide->subtitle }}
-                                    </h2>
-                                    <a href="{{ $slide->link }}"
-                                        class="btn btn-primary px-3 py-2 animate animate_fade animate_btt animate_delay-7">
-                                        Belanja Sekarang
-                                    </a>
-                                </div>
-                            </div>
+    <div class="col-12 col-md-6 slideshow-text text-start">
+        <h6
+            class="text_dash text-uppercase fw-medium animate animate_fade animate_btt animate_delay-3 mb-2">
+            Produk Unggulan
+        </h6>
+        <h2 class="fw-normal animate animate_fade animate_btt animate_delay-5 mb-1">
+            {{ $slide->title }}
+        </h2>
+        <h2 class="fw-bold animate animate_fade animate_btt animate_delay-5 mb-3">
+            {{ $slide->subtitle }}
+        </h2>
+        <a href="{{ $slide->link }}"
+            class="btn btn-primary px-3 py-2 animate animate_fade animate_btt animate_delay-7">
+            Belanja Sekarang
+        </a>
+    </div>
+</div>
+
                         </div>
                     </div>
                 @endforeach

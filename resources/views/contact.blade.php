@@ -192,12 +192,6 @@
         <section class="search-banner">
             <div class="container">
                 <h2>Hai, ada yang bisa kami bantu?</h2>
-                <div class="search-box">
-                    <form action="#" method="GET">
-                        <input type="text" name="search" placeholder="Cari jawaban atau topik bantuan...">
-                        <button type="submit"><i class="fas fa-search"></i></button>
-                    </form>
-                </div>
             </div>
         </section>
 
