@@ -550,51 +550,52 @@ class CartController extends Controller
     }
 
     public function cancelPendingOrder(Request $request)
-    {
-        $orderId = $request->input('order_id');
-        if (!$orderId) {
-            return response()->json(['status' => 'error', 'message' => 'Order ID tidak ada.'], 400);
-        }
+{
+    $orderId = $request->input('order_id');
+    if (!$orderId) {
+        return response()->json(['status' => 'error', 'message' => 'Order ID tidak ada.'], 400);
+    }
 
-        $userId = Auth::id();
-        $order = Order::where('id', $orderId)
-            ->where('user_id', $userId)
-            ->where('status', 'ordered') // Pastikan statusnya masih awal
-            ->first();
+    $userId = Auth::id();
+    $order = Order::where('id', $orderId)
+        ->where('user_id', $userId)
+        ->where('status', 'ordered') // Pastikan statusnya masih awal
+        ->first();
 
-        if ($order) {
-            // Cek status transaksi, hanya batalkan jika masih 'pending'
-            $transaction = $order->transaction;
-            if ($transaction && $transaction->status === 'pending') {
-                DB::beginTransaction();
-                try {
-                    // 1. Kembalikan stok produk
-                    foreach ($order->orderItems as $item) {
-                        $product = Product::find($item->product_id);
-                        if ($product) {
-                            $product->quantity += $item->quantity;
-                            $product->save();
-                        }
+    if ($order) {
+        // Cek status transaksi, hanya batalkan jika masih 'pending'
+        $transaction = $order->transaction;
+        if ($transaction && $transaction->status === 'pending') {
+            DB::beginTransaction();
+            try {
+                // <-- KODE ANDA DIMASUKKAN DI SINI
+                // 1. Kembalikan stok produk
+                foreach ($order->orderItems as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->quantity += $item->quantity; // <- Stok dikembalikan
+                        $product->save();
                     }
-
-                    // 2. Hapus order (order items dan transaction akan terhapus otomatis jika ada cascade delete)
-                    // Jika tidak ada cascade, hapus manual:
-                    $order->orderItems()->delete();
-                    $order->transaction()->delete();
-                    $order->delete();
-
-                    DB::commit();
-
-                    return response()->json(['status' => 'success', 'message' => 'Pesanan berhasil dibatalkan.']);
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    return response()->json(['status' => 'error', 'message' => 'Gagal membatalkan pesanan: ' . $e->getMessage()], 500);
                 }
+
+                // 2. Hapus order (order items dan transaction akan terhapus otomatis jika ada cascade delete)
+                // Jika tidak ada cascade, hapus manual:
+                $order->orderItems()->delete();
+                $order->transaction()->delete();
+                $order->delete();
+
+                DB::commit();
+
+                return response()->json(['status' => 'success', 'message' => 'Pesanan berhasil dibatalkan.']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Gagal membatalkan pesanan: ' . $e->getMessage()], 500);
             }
         }
-
-        return response()->json(['status' => 'error', 'message' => 'Pesanan tidak ditemukan atau sudah diproses.'], 404);
     }
+
+    return response()->json(['status' => 'error', 'message' => 'Pesanan tidak ditemukan atau sudah diproses.'], 404);
+}
 
     /**
      * [MODIFIKASI] Mengatur jumlah total untuk checkout.

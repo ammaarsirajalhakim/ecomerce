@@ -416,7 +416,19 @@
                   cancelOrder(pendingOrderId);
                 }
                 payButton.prop('disabled', false).text('Buat Pesanan');
-              }
+              },
+              onClose: function() {
+    // [MODIFIKASI] Panggil fungsi pembatalan jika popup ditutup
+    // Hanya panggil jika pembayaran tidak sukses/pending
+    if (pendingOrderId) { // `pendingOrderId` didapat setelah order berhasil dibuat di server
+        console.log(
+            'Popup ditutup, membatalkan pesanan...'
+            );
+        cancelOrder(pendingOrderId); // <- Memanggil fungsi pembatalan
+    }
+    payButton.prop('disabled', false);
+    payButton.html('BUAT PESANAN');
+}
             });
           },
           error: function(xhr) {

@@ -56,7 +56,7 @@ Route::put('/cart/increase-quantity/{id}', [CartController::class, 'increase_car
 Route::put('/cart/decrease-quantity/{id}', [CartController::class, 'decrease_cart_quantity'])->name('cart.qty.decrease');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove_item'])->name('cart.item.remove');
 Route::delete('/cart/clear', [CartController::class, 'empty_cart'])->name('cart.empty');
-
+Route::post('/checkout/cancel-order', [App\Http\Controllers\CartController::class, 'cancelPendingOrder'])->name('cart.order.cancel')->middleware('auth');
 // --- RUTE BARU DITAMBAHKAN DI SINI ---
 Route::post('/buy-now', [CartController::class, 'buyNow'])->name('buy.now');
 // ------------------------------------
