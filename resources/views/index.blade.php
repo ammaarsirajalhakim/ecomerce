@@ -373,41 +373,49 @@
     <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
     <section class="products-grid container">
-        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Produk Unggulan</h2>
-        <div class="row">
-            @foreach ($fproducts as $fproduct)
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
-                        <div class="pc__img-wrapper">
+    <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Produk Unggulan</h2>
+    <div class="row">
+        @foreach ($fproducts as $fproduct)
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
+                    <div class="pc__img-wrapper">
+                        <a href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">
+                            <img loading="lazy" src="{{ asset('uploads/products') }}/{{ $fproduct->image }}"
+                                width="330" height="400" alt="{{ $fproduct->name }}" class="pc__img">
+                        </a>
+                    </div>
+                    <div class="pc__info position-relative">
+                        <h6 class="pc__title">
                             <a href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">
-                                <img loading="lazy" src="{{ asset('uploads/products') }}/{{ $fproduct->image }}"
-                                    width="330" height="400" alt="{{ $fproduct->name }}" class="pc__img">
+                                {{ $fproduct->name }}
                             </a>
-                        </div>
-                        <div class="pc__info position-relative">
-                            <h6 class="pc__title"><a
-                                    href="{{ route('shop.product.details', ['product_slug' => $fproduct->slug]) }}">{{ $fproduct->name }}</a>
-                            </h6>
-                            <div class="product-card__price d-flex flex-column align-items-start">
-                                @if ($fproduct->sale_price)
-                                    <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
-                                        Rp. {{ number_format($fproduct->sale_price, 0, ',', '.') }}
-                                    </span>
-                                    <span class="money price text-muted" style="text-decoration: line-through; font-size: 0.9rem;">
-                                        Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
-                                    </span>
-                                @else
-                                    <span class="money price text-secondary" style="font-size: 1rem; color: #ff0000; font-weight: bold;">
-                                        Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
-                                    </span>
-                                @endif
-                            </div>
+                        </h6>
+                        <div class="product-card__price d-flex flex-column align-items-start">
+                            @if ($fproduct->sale_price > 0 && $fproduct->sale_price < $fproduct->regular_price)
+                                {{-- Harga Diskon --}}
+                                <span class="money price text-secondary" 
+                                      style="font-size: 1rem; color: #ff0000; font-weight: bold;">
+                                    Rp. {{ number_format($fproduct->sale_price, 0, ',', '.') }}
+                                </span>
+                                <span class="money price text-muted" 
+                                      style="text-decoration: line-through; font-size: 0.9rem;">
+                                    Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
+                                </span>
+                            @else
+                                {{-- Hanya Harga Normal --}}
+                                <span class="money price text-secondary" 
+                                      style="font-size: 1rem; color: #ff0000; font-weight: bold;">
+                                    Rp. {{ number_format($fproduct->regular_price, 0, ',', '.') }}
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
-            @endforeach
-        </div>
-    </section>
+            </div>
+        @endforeach
+    </div>
+</section>
+
 
     </div>
 </main>
