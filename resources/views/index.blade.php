@@ -352,12 +352,13 @@
                             @style(['background-color: #f2f2f2'=> $isPng]) />
 
                         <div class="category-banner__item-mark">
-                            @if ($lowestSaleProduct)
-                                Mulai Dari Rp. {{ number_format($lowestSaleProduct->sale_price, 2) }}
-                            @else
-                                Check the deals
-                            @endif
-                        </div>
+    @if ($lowestSaleProduct && $lowestSaleProduct->sale_price > 0)
+        Mulai Dari Rp. {{ number_format($lowestSaleProduct->sale_price, 0, ',', '.') }}
+    @else
+        Lihat Penawaran
+    @endif
+</div>
+
 
                         <div class="category-banner__item-content">
                             <h3 class="mb-0">{{ $category->name }}</h3>
