@@ -403,8 +403,9 @@
                 sendPaymentResult(result);
               },
               onPending: function(result) {
-                pendingOrderId = null;
-                sendPaymentResult(result);
+                alert("Pembayaran Gagal!");
+                cancelOrder(pendingOrderId);
+                payButton.prop('disabled', false).text('Buat Pesanan');
               },
               onError: function() {
                 alert("Pembayaran Gagal!");
