@@ -13,10 +13,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\WhatsappSettingController; 
+use App\Http\Controllers\WhatsappSettingController;
 use App\Http\Controllers\RajaOngkirController;
+use App\Http\Controllers\CouponController;
 
 // routes/web.php
+Route::post('/apply-coupon', [CartController::class, 'apply_coupon_code'])
+    ->name('cart.apply_coupon_code');
+Route::get('/kupon', [CouponController::class, 'publicIndex'])->name('home.kupon');
+
 Route::post('/shipping/cost', [\App\Http\Controllers\CartController::class, 'calculateShipping'])
     ->name('shipping.cost');
 
@@ -26,7 +31,6 @@ Route::prefix('ro')->name('ro.')->group(function () {
     Route::get('/districts/{cityId}', [RajaOngkirController::class, 'getDistricts'])->name('districts');
     Route::post('/check-ongkir', [RajaOngkirController::class, 'checkOngkir'])->name('check');
     Route::post('/ro/check-ongkir', [\App\Http\Controllers\RajaOngkirController::class, 'checkOngkir'])->name('ro.check');
-
 });
 
 
@@ -171,7 +175,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
 
     Route::get('/admin/about/edit', [AdminController::class, 'about_edit'])->name('admin.about.edit');
     Route::put('/admin/about/update', [AdminController::class, 'about_update'])->name('admin.about.update');
-    
+
     // --- RUTE PENGATURAN WHATSAPP ---
     Route::get('/admin/whatsapp-settings', [WhatsappSettingController::class, 'edit'])->name('admin.whatsapp.edit');
     Route::put('/admin/whatsapp-settings', [WhatsappSettingController::class, 'update'])->name('admin.whatsapp.update');
@@ -190,4 +194,3 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     // Anda bisa menambahkan route lain yang berhubungan dengan user di sini
     // seperti route untuk alamat, pesanan, dll.
 });
-
