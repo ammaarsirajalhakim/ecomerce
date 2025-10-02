@@ -8,7 +8,7 @@
     {{-- ===== Header ===== --}}
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
       <div>
-        <h1 class="mb-1">Kupon Belanja</h1>
+        <h2 class="mb-1">Kupon Belanja</h2>
         <div class="text-muted">Gunakan kode kupon untuk mendapatkan diskon saat checkout.</div>
       </div>
     </div>

@@ -12,6 +12,46 @@
       </div>
     </header>
 
+    {{-- ========= KALKULASI TERPUSAT UNTUK KUPON ========= --}}
+    @php
+      // Total dari server (sebelum ongkir)
+      $serverTotal = isset($total) ? (int)$total : 0;
+
+      if (Session::has('discounts')) {
+          // Controller sudah menaruh subtotal (SETELAH diskon) dan discount
+          $rawSubtotal = (int)(Session::get('discounts')['subtotal'] ?? $serverTotal);
+          $discount    = (int)(Session::get('discounts')['discount']  ?? 0);
+      } else {
+          // Fallback bila hanya session 'coupon' yg ada
+          $rawSubtotal = $serverTotal;
+          $discount = 0;
+
+          if (Session::has('coupon')) {
+              $c    = Session::get('coupon');
+              $type = $c['type'] ?? $c['kind'] ?? $c['mode'] ?? null;     // 'percent' | 'fixed'
+              $val  = $c['value'] ?? $c['amount'] ?? $c['discount'] ?? 0; // angka kupon
+              $pct  = $c['percent'] ?? $c['percentage'] ?? null;
+
+              if (in_array($type, ['percent','percentage','%'], true)) {
+                  $rate = is_numeric($pct) ? (float)$pct : (float)$val;
+                  $discount = (int) floor($rawSubtotal * max(0, $rate) / 100);
+              } elseif ($type === 'fixed' || $type === 'amount') {
+                  $discount = (int) $val;
+              } else {
+                  $num = (float)$val;
+                  $discount = ($num > 0 && $num <= 100)
+                      ? (int) floor($rawSubtotal * $num / 100)
+                      : (int) $num;
+              }
+          }
+      }
+
+      // Guard
+      $discount = max(0, min($discount, $rawSubtotal));
+      $totalAfterDiscount = max(0, $rawSubtotal - $discount);
+    @endphp
+    {{-- ========= /KALKULASI ========= --}}
+
     <form id="checkout-form" name="checkout-form" action="{{ route('cart.place.an.order') }}" method="POST" class="ck-form">
       @csrf
 
@@ -78,7 +118,7 @@
             <div class="card-header ck-card__header">
               <h5 class="mb-0 d-flex align-items-center gap-2">
                 <span class="ck-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 8h-3V4H3v13h2a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h2v-5l-3-4zM7 19a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 .001-2.001A1 1 0 0 1 17 19zm3-4h-1.17a3.001 3.001 0 0 0-5.66 0H11a3.001 3.001 0 0 0-5.66 0H5V6h10v4h4l1 1.333V15z" fill="currentColor"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 8h-3V4H3v13h2a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h2v-5l-3-4zM7 19a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 0 .001-2.001A1 1 0 0 1 17 19zm3-4h-1.17a3.001 3.001 0 0 0-5.66 0H11a3.001 3.001 0 0 0-5.66 0H5V6h10v4h4l1 1.333V15z" fill="currentColor"/></svg>
                 </span>
                 Ekspedisi & Ongkos Kirim
               </h5>
@@ -91,9 +131,9 @@
               <input type="hidden" name="shipping_cost" id="shipping_cost" value="0">
               <input type="hidden" name="shipping_etd" id="shipping_etd">
 
-              {{-- Simpan total barang (sudah termasuk diskon) untuk kalkulasi client-side --}}
+              {{-- Total barang SETELAH diskon untuk kalkulasi client-side --}}
               <input type="hidden" id="base_total_without_shipping"
-                value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
+                     value="@if(Session::has('discounts')){{ Session::get('discounts')['subtotal'] }}@else{{ $total }}@endif">
 
               <div class="mb-3">
                 <div class="ck-courier d-flex flex-wrap gap-2">
@@ -163,30 +203,67 @@
 
                 <hr class="ck-sep">
 
+                {{-- INPUT KUPON --}}
+                @if (!Session::has('coupon'))
+                  <div class="position-relative bg-body">
+                    <input class="form-control" type="text" name="coupon_code" id="coupon_code"
+                           placeholder="Kode Kupon" value="" form="coupon-apply-form">
+                    <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4"
+                           type="submit" id="apply-voucher-btn" value="GUNAKAN KUPON"
+                           form="coupon-apply-form" disabled>
+                  </div>
+                @else
+                  <div class="position-relative bg-body">
+                    <input class="form-control" type="text" name="coupon_code" placeholder="Coupon Code"
+                           value="@if (Session::has('coupon')) {{ Session::get('coupon')['code'] }} Digunakan! @endif" readonly
+                           form="coupon-remove-form">
+                    <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4"
+                           type="submit" value="HAPUS KUPON" form="coupon-remove-form">
+                  </div>
+                @endif
+                {{-- /INPUT KUPON --}}
+
+                <div class="mt-2">
+                  @if (Session::has('success'))
+                    <p class="text-success">{{ Session::get('success') }}</p>
+                  @elseif(Session::has('error'))
+                    <p class="text-danger">{{ Session::get('error') }}</p>
+                  @endif
+                </div>
+
                 <div class="table-responsive">
                   <table class="table ck-table-totals mb-0">
                     <tbody>
                       @if (Session::has('discounts'))
+                        {{-- Subtotal (sebelum diskon) --}}
                         <tr>
                           <th class="border-0">Subtotal</th>
                           <td class="border-0 text-end" id="subtotal_products_text">
-                            Rp. {{ number_format(Session::get('discounts')['subtotal'], 0, ',', '.') }}
+                            Rp. {{ number_format($subtotal, 0, ',', '.') }}
                           </td>
                         </tr>
+                        {{-- Diskon --}}
                         <tr>
-                          <th class="border-0">Diskon ({{ Session::get('coupon')['code'] }})</th>
-                          <td class="border-0 text-end">- Rp. {{ number_format(Session::get('discounts')['discount'], 0, ',', '.') }}</td>
+                          @php $couponCode = data_get(Session::get('coupon'), 'code', 'Kupon'); @endphp
+<th class="border-0">Diskon ({{ $couponCode }})</th>
+
+                          <td class="border-0 text-end">
+                            - Rp. {{ number_format(Session::get('discounts')['discount'], 0, ',', '.') }}
+                          </td>
                         </tr>
+                        {{-- Total barang (setelah diskon) --}}
                         <tr>
                           <th class="border-0">Total Barang</th>
                           <td class="border-0 text-end" id="total_products_text">
-                            Rp. {{ number_format(Session::get('discounts')['subtotal'] - Session::get('discounts')['discount'], 0, ',', '.') }}
+                            Rp. {{ number_format(Session::get('discounts')['subtotal'], 0, ',', '.') }}
                           </td>
                         </tr>
                       @else
                         <tr>
                           <th class="border-0">Total Barang</th>
-                          <td class="border-0 text-end" id="total_products_text">Rp. {{ number_format($total, 0, ',', '.') }}</td>
+                          <td class="border-0 text-end" id="total_products_text">
+                            Rp. {{ number_format($total, 0, ',', '.') }}
+                          </td>
                         </tr>
                       @endif
 
@@ -199,11 +276,8 @@
                       <tr class="fw-semibold ck-total-row">
                         <th class="border-0">Total Bayar</th>
                         <td class="border-0 text-end" id="grand_total_text">
-                          @if (Session::has('discounts'))
-                            Rp. {{ number_format(Session::get('discounts')['subtotal'] - Session::get('discounts')['discount'], 0, ',', '.') }}
-                          @else
-                            Rp. {{ number_format($total, 0, ',', '.') }}
-                          @endif
+                          {{-- default: total setelah diskon, ongkir 0 --}}
+                          Rp. {{ number_format($totalAfterDiscount, 0, ',', '.') }}
                         </td>
                       </tr>
                     </tbody>
@@ -212,9 +286,9 @@
 
                 {{-- Hidden untuk server --}}
                 <input type="hidden" name="products_total_without_shipping" id="products_total_without_shipping_hidden"
-                  value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
+                       value="@if(Session::has('discounts')){{ Session::get('discounts')['subtotal'] }}@else{{ $total }}@endif">
                 <input type="hidden" name="grand_total_client" id="grand_total_client_hidden"
-                  value="@if(Session::has('discounts')){{ (Session::get('discounts')['subtotal'] - Session::get('discounts')['discount']) }}@else{{ $total }}@endif">
+                       value="@if(Session::has('discounts')){{ Session::get('discounts')['subtotal'] }}@else{{ $total }}@endif">
               </div>
             </div>
 
@@ -247,7 +321,7 @@
                 </div>
                 @error('mode')<div class="text-danger mt-2">{{ $message }}</div>@enderror
 
-                {{-- NOTE: tetap gunakan id asli "place-order-btn" agar fungsionalitas tidak berubah --}}
+                {{-- gunakan id "place-order-btn" --}}
                 <button type="submit" id="place-order-btn" class="btn btn-primary w-100 mt-3" disabled>
                   Buat Pesanan
                 </button>
@@ -258,6 +332,19 @@
         </div>
       </div> {{-- /row --}}
     </form>
+
+    {{-- ====== Form asli untuk kupon (di luar #checkout-form supaya tidak nested) ====== --}}
+    @if (!Session::has('coupon'))
+      <form id="coupon-apply-form" action="{{ route('cart.coupon.apply') }}" method="POST" class="d-none">
+        @csrf
+      </form>
+    @else
+      <form id="coupon-remove-form" action="{{ route('cart.coupon.remove') }}" method="POST" class="d-none">
+        @csrf
+        @method('DELETE')
+      </form>
+    @endif
+
   </section>
 </main>
 
@@ -275,96 +362,58 @@
   .top-lg-20 { top: 20px; }
   @media (min-width: 992px) { .position-lg-sticky { position: sticky; } }
 
-  /* Header */
   .ck-title{ font-weight:800; letter-spacing:.2px; }
   .ck-subtitle{ color:#666; }
-  .ck-steps{ list-style:none; display:flex; gap:.5rem; padding:0; }
-  .ck-step{
-    font-size:.85rem; padding:.35rem .65rem; border-radius:20px; border:1px solid var(--ck-border);
-    color:#666; background:#fff;
-  }
-  .ck-step.is-active{ border-color:var(--ck-primary); color:var(--ck-primary); font-weight:600; }
-  .ck-step.is-done{ background:var(--ck-bg-soft); color:#444; }
 
-  /* Cards */
   .ck-card{ border:1px solid var(--ck-border); border-radius:var(--ck-radius); overflow:hidden; }
-  .ck-card__header{
-    background:#fff; border-bottom:1px solid var(--ck-border); padding:1rem 1.25rem;
-  }
+  .ck-card__header{ background:#fff; border-bottom:1px solid var(--ck-border); padding:1rem 1.25rem; }
   .ck-card .card-body{ padding:1.25rem; }
   .ck-icon{ display:inline-flex; align-items:center; justify-content:center; color:var(--ck-primary); }
 
-  /* Address */
   .ck-badge{
     background:rgba(13,110,253,.08); color:#0b5ed7; border:1px solid rgba(13,110,253,.2);
     padding:.3rem .55rem; border-radius:999px;
   }
-  .ck-address{
-    border:1px dashed var(--ck-border-strong);
-    background:linear-gradient(180deg,#fff, #fff), radial-gradient(1200px 1200px at 0% 0%, rgba(13,110,253,.05), transparent);
-    border-radius:12px; padding:1rem;
-  }
+  .ck-address{ border:1px dashed var(--ck-border-strong); background:#fff; border-radius:12px; padding:1rem; }
   .ck-address--empty{ background:#f9fbff; }
   .ck-address__content{ display:grid; grid-template-columns: 1fr 2fr; gap:1rem; }
   .ck-address__icon{ color:var(--ck-primary); }
   @media (max-width: 576px){ .ck-address__content{ grid-template-columns:1fr; } }
 
-  /* Courier selector as pills */
   .ck-pill{
     display:inline-flex; align-items:center; gap:.5rem; padding:.5rem .85rem; border-radius:999px;
     border:1px solid var(--ck-border); cursor:pointer; user-select:none; background:#fff;
     transition: all .15s ease;
   }
   .ck-pill:hover{ border-color:var(--ck-border-strong); background:#fafafa; }
-  .ck-pill input:checked + span,
-  .ck-pill input:checked ~ span{
-    font-weight:600;
-  }
-  .ck-pill input:checked ~ span::after{
-    content:""; display:inline-block; width:.5rem; height:.5rem; margin-left:.4rem; border-radius:50%;
-    background:var(--ck-primary);
-  }
+  .ck-pill input:checked ~ span{ font-weight:600; }
+  .ck-pill input:checked ~ span::after{ content:""; display:inline-block; width:.5rem; height:.5rem; margin-left:.4rem; border-radius:50%; background:var(--ck-primary); }
 
-  /* Shipping options */
-  #shippingOptions .custom-control{
-    border:1px solid var(--ck-border); border-radius:12px;
-    padding:.85rem .85rem .85rem 2.25rem; transition:.15s ease; background:#fff;
-  }
+  #shippingOptions .custom-control{ border:1px solid var(--ck-border); border-radius:12px; padding:.85rem .85rem .85rem 2.25rem; background:#fff; }
   #shippingOptions .custom-control:hover{ background:#fafafa; border-color:var(--ck-border-strong); }
   .ck-ship-options{ display:grid; gap:.6rem; }
 
-  /* Items table */
   .ck-table-items th, .ck-table-items td{ background:transparent !important; }
   .ck-sep{ border-color:var(--ck-border); opacity:1; }
 
-  /* Totals */
   .ck-table-totals th{ width:55%; }
-  .ck-total-row td, .ck-total-row th{
-    border-top:1px dashed var(--ck-border-strong) !important;
-    font-size:1.05rem;
-  }
+  .ck-total-row td, .ck-total-row th{ border-top:1px dashed var(--ck-border-strong) !important; font-size:1.05rem; }
 
-  /* Payment radios */
   .ck-radio{ position:relative; display:flex; align-items:center; gap:.75rem; cursor:pointer; }
   .ck-radio input{ position:absolute; opacity:0; }
   .ck-radio__box{
-    width:22px; height:22px; border:2px solid var(--ck-border-strong); border-radius:50%; display:inline-block;
-    transition:.15s ease; background:#fff;
+    width:22px; height:22px; border:2px solid var(--ck-border-strong); border-radius:50%;
+    display:inline-block; transition:.15s ease; background:#fff;
   }
-  .ck-radio input:checked + .ck-radio__box{
-    border-color:var(--ck-primary); box-shadow:inset 0 0 0 6px var(--ck-primary);
-  }
+  .ck-radio input:checked + .ck-radio__box{ border-color:var(--ck-primary); box-shadow:inset 0 0 0 6px var(--ck-primary); }
   .ck-radio__label{ font-weight:600; }
 
-  /* Buttons */
   .btn-primary{ border-radius:12px; padding:.7rem 1rem; font-weight:600; }
-
-  /* Minor utilities */
   .ck-policy{ line-height:1.6; }
 </style>
 @endpush
 
-{{-- ====== SCRIPT YANG SUDAH ADA (TETAP) ====== --}}
+{{-- ====== SCRIPT ====== --}}
 @push('scripts')
 {{-- Midtrans Snap --}}
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
@@ -374,8 +423,15 @@
   $(document).ready(function() {
     let pendingOrderId = null;
 
+    // Tombol voucher aktif saat ada input
+    const couponInput = $('#coupon_code');
+    const applyBtn = $('#apply-voucher-btn');
+    couponInput.on('input', function() {
+      applyBtn.prop('disabled', $(this).val().trim() === '');
+    });
+
     $('#checkout-form').on('submit', function(event) {
-      var payButton = $('#pay-button'); // (tetap sesuai kode asal)
+      var payButton = $('#place-order-btn');
       var selectedPaymentMethod = $('input[name="mode"]:checked').val();
 
       if (selectedPaymentMethod === 'transfer') {
@@ -416,20 +472,8 @@
                 if (pendingOrderId) {
                   cancelOrder(pendingOrderId);
                 }
-                payButton.prop('disabled', false).text('Buat Pesanan');
-              },
-              onClose: function() {
-    // [MODIFIKASI] Panggil fungsi pembatalan jika popup ditutup
-    // Hanya panggil jika pembayaran tidak sukses/pending
-    if (pendingOrderId) { // `pendingOrderId` didapat setelah order berhasil dibuat di server
-        console.log(
-            'Popup ditutup, membatalkan pesanan...'
-            );
-        cancelOrder(pendingOrderId); // <- Memanggil fungsi pembatalan
-    }
-    payButton.prop('disabled', false);
-    payButton.html('BUAT PESANAN');
-}
+                payButton.prop('disabled', false).html('Buat Pesanan');
+              }
             });
           },
           error: function(xhr) {
@@ -470,10 +514,8 @@
           _token: "{{ csrf_token() }}",
           order_id: orderId
         },
-        success: function() { /* no-op UI */ },
-        error: function(xhr) {
-          console.error(xhr.responseText);
-        }
+        success: function() {},
+        error: function(xhr) { console.error(xhr.responseText); }
       });
     }
   });
@@ -498,7 +540,6 @@
     const hidCost = document.getElementById('shipping_cost');
     const hidEtd = document.getElementById('shipping_etd');
 
-    // label ringkasan
     const lblShip = document.getElementById('shipping_cost_text');
     const lblGrand = document.getElementById('grand_total_text');
 
@@ -507,7 +548,6 @@
     const hiddenGrandClient = document.getElementById('grand_total_client_hidden');
     const placeBtn = document.getElementById('place-order-btn');
 
-    // helper rupiah
     function rupiah(n) {
       return new Intl.NumberFormat('id-ID', {
         style: 'currency',
