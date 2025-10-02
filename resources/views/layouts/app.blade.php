@@ -388,6 +388,9 @@
                             <a href="{{ route('cart.index') }}" class="navigation__link">Keranjang</a>
                         </li>
                         <li class="navigation__item">
+                            <a href="{{ route('home.kupon') }}" class="navigation__link">Kupon</a>
+                        </li>
+                        <li class="navigation__item">
                             <a href="{{ route('home.about') }}" class="navigation__link">Tentang Kami</a>
                         </li>
                         <li class="navigation__item">
@@ -560,6 +563,9 @@
                             </li>
                             <li class="navigation__item">
                                 <a href="{{ route('cart.index') }}" class="navigation__link">Keranjang</a>
+                            </li>
+                            <li class="navigation__item">
+                                <a href="{{ route('home.kupon') }}" class="navigation__link">Kupon</a>
                             </li>
                             <li class="navigation__item">
                                 <a href="{{ route('home.about') }}" class="navigation__link">Tentang Kami</a>
