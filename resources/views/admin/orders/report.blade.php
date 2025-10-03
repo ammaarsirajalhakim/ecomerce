@@ -1,8 +1,18 @@
 @extends('layouts.admin')
 
 @section('content')
-{{-- CSS Khusus untuk membuat tabel dan tombol lebih bagus --}}
+{{-- CSS Khusus untuk membuat halaman lebih responsif dan mudah dibaca --}}
 <style>
+    /* BARU: Styling Judul */
+    .box-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+    }
+    .box-subtitle {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
     /* Styling Tabel */
     .report-table th {
         background-color: #f8f9fa;
@@ -10,12 +20,13 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         vertical-align: middle;
-        text-align: center; /* BARU: Membuat semua judul tabel ke tengah */
+        text-align: center;
     }
     .report-table td, .report-table th {
-        padding: 1rem 0.75rem;
-        font-size: 1rem;
+        padding: 1.1rem 0.85rem;
+        font-size: 1.1rem;
         vertical-align: middle;
+        white-space: nowrap; /* Mencegah teks di tabel turun baris */
     }
     .report-table tbody tr:hover {
         filter: brightness(95%);
@@ -24,10 +35,10 @@
     .sold-column { width: 180px; text-align: center; }
     .sku-column { width: 150px; }
 
-    /* CSS BARU UNTUK TOMBOL UNDUH */
+    /* CSS UNTUK TOMBOL UNDUH */
     .btn-download {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.95rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
         font-weight: 600;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -43,15 +54,22 @@
     .btn-download .icon-file-text {
         font-size: 1.1rem;
     }
+
+    /* 👇👇👇 CSS BARU UNTUK MEMPERBAIKI TABEL RESPONSIVE 👇👇👇 */
+    /* Aturan ini hanya berlaku untuk layar dengan lebar 767px atau kurang */
+    @media (max-width: 767px) {
+        .report-table {
+            min-width: 750px; /* Atur lebar minimal tabel agar bisa di-scroll */
+        }
+    }
 </style>
 
 <div class="main-content-inner">
     <div class="row">
         <div class="col-12">
             <div class="box">
-                {{-- BARU: Menambahkan padding-bottom (pb-4) untuk memberi jarak ke bawah --}}
-                <div class="box-header pb-4">
-                    <div class="flex-grow-1">
+                <div class="box-header pb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                    <div class="flex-grow-1 mb-3 mb-md-0">
                         <h4 class="box-title">Laporan Produk Terlaris</h4>
                         <p class="box-subtitle">Menampilkan semua produk, diurutkan dari yang paling laris hingga yang belum pernah terjual.</p>
                     </div>
@@ -81,11 +99,10 @@
                             <tbody>
                                 @forelse ($bestSellingProducts as $product)
                                     @php
-                                        // Logika untuk menentukan warna baris
                                         $rowClass = '';
-                                        if ($product->total_quantity_sold > 5) { // Jika terjual lebih dari 5, baris jadi hijau
+                                        if ($product->total_quantity_sold > 5) {
                                             $rowClass = 'table-success';
-                                        } elseif ($product->total_quantity_sold > 0) { // Jika terjual 1-5, baris jadi kuning
+                                        } elseif ($product->total_quantity_sold > 0) {
                                             $rowClass = 'table-warning';
                                         }
                                     @endphp
@@ -93,7 +110,6 @@
                                         <td class="rank-column">
                                             {{ $loop->iteration + ($bestSellingProducts->currentPage() - 1) * $bestSellingProducts->perPage() }}
                                         </td>
-                                        {{-- BARU: Menambahkan text-center pada kolom SKU --}}
                                         <td class="sku-column text-center">{{ $product->SKU }}</td>
                                         <td>{{ $product->name }}</td>
                                         <td class="sold-column">
