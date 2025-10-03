@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
@@ -37,18 +36,12 @@
         <div id="page" class="">
             <div class="layout-wrap">
 
-                <!-- <div id="preload" class="preload-container">
-    <div class="preloading">
-        <span></span>
-    </div>
-</div> -->
-
                 <div class="section-menu-left">
                     <div class="box-logo">
                         <a href="{{ route('home.index') }}" id="site-logo-inner">
                             <img src="{{ $about_us_data && $about_us_data->logo_image ? asset('uploads/about/' . $about_us_data->logo_image) : asset('assets/images/logo.png') }}" 
-                                 alt="Logo Usaha"
-                                 class="logo__image d-block" />
+                                alt="Logo Usaha"
+                                class="logo__image d-block" />
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -144,6 +137,12 @@
                                                 <div class="text">Daftar Pesanan</div>
                                             </a>
                                         </li>
+                                        {{-- Menu Laporan Pesanan ditambahkan di sini --}}
+                                        <li class="sub-menu-item">
+                                            <a href="{{ route('admin.orders.report') }}" class="">
+                                                <div class="text">Laporan Pesanan</div>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li class="menu-item">
@@ -170,7 +169,6 @@
                                         <div class="text">Profil Usaha</div>
                                     </a>
                                 </li>
-                                <!-- 👇👇👇 MENU BARU DITAMBAHKAN DI SINI 👇👇👇 -->
                                 <li class="menu-item">
                                     <a href="{{ route('admin.whatsapp.edit') }}" class="">
                                         <div class="icon"><i class="icon-settings"></i></div>
