@@ -43,8 +43,8 @@
 
                     <fieldset class="name">
                         <div class="body-title mb-10">Link produk <span class="tf-color-1">*</span></div>
-                        <input class="mb-10" type="text" placeholder="masukkan Link Produk" name="slug" tabindex="0"
-                            value="{{ old('slug') }}" required>
+                        <input class="mb-10" type="text" placeholder="masukkan Link Produk" name="slug"
+                            tabindex="0" value="{{ old('slug') }}" required>
                         <div class="text-tiny">Link produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('slug')
@@ -59,7 +59,9 @@
                                 <select name="category_id" required>
                                     <option value="">Pilih Kategori</option>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}"
+                                            {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -74,7 +76,9 @@
                                 <select name="brand_id" required>
                                     <option value="">Pilih Merek</option>
                                     @foreach ($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                        <option value="{{ $brand->id }}"
+                                            {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -96,8 +100,7 @@
                     <fieldset class="description">
                         <div class="body-title mb-10">Deskripsi <span class="tf-color-1">*</span>
                         </div>
-                        <textarea class="mb-10" name="description" placeholder="Deskripsi" tabindex="0"
-                            required>{{ old('description') }}</textarea>
+                        <textarea class="mb-10" name="description" placeholder="Deskripsi" tabindex="0" required>{{ old('description') }}</textarea>
                         <div class="text-tiny">Deskripsi produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('description')
@@ -148,12 +151,11 @@
                     @error('images')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
-<div class="form-group">
-  <label for="weight_gram">Berat (gram)</label>
-  <input type="number" min="0" step="1"
-         class="form-control" id="weight_gram" name="weight_gram"
-         value="{{ old('weight_gram', $product->weight_gram ?? 0) }}">
-</div>
+                    <div class="form-group">
+                        <label for="weight_gram">Berat (gram)</label>
+                        <input type="number" min="0" step="1" class="form-control" id="weight_gram"
+                            name="weight_gram" value="{{ old('weight_gram', $product->weight_gram ?? 0) }}">
+                    </div>
 
                     <div class="cols gap22">
                         <fieldset class="name">
@@ -197,11 +199,25 @@
 
                     <div class="cols gap22">
                         <fieldset class="name">
+                            <div class="body-title mb-10">Tanggal Kadaluarsa</div>
+                            <input class="mb-10" type="date" name="exp_date" tabindex="0"
+                                value="{{ old('exp_date') }}">
+                        </fieldset>
+                        @error('exp_date')
+                            <span class="alert alert-danger text-center">{{ $message }}</span>
+                        @enderror
+                        <fieldset></fieldset>
+                    </div>
+
+                    <div class="cols gap22">
+                        <fieldset class="name">
                             <div class="body-title mb-10">Stok</div>
                             <div class="select mb-10">
                                 <select name="stock_status">
-                                    <option value="instock" {{ old('stock_status') == 'instock' ? 'selected' : '' }}>Tersedia</option>
-                                    <option value="outofstock" {{ old('stock_status') == 'outofstock' ? 'selected' : '' }}>Stok Habis</option>
+                                    <option value="instock" {{ old('stock_status') == 'instock' ? 'selected' : '' }}>
+                                        Tersedia</option>
+                                    <option value="outofstock"
+                                        {{ old('stock_status') == 'outofstock' ? 'selected' : '' }}>Stok Habis</option>
                                 </select>
                             </div>
                         </fieldset>
@@ -226,8 +242,8 @@
                     </div>
                 </div>
             </form>
-            </div>
         </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -291,21 +307,24 @@
             // Mencegat event submit pada form
             $('#productForm').on('submit', function(e) {
                 let formIsValid = true;
-                
+
                 // Memeriksa setiap input, select, dan textarea yang wajib diisi
                 $(this).find('input[required], select[required], textarea[required]').each(function() {
-                    const fieldName = $(this).closest('fieldset').find('.body-title').text().trim().replace('*', '').trim();
+                    const fieldName = $(this).closest('fieldset').find('.body-title').text().trim()
+                        .replace('*', '').trim();
                     let errorMessage = '';
 
                     // Validasi untuk dropdown/select
                     if ($(this).is('select') && $(this).val() === "") {
-                        errorMessage = 'Anda harus memilih salah satu opsi untuk kolom "' + fieldName + '".';
+                        errorMessage = 'Anda harus memilih salah satu opsi untuk kolom "' +
+                            fieldName + '".';
                         formIsValid = false;
                     }
 
                     // Validasi untuk input file
                     if ($(this).is(':file') && $(this).get(0).files.length === 0) {
-                        errorMessage = 'Anda harus mengunggah gambar untuk kolom "' + fieldName + '".';
+                        errorMessage = 'Anda harus mengunggah gambar untuk kolom "' + fieldName +
+                            '".';
                         formIsValid = false;
                     }
 
@@ -331,7 +350,7 @@
                         formIsValid = false;
                     }
                 }
-                
+
                 // Mencegah form untuk submit jika tidak valid
                 if (!formIsValid) {
                     e.preventDefault();

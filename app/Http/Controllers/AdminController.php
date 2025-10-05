@@ -562,6 +562,7 @@ class AdminController extends BaseController
             'category_id' => 'required',
             'brand_id' => 'required',
             'weight_gram' => ['required', 'integer', 'min:0'],
+            'exp_date' => 'nullable|date',
         ]);
 
         $product = new Product();
@@ -577,6 +578,7 @@ class AdminController extends BaseController
         $product->quantity = $request->quantity;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
+        $product->exp_date = $request->exp_date; 
 
         $current_timestamp = Carbon::now()->timestamp;
 
@@ -653,6 +655,7 @@ class AdminController extends BaseController
             'category_id' => 'required',
             'brand_id' => 'required',
             'weight_gram' => ['required', 'integer', 'min:0'],
+            'exp_date' => 'nullable|date',
         ]);
 
         $product = Product::find($request->id);
@@ -668,6 +671,7 @@ class AdminController extends BaseController
         $product->quantity = $request->quantity;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
+        $product->exp_date = $request->exp_date;
 
         $current_timestamp = Carbon::now()->timestamp;
 

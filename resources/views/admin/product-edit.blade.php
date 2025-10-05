@@ -47,8 +47,8 @@
 
                     <fieldset class="name">
                         <div class="body-title mb-10">Link Produk <span class="tf-color-1">*</span></div>
-                        <input class="mb-10" type="text" placeholder="masukkan Link Produk " name="slug" tabindex="0"
-                            value="{{ $product->slug }}" aria-required="true" required="">
+                        <input class="mb-10" type="text" placeholder="masukkan Link Produk " name="slug"
+                            tabindex="0" value="{{ $product->slug }}" aria-required="true" required="">
                         <div class="text-tiny">Link produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('slug')
@@ -106,8 +106,7 @@
                     <fieldset class="description">
                         <div class="body-title mb-10">Deskripsi <span class="tf-color-1">*</span>
                         </div>
-                        <textarea class="mb-10" name="description" placeholder="Deskripsi" tabindex="0" aria-required="true"
-                            required="">{{ $product->description }}</textarea>
+                        <textarea class="mb-10" name="description" placeholder="Deskripsi" tabindex="0" aria-required="true" required="">{{ $product->description }}</textarea>
                         <div class="text-tiny">Deskripsi produk tidak boleh melebihi 100 karakter.</div>
                     </fieldset>
                     @error('description')
@@ -132,7 +131,7 @@
                                     </span>
                                     <<span class="body-text">Letakkan gambar di sini <span
                                             class="tf-color">cari</span></span>
-                                    <input type="file" id="myFile" name="image" accept="image/*">
+                                        <input type="file" id="myFile" name="image" accept="image/*">
                                 </label>
                             </div>
                         </div>
@@ -181,19 +180,18 @@
                     @error('images')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
                     @enderror
-<div class="form-group">
-  <label for="weight_gram">Berat (gram)</label>
-  <input type="number" min="0" step="1"
-         class="form-control" id="weight_gram" name="weight_gram"
-         value="{{ old('weight_gram', $product->weight_gram ?? 0) }}">
-</div>
+                    <div class="form-group">
+                        <label for="weight_gram">Berat (gram)</label>
+                        <input type="number" min="0" step="1" class="form-control" id="weight_gram"
+                            name="weight_gram" value="{{ old('weight_gram', $product->weight_gram ?? 0) }}">
+                    </div>
 
                     <div class="cols gap22">
                         <fieldset class="name">
                             <div class="body-title mb-10">Harga Jual <span class="tf-color-1">*</span></div>
-                            <input class="mb-10" type="text" placeholder="masukkan Harga standar" name="regular_price"
-                                tabindex="0" value="{{ $product->regular_price }}" aria-required="true"
-                                required="">
+                            <input class="mb-10" type="text" placeholder="masukkan Harga standar"
+                                name="regular_price" tabindex="0" value="{{ $product->regular_price }}"
+                                aria-required="true" required="">
                         </fieldset>
                         @error('regular_price')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
@@ -213,8 +211,8 @@
                         <fieldset class="name">
                             <div class="body-title mb-10">Kode Barang<span class="tf-color-1">*</span>
                             </div>
-                            <input class="mb-10" type="text" placeholder="Masukkan Kode Barang" name="SKU" tabindex="0"
-                                value="{{ $product->SKU }}" aria-required="true" required="">
+                            <input class="mb-10" type="text" placeholder="Masukkan Kode Barang" name="SKU"
+                                tabindex="0" value="{{ $product->SKU }}" aria-required="true" required="">
                         </fieldset>
                         @error('SKU')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
@@ -228,6 +226,18 @@
                         @error('quantity')
                             <span class="alert alert-danger text-center">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                    <div class="cols gap22">
+                        <fieldset class="name">
+                            <div class="body-title mb-10">Tanggal Kadaluarsa</div>
+                            <input class="mb-10" type="date" name="exp_date" tabindex="0"
+                                value="{{ $product->exp_date }}">
+                        </fieldset>
+                        @error('exp_date')
+                            <span class="alert alert-danger text-center">{{ $message }}</span>
+                        @enderror
+                        <fieldset></fieldset>
                     </div>
 
                     <div class="cols gap22">
@@ -314,7 +324,7 @@
             $('select[name="category_id"]').on('change', function() {
                 const categoryId = $(this).val();
                 const brandSelect = $('select[name="brand_id"]');
-                
+
                 // Simpan ID merek yang sedang dipilih (jika ada) untuk pembandingan
                 const currentSelectedBrandId = "{{ $product->brand_id }}";
 
@@ -327,20 +337,24 @@
                     $.ajax({
                         url: "{{ route('admin.get_brands_by_category') }}",
                         type: 'GET',
-                        data: { category_id: categoryId },
+                        data: {
+                            category_id: categoryId
+                        },
                         success: function(brands) {
                             if (brands.length > 0) {
                                 // Loop melalui data merek yang diterima dari server
                                 $.each(brands, function(key, brand) {
                                     // Buat tag <option> baru untuk setiap merek
-                                    let option = $(`<option value="${brand.id}">${brand.name}</option>`);
+                                    let option = $(
+                                        `<option value="${brand.id}">${brand.name}</option>`
+                                        );
 
                                     // Jika ID merek dari server sama dengan ID merek produk,
                                     // tandai sebagai 'selected'
-                                    if(brand.id == currentSelectedBrandId) {
+                                    if (brand.id == currentSelectedBrandId) {
                                         option.attr('selected', 'selected');
                                     }
-                                    
+
                                     brandSelect.append(option);
                                 });
                             }
