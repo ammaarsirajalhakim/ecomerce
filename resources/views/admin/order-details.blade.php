@@ -10,17 +10,9 @@
             <div class="flex items-center flex-wrap justify-between gap20 mb-27 page-header">
                 <h3>Detail Pesanan</h3>
                 <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
-                    <li>
-                        <a href="{{ route('admin.index') }}">
-                            <div class="text-tiny">Menu Utama</div>
-                        </a>
-                    </li>
-                    <li>
-                        <i class="icon-chevron-right"></i>
-                    </li>
-                    <li>
-                        <div class="text-tiny">Detail Pesanan</div>
-                    </li>
+                    <li><a href="{{ route('admin.index') }}"><div class="text-tiny">Menu Utama</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Detail Pesanan</div></li>
                 </ul>
             </div>
 
@@ -37,50 +29,45 @@
                     @endif
                     <table class="table table-striped table-bordered">
                         <tr>
-                            <th>No Pesanan</th>
-                            <td>{{ $order->id }}</td>
-                            <th>No Telepon</th>
-                            <td>{{ $order->phone }}</td>
-                            <th>Kode Pos</th>
-                            <td>{{ $order->zip }}</td>
+                            <th>No Pesanan</th><td>{{ $order->id }}</td>
+                            <th>No Telepon</th><td>{{ $order->phone }}</td>
+                            <th>Kode Pos</th><td>{{ $order->zip }}</td>
                         </tr>
                         <tr>
-                            <th>Tanggal Pemesanan</th>
-                            <td>{{ $order->created_at }}</td>
-                            <th>Tanggal Diantar</th>
-                            <td>{{ $order->delivered_date }}</td>
-                            <th>Tanggal Ditolak</th>
-                            <td>{{ $order->canceled_date }}</td>
+                            <th>Tanggal Pemesanan</th><td>{{ $order->created_at }}</td>
+                            <th>Tanggal Diantar</th><td>{{ $order->delivered_date }}</td>
+                            <th>Tanggal Ditolak</th><td>{{ $order->canceled_date }}</td>
                         </tr>
-
                         <tr>
-                            <th>Ongkos Kirim</th>
-                            <td>{{ $order->ongkir }}</td>
-                            <th>Jenis Pengiriman</th>
-                            <td>{{ $order->mode_pengiriman }}</td>
-                            <th>Tipe Pengiriman</th>
-                            <td>{{ $order->jenis_pengiriman }}</td>
+                            <th>Ongkos Kirim</th><td>{{ $order->ongkir }}</td>
+                            <th>Jenis Pengiriman</th><td>{{ $order->mode_pengiriman }}</td>
+                            <th>Tipe Pengiriman</th><td>{{ $order->jenis_pengiriman }}</td>
                         </tr>
                         <tr>
                             <th>Status Pesanan</th>
                             <td colspan="5">
+                                {{-- 👇👇👇 BAGIAN INI DIPERBARUI 👇👇👇 --}}
                                 @if ($order->status == 'delivered')
-                                    <span class="badge bg-success">Dikirim</span>
+                                    <span class="badge bg-success">Terkirim (Diterima)</span>
+                                @elseif($order->status == 'shipping')
+                                    <span class="badge bg-info">Dikirim</span>
                                 @elseif ($order->status == 'canceled')
                                     <span class="badge bg-danger">Ditolak</span>
                                 @else
                                     <span class="badge bg-warning">Dipesan</span>
                                 @endif
+                                {{-- 👆👆👆 AKHIR DARI BAGIAN YANG DIPERBARUI 👆👆👆 --}}
                             </td>
                         </tr>
                     </table>
                 </div>
             </div>
 
+            {{-- ... sisa kode untuk Daftar Pesanan & Alamat Pemesan tidak perlu diubah ... --}}
             <div class="wg-box mt-5">
                 <div class="flex items-center justify-between gap10 flex-wrap">
                     <div class="wg-filter flex-grow">
-                        <h5>Daftar Pesanan</h5>
+                        <h5>Daftar Item Pesanan</h5>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -101,14 +88,8 @@
                             @foreach ($orderItems as $item)
                                 <tr>
                                     <td class="pname">
-                                        <div class="image">
-                                            <img src="{{ asset('uploads/products/thumbnails') }}/{{ $item->product->image }}"
-                                                alt="" class="image">
-                                        </div>
-                                        <div class="name">
-                                            <a href="{{ route('shop.product.details', ['product_slug' => $item->product->slug]) }}"
-                                                target="_blank" class="body-title-2">{{ $item->product->name }}</a>
-                                        </div>
+                                        <div class="image"><img src="{{ asset('uploads/products/thumbnails') }}/{{ $item->product->image }}" alt="" class="image"></div>
+                                        <div class="name"><a href="{{ route('shop.product.details', ['product_slug' => $item->product->slug]) }}" target="_blank" class="body-title-2">{{ $item->product->name }}</a></div>
                                     </td>
                                     <td class="text-center">${{ $item->price }}</td>
                                     <td class="text-center">{{ $item->quantity }}</td>
@@ -122,13 +103,9 @@
                         </tbody>
                     </table>
                 </div>
-
                 <div class="divider"></div>
-                <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
-                    {{ $orderItems->links('pagination::bootstrap-5') }}
-                </div>
+                <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">{{ $orderItems->links('pagination::bootstrap-5') }}</div>
             </div>
-
             <div class="wg-box mt-5">
                 <h5>Alamat Pemesan</h5>
                 <div class="my-account__address-item col-md-6">
@@ -144,35 +121,29 @@
                     </div>
                 </div>
             </div>
-
             <div class="wg-box mt-5">
                 <h5>Transaksi</h5>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-transaction">
                         <tbody>
                             <tr>
-                                <th>Jumlah Sementara</th>
-                                <td>${{ $order->subtotal }}</td>
-                                <th>Pajak</th>
-                                <td>${{ $order->tax }}</td>
-                                <th>Diskon</th>
-                                <td>${{ $order->discount }}</td>
+                                <th>Jumlah Sementara</th><td>${{ $order->subtotal }}</td>
+                                <th>Pajak</th><td>${{ $order->tax }}</td>
+                                <th>Diskon</th><td>${{ $order->discount }}</td>
                             </tr>
                             <tr>
-                                <th>Jumlah</th>
-                                <td>${{ $order->total }}</td>
-                                <th>Metode Pembayaran</th>
-                                <td>{{ $order->transaction->mode }}</td>
+                                <th>Jumlah</th><td>${{ $order->total }}</td>
+                                <th>Metode Pembayaran</th><td>{{ $order->transaction->mode }}</td>
                                 <th>Status</th>
                                 <td>
                                     @if ($transaction->status == 'approved')
-                                        <span class="badge bg-success">Dikirim</span>
+                                        <span class="badge bg-success">Disetujui (Lunas)</span>
                                     @elseif ($transaction->status == 'declined')
-                                        <span class="badge bg-danger">Tolak</span>
+                                        <span class="badge bg-danger">Ditolak</span>
                                     @elseif ($transaction->status == 'refunded')
                                         <span class="badge bg-secondary">Dikembalikan</span>
                                     @else
-                                        <span class="badge bg-warning">Ditunda</span>
+                                        <span class="badge bg-warning">Tertunda</span>
                                     @endif
                                 </td>
                             </tr>
@@ -182,7 +153,7 @@
             </div>
 
             <div class="wg-box mt-5">
-                <h5>Perbarui Status Pemesanan</h5>
+                <h5>Perbarui Status Pesanan</h5>
                 <form action="{{ route('admin.order.status.update') }}" method="POST">
                     @csrf
                     @method('PUT')
@@ -191,12 +162,12 @@
                         <div class="col-md-3">
                             <div class="select">
                                 <select name="order_status" id="order_status">
-                                    <option value="ordered" {{ $order->status == 'ordered' ? 'selected' : '' }}>Dalam Pemesanan
-                                    </option>
-                                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>
-                                        Dikirim</option>
-                                    <option value="canceled" {{ $order->status == 'canceled' ? 'selected' : '' }}>Ditolak
-                                    </option>
+                                    {{-- 👇👇👇 BAGIAN INI DIPERBARUI 👇👇👇 --}}
+                                    <option value="ordered" {{ $order->status == 'ordered' ? 'selected' : '' }}>Dipesan</option>
+                                    <option value="shipping" {{ $order->status == 'shipping' ? 'selected' : '' }}>Dikirim</option>
+                                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Terkirim (Diterima)</option>
+                                    <option value="canceled" {{ $order->status == 'canceled' ? 'selected' : '' }}>Ditolak</option>
+                                    {{-- 👆👆👆 AKHIR DARI BAGIAN YANG DIPERBARUI 👆👆👆 --}}
                                 </select>
                             </div>
                         </div>

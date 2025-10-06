@@ -289,43 +289,59 @@ class AdminController extends BaseController
     public function index()
     {
         $orders = Order::orderBy('created_at', 'DESC')->get()->take(10);
-        $dashboardDatas = DB::select("Select sum(total) As TotalAmount,
-                                 sum(if(status='ordered', total,0)) As TotalOrderedAmount,
-                                 sum(if(status='delivered', total,0)) As TotalDeliveredAmount,
-                                 sum(if(status='canceled', total,0)) As TotalCanceledAmount,
-                                 Count(*) As Total,
-                                 sum(if(status='ordered', 1,0)) As TotalOrdered,
-                                 sum(if(status='delivered', 1,0)) As TotalDelivered,
-                                 sum(if(status='canceled', 1,0)) As TotalCanceled
-                                 From Orders
-                                 ");
 
+        // 👇👇👇 QUERY INI DIPERBARUI UNTUK MENAMBAHKAN STATUS 'SHIPPING' 👇👇👇
+        $dashboardDatas = DB::select("Select 
+            sum(total) As TotalAmount,
+            sum(if(status='ordered', total,0)) As TotalOrderedAmount,
+            sum(if(status='shipping', total,0)) As TotalShippingAmount,
+            sum(if(status='delivered', total,0)) As TotalDeliveredAmount,
+            sum(if(status='canceled', total,0)) As TotalCanceledAmount,
+            Count(*) As Total,
+            sum(if(status='ordered', 1,0)) As TotalOrdered,
+            sum(if(status='shipping', 1,0)) As TotalShipping,
+            sum(if(status='delivered', 1,0)) As TotalDelivered,
+            sum(if(status='canceled', 1,0)) As TotalCanceled
+            From Orders");
+
+        // 👇👇👇 QUERY INI JUGA DIPERBARUI 👇👇👇
         $monthlyDatas = DB::select("SELECT M.id As MonthNo, M.name As MonthName,
-                                 IFNULL(D.TotalAmount,0) As TotalAmount,
-                                 IFNULL(D.TotalOrderedAmount,0) As TotalOrderedAmount,
-                                 IFNULL(D.TotalDeliveredAmount,0) As TotalDeliveredAmount,
-                                 IFNULL(D.TotalCanceledAmount,0) As TotalCanceledAmount FROM month_names M
-                                 LEFT JOIN (Select DATE_FORMAT(created_at, '%b') As MonthName,
-                                 MONTH(created_at) As MonthNo,
-                                 sum(total) As TotalAmount,
-                                 sum(if(status='ordered',total,0)) As TotalOrderedAmount,
-                                 sum(if(status='delivered',total,0)) As TotalDeliveredAmount,
-                                 sum(if(status='canceled',total,0)) As TotalCanceledAmount
-                                 FROM Orders WHERE YEAR(created_at)=YEAR(NOW()) GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b')
-                                 Order By MONTH(created_at)) D On D.MonthNo=M.id
-                                 ");
+            IFNULL(D.TotalAmount,0) As TotalAmount,
+            IFNULL(D.TotalOrderedAmount,0) As TotalOrderedAmount,
+            IFNULL(D.TotalShippingAmount,0) As TotalShippingAmount,
+            IFNULL(D.TotalDeliveredAmount,0) As TotalDeliveredAmount,
+            IFNULL(D.TotalCanceledAmount,0) As TotalCanceledAmount 
+            FROM month_names M
+            LEFT JOIN (
+                Select 
+                    DATE_FORMAT(created_at, '%b') As MonthName,
+                    MONTH(created_at) As MonthNo,
+                    sum(total) As TotalAmount,
+                    sum(if(status='ordered',total,0)) As TotalOrderedAmount,
+                    sum(if(status='shipping',total,0)) As TotalShippingAmount,
+                    sum(if(status='delivered',total,0)) As TotalDeliveredAmount,
+                    sum(if(status='canceled',total,0)) As TotalCanceledAmount
+                FROM Orders WHERE YEAR(created_at)=YEAR(NOW()) 
+                GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b')
+                Order By MONTH(created_at)
+            ) D On D.MonthNo=M.id");
 
         $AmountM = implode(',', collect($monthlyDatas)->pluck('TotalAmount')->toArray());
         $OrderedAmountM = implode(',', collect($monthlyDatas)->pluck('TotalOrderedAmount')->toArray());
+        $ShippingAmountM = implode(',', collect($monthlyDatas)->pluck('TotalShippingAmount')->toArray()); // <-- BARU
         $DeliveredAmountM = implode(',', collect($monthlyDatas)->pluck('TotalDeliveredAmount')->toArray());
         $CanceledAmountM = implode(',', collect($monthlyDatas)->pluck('TotalCanceledAmount')->toArray());
 
         $TotalAmount = collect($monthlyDatas)->sum('TotalAmount');
         $TotalOrderedAmount = collect($monthlyDatas)->sum('TotalOrderedAmount');
+        $TotalShippingAmount = collect($monthlyDatas)->sum('TotalShippingAmount'); // <-- BARU
         $TotalDeliveredAmount = collect($monthlyDatas)->sum('TotalDeliveredAmount');
         $TotalCanceledAmount = collect($monthlyDatas)->sum('TotalCanceledAmount');
 
-        return view('admin.index', compact('orders', 'dashboardDatas', 'AmountM', 'OrderedAmountM', 'DeliveredAmountM', 'CanceledAmountM', 'TotalAmount', 'TotalOrderedAmount', 'TotalDeliveredAmount', 'TotalCanceledAmount'));
+        return view('admin.index', compact(
+            'orders', 'dashboardDatas', 'AmountM', 'OrderedAmountM', 'ShippingAmountM', 'DeliveredAmountM', 'CanceledAmountM', 
+            'TotalAmount', 'TotalOrderedAmount', 'TotalShippingAmount', 'TotalDeliveredAmount', 'TotalCanceledAmount'
+        ));
     }
 
     public function brands()
@@ -836,25 +852,54 @@ class AdminController extends BaseController
         return view('admin.orders', compact('orders'));
     }
 
-  public function orderReport()
+    public function orderReport()
     {
-        // Query BARU: Mulai dari tabel produk dan LEFT JOIN ke data penjualan
+        // KEMBALIKAN KE QUERY LENGKAP: agar data notifikasi di header tetap ada
+        $dashboardDatas = DB::select("Select sum(total) As TotalAmount,
+                                 sum(if(status='ordered', total,0)) As TotalOrderedAmount,
+                                 sum(if(status='delivered', total,0)) As TotalDeliveredAmount,
+                                 sum(if(status='canceled', total,0)) As TotalCanceledAmount,
+                                 Count(*) As Total,
+                                 sum(if(status='ordered', 1,0)) As TotalOrdered,
+                                 sum(if(status='delivered', 1,0)) As TotalDelivered,
+                                 sum(if(status='canceled', 1,0)) As TotalCanceled
+                                 From Orders
+                                 ");
+
+        // Data untuk pendapatan per bulan di tahun ini
+        $monthlyDatas = DB::table('orders')
+            ->select(
+                DB::raw('MONTH(created_at) as month_num'),
+                DB::raw('DATE_FORMAT(created_at, "%M") as month_name'),
+                DB::raw('SUM(CASE WHEN status = "delivered" THEN total ELSE 0 END) as monthly_revenue')
+            )
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month_num', 'month_name')
+            ->orderBy('month_num', 'asc')
+            ->get();
+
+
+        // Data untuk tabel produk terlaris
         $bestSellingProducts = DB::table('products')
             ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
             ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
             ->select(
                 'products.SKU',
                 'products.name',
-                // Hitung jumlah hanya jika status order 'delivered', jika tidak, anggap 0.
-                // COALESCE digunakan untuk mengubah hasil NULL (produk yg tak pernah diorder) menjadi 0.
+                'products.exp_date',
                 DB::raw('COALESCE(SUM(CASE WHEN orders.status = "delivered" THEN order_items.quantity ELSE 0 END), 0) as total_quantity_sold')
             )
-            ->groupBy('products.id', 'products.SKU', 'products.name')
-            ->orderByDesc('total_quantity_sold') // Urutkan dari Terlaris
-            ->orderBy('products.name', 'asc')     // Urutkan berdasarkan nama untuk produk yg penjualannya 0
+            ->groupBy('products.id', 'products.SKU', 'products.name', 'products.exp_date')
+            ->orderByDesc('total_quantity_sold')
+            ->orderBy('products.name', 'asc')
             ->paginate(20);
 
-        return view('admin.orders.report', compact('bestSellingProducts'));
+        // Kirim semua data yang dibutuhkan ke view
+        return view('admin.orders.report', compact(
+            'bestSellingProducts',
+            'dashboardDatas',
+            'monthlyDatas'
+        ));
     }
 
     public function exportExcel()
@@ -862,24 +907,49 @@ class AdminController extends BaseController
         return Excel::download(new ProductsReportExport, 'laporan-produk-terlaris.xlsx');
     }
 
-    public function exportPdf()
+   public function exportPdf()
     {
-        // Gunakan Query BARU yang sama untuk PDF
+        // KEMBALIKAN KE QUERY LENGKAP: agar konsisten
+        $dashboardDatas = DB::select("Select sum(total) As TotalAmount,
+                                 sum(if(status='ordered', total,0)) As TotalOrderedAmount,
+                                 sum(if(status='delivered', total,0)) As TotalDeliveredAmount,
+                                 sum(if(status='canceled', total,0)) As TotalCanceledAmount,
+                                 Count(*) As Total,
+                                 sum(if(status='ordered', 1,0)) As TotalOrdered,
+                                 sum(if(status='delivered', 1,0)) As TotalDelivered,
+                                 sum(if(status='canceled', 1,0)) As TotalCanceled
+                                 From Orders
+                                 ");
+        
+        // Data untuk pendapatan per bulan di tahun ini
+        $monthlyDatas = DB::table('orders')
+            ->select(
+                DB::raw('MONTH(created_at) as month_num'),
+                DB::raw('DATE_FORMAT(created_at, "%M") as month_name'),
+                DB::raw('SUM(CASE WHEN status = "delivered" THEN total ELSE 0 END) as monthly_revenue')
+            )
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month_num', 'month_name')
+            ->orderBy('month_num', 'asc')
+            ->get();
+            
+        // Data untuk tabel produk terlaris
         $bestSellingProducts = DB::table('products')
             ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
             ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
             ->select(
                 'products.SKU',
                 'products.name',
+                'products.exp_date',
                 DB::raw('COALESCE(SUM(CASE WHEN orders.status = "delivered" THEN order_items.quantity ELSE 0 END), 0) as total_quantity_sold')
             )
-            ->groupBy('products.id', 'products.SKU', 'products.name')
+            ->groupBy('products.id', 'products.SKU', 'products.name', 'products.exp_date')
             ->orderByDesc('total_quantity_sold')
             ->orderBy('products.name', 'asc')
-            ->get(); // Gunakan get() untuk ekspor, bukan paginate()
+            ->get();
 
-        $pdf = Pdf::loadView('admin.orders.report_pdf', compact('bestSellingProducts'));
-        return $pdf->download('laporan-produk-terlaris.pdf');
+        $pdf = Pdf::loadView('admin.orders.report_pdf', compact('bestSellingProducts', 'dashboardDatas', 'monthlyDatas'));
+        return $pdf->download('laporan-penjualan.pdf');
     }
 
     public function order_details($order_id)

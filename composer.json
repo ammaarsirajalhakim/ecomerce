@@ -7,15 +7,16 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "doctrine/dbal": "^4.3",
         "google/recaptcha": "^1.3",
         "intervention/image-laravel": "^1.2",
         "laravel/framework": "^11.0",
         "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
+        "maatwebsite/excel": "^3.1",
         "midtrans/midtrans-php": "^2.6",
-        "surfsidemedia/shoppingcart": "^2.0",
-        "maatwebsite/excel": "^3.1"
+        "surfsidemedia/shoppingcart": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6",

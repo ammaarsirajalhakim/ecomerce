@@ -43,13 +43,11 @@
                                     <th style="width:70px">No Pesanan</th>
                                     <th class="text-center">Nama</th>
                                     <th class="text-center">No Telepon</th>
-                                    <th class="text-center">Total Sementara</th>
-                                    <th class="text-center">Pajak</th>
                                     <th class="text-center">Total</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Tanggal Pemesanan</th>
                                     <th class="text-center">Total Barang</th>
-                                    <th class="text-center">Tgl Pengiriman</th>
+                                    <th class="text-center">Tgl Diterima</th>
                                     <th class="text-center">Detail</th>
                                 </tr>
                             </thead>
@@ -59,17 +57,19 @@
                                         <td class="text-center">{{ $order->id }}</td>
                                         <td class="text-center">{{ $order->name }}</td>
                                         <td class="text-center">{{ $order->phone }}</td>
-                                        <td class="text-center">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</td>
-                                        <td class="text-center">Rp {{ number_format($order->tax, 0, ',', '.') }}</td>
                                         <td class="text-center">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                                         <td class="text-center">
+                                            {{-- 👇👇👇 LOGIKA STATUS YANG DIPERBARUI 👇👇👇 --}}
                                             @if ($order->status == 'delivered')
-                                                <span class="badge bg-success">Dikirim</span>
+                                                <span class="badge bg-success">Terkirim (Diterima)</span>
+                                            @elseif($order->status == 'shipping')
+                                                <span class="badge bg-info">Dikirim</span>
                                             @elseif ($order->status == 'canceled')
                                                 <span class="badge bg-danger">Ditolak</span>
                                             @else
-                                                <span class="badge bg-warning">Dalam Pemesanan</span>
+                                                <span class="badge bg-warning">Dipesan</span>
                                             @endif
+                                            {{-- 👆👆👆 AKHIR DARI PERUBAHAN 👆👆👆 --}}
                                         </td>
                                         <td class="text-center">
                                             {{ \Carbon\Carbon::parse($order->created_at)->format('d F Y') }}</td>
@@ -102,6 +102,7 @@
 @endsection
 
 @push('scripts')
+    {{-- (Script live search Anda tidak perlu diubah dan akan tetap berfungsi) --}}
     <script>
         $(document).ready(function() {
             // Mencegah form pencarian melakukan submit dan refresh halaman
@@ -138,14 +139,13 @@
                                 // Logic untuk status badge
                                 var statusBadge = '';
                                 if (order.status == 'delivered') {
-                                    statusBadge =
-                                        '<span class="badge bg-success">Dikirim</span>';
+                                    statusBadge = '<span class="badge bg-success">Selesai (Diterima)</span>';
+                                } else if (order.status == 'shipping') {
+                                    statusBadge = '<span class="badge bg-info">Dikirim</span>';
                                 } else if (order.status == 'canceled') {
-                                    statusBadge =
-                                        '<span class="badge bg-danger">Ditolak</span>';
+                                    statusBadge = '<span class="badge bg-danger">Ditolak</span>';
                                 } else {
-                                    statusBadge =
-                                        '<span class="badge bg-warning">Dalam Pemesanan</span>';
+                                    statusBadge = '<span class="badge bg-warning">Dipesan</span>';
                                 }
 
                                 // Formatting tanggal
@@ -164,24 +164,20 @@
                                     }) : '-';
 
                                 // Formatting mata uang
-                                var subtotal = 'Rp ' + new Intl.NumberFormat('id-ID')
-                                    .format(order.subtotal);
-                                var tax = 'Rp ' + new Intl.NumberFormat('id-ID').format(
-                                    order.tax);
                                 var total = 'Rp ' + new Intl.NumberFormat('id-ID')
                                     .format(order.total);
+                                
+                                var itemCount = order.order_items ? order.order_items.length : 0;
 
                                 var row = `
                                     <tr>
                                         <td class="text-center">${order.id}</td>
                                         <td class="text-center">${order.name}</td>
                                         <td class="text-center">${order.phone}</td>
-                                        <td class="text-center">${subtotal}</td>
-                                        <td class="text-center">${tax}</td>
                                         <td class="text-center">${total}</td>
                                         <td class="text-center">${statusBadge}</td>
                                         <td class="text-center">${orderDate}</td>
-                                        <td class="text-center">${order.order_items.length}</td>
+                                        <td class="text-center">${itemCount}</td>
                                         <td class="text-center">${deliveredDate}</td>
                                         <td class="text-center">
                                             <a href="${detailUrl}">
@@ -197,7 +193,7 @@
                         } else {
                             orderTableBody.append(
                                 '<tr><td colspan="11" class="text-center">Pesanan tidak ditemukan.</td></tr>'
-                                );
+                            );
                         }
                     }
                 });
