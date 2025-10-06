@@ -53,6 +53,7 @@
                                 <th>Unggulan</th>
                                 <th>Stok</th>
                                 <th>Jumlah</th>
+                                <th>Kadaluarsa</th>
                                 <th>Opsi</th>
                             </tr>
                         </thead>
@@ -78,6 +79,7 @@
                                     <td>{{ $product->featured == 0 ? 'Tidak' : 'Ya' }}</td>
                                     <td>{{ $product->stock_status }}</td>
                                     <td>{{ $product->quantity }}</td>
+                                    <td>{{ $product->exp_date ? \Carbon\Carbon::parse($product->exp_date)->format('d M Y') : 'N/A' }}</td>
                                     <td>
                                         <div class="list-icon-function">
                                             <a href="{{ route('admin.product.edit', ['id' => $product->id]) }}">
@@ -178,6 +180,7 @@
                                         <td>${featured}</td>
                                         <td>${product.stock_status}</td>
                                         <td>${product.quantity}</td>
+                                        <td>${expDate}</td>
                                         <td>
                                             <div class="list-icon-function">
                                                 <a href="#" target="_blank">
